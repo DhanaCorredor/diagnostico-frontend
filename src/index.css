@@ -1,9 +1,1 @@
-/* Estilos globales base. En la tarea #8 se añadirá Tailwind CSS. */
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
-}
+@import "tailwindcss";
