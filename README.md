@@ -1,16 +1,56 @@
-# React + Vite
+# 🩺 Diagnóstico — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Single-page app for the **Diagnóstico** health center's appointment-management ERP.
+Built with **React + Vite** and styled with **Tailwind CSS**. It consumes the REST API
+served by the backend (separate repo: [`diagnostico-backend`](../diagnostico-backend))
+over HTTP/JSON, authenticated with a JWT bearer token.
 
-Currently, two official plugins are available:
+> Bootcamp final project — MVP. The frontend is used only by the center's staff
+> (administration, reception and doctors). Project documentation lives in the backend
+> repo, under `docs/` (in Spanish).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🧱 Tech stack
 
-## React Compiler
+| Layer | Technology |
+|-------|-----------|
+| Framework | **React 19** |
+| Build tool | **Vite** |
+| Styling | **Tailwind CSS v4** |
+| Language | **JavaScript** (no TypeScript) |
+| Linter | **Oxlint** |
+| Package manager | **pnpm** |
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🚀 Getting started
 
-## Expanding the Oxlint configuration
+> Requirements: Node.js 20+ and pnpm. The backend must be running separately
+> (see [`diagnostico-backend`](../diagnostico-backend)).
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+```bash
+pnpm install     # install dependencies
+pnpm dev         # start the dev server → http://localhost:5173
+```
+
+## 📜 Scripts
+
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start the Vite dev server (with HMR) |
+| `pnpm build` | Build for production into `dist/` |
+| `pnpm preview` | Preview the production build locally |
+| `pnpm lint` | Run Oxlint over the source |
+
+## 📂 Project structure
+
+```
+├── index.html          # HTML entry point
+├── src/
+│   ├── main.jsx        # React entry point (mounts <App />)
+│   ├── App.jsx         # root component (base layout)
+│   └── index.css       # Tailwind entry
+├── public/             # static assets served as-is
+└── vite.config.js      # Vite + React + Tailwind config
+```
+
+## 🔗 Related
+
+- **Backend:** [`diagnostico-backend`](../diagnostico-backend) — FastAPI + PostgreSQL API and project docs.
