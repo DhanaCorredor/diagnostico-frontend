@@ -44,15 +44,7 @@ export default function LoginPage() {
         onSubmit={onSubmit}
         className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-xl ring-1 ring-line"
       >
-        <div className="mb-6 flex items-center gap-3">
-          <div className="grid h-11 w-11 place-items-center rounded-xl bg-brand text-lg font-bold text-white">
-            D
-          </div>
-          <div>
-            <p className="text-lg font-semibold leading-tight">Diagnóstico</p>
-            <p className="text-xs text-ink-muted">Centro de Salud · Gestión de Citas</p>
-          </div>
-        </div>
+        <img src="/logo.png" alt="Diagnóstico · Centro de Salud" className="mb-6 h-14 w-auto" />
 
         <h1 className="mb-1 text-xl font-semibold">Iniciar sesión</h1>
         <p className="mb-6 text-sm text-ink-2">Acceso solo para personal autorizado.</p>

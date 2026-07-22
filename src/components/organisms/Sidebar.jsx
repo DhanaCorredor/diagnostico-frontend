@@ -56,9 +56,7 @@ export default function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 flex w-60 flex-col border-r border-line bg-white">
       <div className="flex items-center gap-3 px-5 py-5">
-        <div className="grid h-9 w-9 place-items-center rounded-lg bg-brand font-bold text-white">
-          D
-        </div>
+        <img src="/isotipo.jpg" alt="Diagnóstico" className="h-9 w-9 object-contain" />
         <div>
           <p className="text-sm font-semibold leading-tight">Diagnóstico</p>
           <p className="text-[11px] text-ink-muted">Gestión de Citas</p>
