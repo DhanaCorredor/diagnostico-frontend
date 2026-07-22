@@ -2,6 +2,7 @@
 //
 // - Filas: médicos (filtrables). Columnas: horas del día (07–17).
 // - Las citas aparecen como "chips" en la celda de su médico y su hora.
+// - Al pulsar una cita se abre su detalle (con acciones para ADMIN/RECEPCIÓN).
 // - Las horas fuera de la disponibilidad del médico se grisan (bloqueadas).
 // - Un MÉDICO solo ve su propia agenda (el backend ya se lo filtra).
 
@@ -10,6 +11,7 @@ import { api } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 import { diaSemana, fechaLargaDesdeISO, formatHora, hoyISO, sumarDias } from '../utils/fecha'
 import { indexarPor } from '../utils/datos'
+import DetalleCita from '../components/DetalleCita'
 
 // Horas visibles (el centro atiende 07:30–17:30).
 const HORAS = Array.from({ length: 11 }, (_, i) => 7 + i) // 7..17
@@ -46,52 +48,56 @@ export default function AgendaPage() {
   const [filtroMedico, setFiltroMedico] = useState('todos')
   const [citas, setCitas] = useState([])
   const [medicos, setMedicos] = useState([])
-  const [servicios, setServicios] = useState({})
-  const [pacientes, setPacientes] = useState({})
+  const [servicios, setServicios] = useState([]) // lista (para el selector de edición)
+  const [pacientes, setPacientes] = useState({}) // mapa id -> nombre
   const [dispPorMedico, setDispPorMedico] = useState({})
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
+  const [citaSel, setCitaSel] = useState(null)
 
-  const puedeVerPacientes = user.rol === 'ADMIN' || user.rol === 'RECEPCION'
+  const puedeGestionar = user.rol === 'ADMIN' || user.rol === 'RECEPCION'
+
+  async function cargar() {
+    setCargando(true)
+    setError('')
+    try {
+      const [citasDia, listaMedicos, listaServicios, listaPacientes] = await Promise.all([
+        api.get(`/citas?fecha=${fecha}`),
+        api.get('/medicos'),
+        api.get('/servicios'),
+        puedeGestionar ? api.get('/pacientes') : Promise.resolve([]),
+      ])
+      const franjas = await Promise.all(
+        listaMedicos.map((m) => api.get(`/disponibilidad?medico_id=${m.id}`)),
+      )
+      const dispMapa = {}
+      listaMedicos.forEach((m, i) => {
+        dispMapa[m.id] = franjas[i]
+      })
+
+      setCitas(citasDia)
+      setMedicos(listaMedicos)
+      setServicios(listaServicios)
+      setPacientes(indexarPor(listaPacientes, 'nombre_completo'))
+      setDispPorMedico(dispMapa)
+    } catch {
+      setError('No se pudo cargar la agenda.')
+    } finally {
+      setCargando(false)
+    }
+  }
 
   useEffect(() => {
-    async function cargar() {
-      setCargando(true)
-      setError('')
-      try {
-        const [citasDia, listaMedicos, listaServicios, listaPacientes] = await Promise.all([
-          api.get(`/citas?fecha=${fecha}`),
-          api.get('/medicos'),
-          api.get('/servicios'),
-          puedeVerPacientes ? api.get('/pacientes') : Promise.resolve([]),
-        ])
-        const franjas = await Promise.all(
-          listaMedicos.map((m) => api.get(`/disponibilidad?medico_id=${m.id}`)),
-        )
-        const dispMapa = {}
-        listaMedicos.forEach((m, i) => {
-          dispMapa[m.id] = franjas[i]
-        })
-
-        setCitas(citasDia)
-        setMedicos(listaMedicos)
-        setServicios(indexarPor(listaServicios, 'nombre'))
-        setPacientes(indexarPor(listaPacientes, 'nombre_completo'))
-        setDispPorMedico(dispMapa)
-      } catch {
-        setError('No se pudo cargar la agenda.')
-      } finally {
-        setCargando(false)
-      }
-    }
     cargar()
-  }, [fecha, puedeVerPacientes])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fecha, puedeGestionar])
 
   const dia = diaSemana(fecha)
+  const serviciosMap = indexarPor(servicios, 'nombre')
   const medicosVisibles =
     filtroMedico === 'todos' ? medicos : medicos.filter((m) => m.id === filtroMedico)
 
-  // Citas de un médico en una hora concreta (ignora canceladas visualmente).
+  // Citas de un médico en una hora concreta.
   function citasDe(medicoId, h) {
     return citas.filter(
       (c) => c.medico_id === medicoId && new Date(c.starts_at).getHours() === h,
@@ -169,8 +175,9 @@ export default function AgendaPage() {
                 dia={dia}
                 franjas={dispPorMedico[m.id] ?? []}
                 citasDe={citasDe}
-                servicios={servicios}
+                serviciosMap={serviciosMap}
                 pacientes={pacientes}
+                onSeleccionar={setCitaSel}
               />
             ))}
           </div>
@@ -178,14 +185,29 @@ export default function AgendaPage() {
       )}
 
       <p className="mt-2 text-[11px] text-ink-muted">
-        Las celdas grises quedan fuera del horario del médico ese día.
+        Pulsa una cita para ver el detalle. Las celdas grises quedan fuera del horario del médico.
       </p>
+
+      {citaSel && (
+        <DetalleCita
+          cita={citaSel}
+          nombrePaciente={pacientes[citaSel.paciente_id]}
+          medicos={medicos}
+          servicios={servicios}
+          puedeGestionar={puedeGestionar}
+          onCerrar={() => setCitaSel(null)}
+          onActualizada={() => {
+            setCitaSel(null)
+            cargar()
+          }}
+        />
+      )}
     </div>
   )
 }
 
 // Una fila del calendario (un médico y sus 11 celdas de hora).
-function FilaMedico({ medico, dia, franjas, citasDe, servicios, pacientes }) {
+function FilaMedico({ medico, dia, franjas, citasDe, serviciosMap, pacientes, onSeleccionar }) {
   return (
     <>
       <div className="sticky left-0 z-10 bg-white px-3 py-2 shadow-[1px_0_0_var(--color-line)]">
@@ -203,19 +225,20 @@ function FilaMedico({ medico, dia, franjas, citasDe, servicios, pacientes }) {
             className={`min-h-[46px] space-y-1 p-1 ${disponible ? 'bg-white' : 'bg-surface-plane'}`}
           >
             {enHora.map((c) => (
-              <span
+              <button
                 key={c.id}
-                title={`${formatHora(c.starts_at)} · ${servicios[c.servicio_id] ?? ''}`}
-                className={`block rounded px-1.5 py-1 text-[11px] leading-tight ${
+                onClick={() => onSeleccionar(c)}
+                title={`${formatHora(c.starts_at)} · ${serviciosMap[c.servicio_id] ?? ''}`}
+                className={`block w-full rounded px-1.5 py-1 text-left text-[11px] leading-tight hover:brightness-95 ${
                   CHIP[c.estado] ?? 'bg-brand-light text-brand-dark'
                 }`}
               >
                 <span className="tnum font-medium">{formatHora(c.starts_at)}</span>{' '}
                 {pacientes[c.paciente_id] ? nombreCorto(pacientes[c.paciente_id]) : ''}
                 <span className="block text-[10px] opacity-80">
-                  {servicios[c.servicio_id] ?? ''}
+                  {serviciosMap[c.servicio_id] ?? ''}
                 </span>
-              </span>
+              </button>
             ))}
           </div>
         )

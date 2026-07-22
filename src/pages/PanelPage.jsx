@@ -2,11 +2,13 @@
 //
 // Pide al backend las citas de hoy y los catálogos (médicos, servicios y, si el
 // rol lo permite, pacientes) para poder mostrar nombres en vez de identificadores.
+// Al pulsar una cita se abre su detalle (con acciones para ADMIN/RECEPCIÓN).
 
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 import EstadoBadge from '../components/EstadoBadge'
+import DetalleCita from '../components/DetalleCita'
 import { formatHora, hoyISO } from '../utils/fecha'
 import { indexarPor } from '../utils/datos'
 
@@ -32,39 +34,43 @@ function Kpi({ titulo, valor, nota }) {
 export default function PanelPage() {
   const { user } = useAuth()
   const [citas, setCitas] = useState([])
-  const [medicos, setMedicos] = useState({})
-  const [servicios, setServicios] = useState({})
-  const [pacientes, setPacientes] = useState({})
+  const [medicos, setMedicos] = useState([]) // listas (para el detalle de cita)
+  const [servicios, setServicios] = useState([])
+  const [pacientes, setPacientes] = useState({}) // mapa id -> nombre
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
+  const [citaSel, setCitaSel] = useState(null)
 
-  const puedeVerPacientes = user.rol === 'ADMIN' || user.rol === 'RECEPCION'
+  const puedeGestionar = user.rol === 'ADMIN' || user.rol === 'RECEPCION'
+
+  async function cargar() {
+    setCargando(true)
+    setError('')
+    try {
+      const [citasHoy, listaMedicos, listaServicios, listaPacientes] = await Promise.all([
+        api.get(`/citas?fecha=${hoyISO()}`),
+        api.get('/medicos'),
+        api.get('/servicios'),
+        puedeGestionar ? api.get('/pacientes') : Promise.resolve([]),
+      ])
+      setCitas(citasHoy)
+      setMedicos(listaMedicos)
+      setServicios(listaServicios)
+      setPacientes(indexarPor(listaPacientes, 'nombre_completo'))
+    } catch {
+      setError('No se pudieron cargar los datos del panel.')
+    } finally {
+      setCargando(false)
+    }
+  }
 
   useEffect(() => {
-    async function cargar() {
-      setCargando(true)
-      setError('')
-      try {
-        // Lanzamos las peticiones en paralelo (más rápido que una tras otra).
-        const [citasHoy, listaMedicos, listaServicios, listaPacientes] = await Promise.all([
-          api.get(`/citas?fecha=${hoyISO()}`),
-          api.get('/medicos'),
-          api.get('/servicios'),
-          puedeVerPacientes ? api.get('/pacientes') : Promise.resolve([]),
-        ])
-        setCitas(citasHoy)
-        setMedicos(indexarPor(listaMedicos, 'nombre_completo'))
-        setServicios(indexarPor(listaServicios, 'nombre'))
-        setPacientes(indexarPor(listaPacientes, 'nombre_completo'))
-      } catch {
-        setError('No se pudieron cargar los datos del panel.')
-      } finally {
-        setCargando(false)
-      }
-    }
     cargar()
-  }, [puedeVerPacientes])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [puedeGestionar])
 
+  const medicosMap = indexarPor(medicos, 'nombre_completo')
+  const serviciosMap = indexarPor(servicios, 'nombre')
   const confirmadas = citas.filter((c) => c.estado === 'CONFIRMED').length
   const pendientes = citas.filter((c) => c.estado === 'SCHEDULED').length
   const ordenadas = [...citas].sort((a, b) => a.starts_at.localeCompare(b.starts_at))
@@ -97,7 +103,11 @@ export default function PanelPage() {
         ) : (
           <div className="divide-y divide-line">
             {ordenadas.map((c) => (
-              <div key={c.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-surface-plane">
+              <button
+                key={c.id}
+                onClick={() => setCitaSel(c)}
+                className="flex w-full items-center gap-4 px-5 py-3.5 text-left hover:bg-surface-plane"
+              >
                 <span className="tnum w-14 text-sm font-medium text-ink-2">
                   {formatHora(c.starts_at)}
                 </span>
@@ -107,15 +117,30 @@ export default function PanelPage() {
                     {pacientes[c.paciente_id] ?? c.motivo ?? 'Paciente'}
                   </p>
                   <p className="text-xs text-ink-muted">
-                    {medicos[c.medico_id] ?? 'Médico'} · {servicios[c.servicio_id] ?? 'Servicio'}
+                    {medicosMap[c.medico_id] ?? 'Médico'} · {serviciosMap[c.servicio_id] ?? 'Servicio'}
                   </p>
                 </div>
                 <EstadoBadge estado={c.estado} />
-              </div>
+              </button>
             ))}
           </div>
         )}
       </div>
+
+      {citaSel && (
+        <DetalleCita
+          cita={citaSel}
+          nombrePaciente={pacientes[citaSel.paciente_id]}
+          medicos={medicos}
+          servicios={servicios}
+          puedeGestionar={puedeGestionar}
+          onCerrar={() => setCitaSel(null)}
+          onActualizada={() => {
+            setCitaSel(null)
+            cargar()
+          }}
+        />
+      )}
     </div>
   )
 }
