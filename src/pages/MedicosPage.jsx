@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { api } from '../api/client'
 import TarjetaMedico from '../components/TarjetaMedico'
 import Spinner from '../components/atoms/Spinner'
+import Alerta from '../components/atoms/Alerta'
 
 export default function MedicosPage() {
   const [medicos, setMedicos] = useState([])
@@ -34,7 +35,7 @@ export default function MedicosPage() {
   }, [])
 
   if (cargando) return <Spinner />
-  if (error) return <p className="rounded-lg bg-crit/10 px-4 py-3 text-crit">{error}</p>
+  if (error) return <Alerta>{error}</Alerta>
 
   return (
     <div className="space-y-4">

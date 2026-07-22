@@ -5,6 +5,7 @@ import Campo from './Campo'
 import Input from './atoms/Input'
 import Select from './atoms/Select'
 import Boton from './atoms/Boton'
+import Alerta from './atoms/Alerta'
 
 const ROLES = [
   { valor: 'ADMIN', etiqueta: 'Administrador' },
@@ -87,7 +88,7 @@ export default function FormularioUsuario({ usuario, especialidades, onCerrar, o
       footer={footer}
     >
       <form id="form-usuario" onSubmit={onSubmit} className="space-y-4">
-        {error && <p className="rounded-lg bg-crit/10 px-3 py-2 text-sm text-crit">{error}</p>}
+        {error && <Alerta>{error}</Alerta>}
 
         <Campo label="Nombre completo">
           <Input

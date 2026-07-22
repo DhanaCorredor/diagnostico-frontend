@@ -6,6 +6,7 @@ import Campo from '../components/Campo'
 import Input from '../components/atoms/Input'
 import Select from '../components/atoms/Select'
 import Boton from '../components/atoms/Boton'
+import Tarjeta from '../components/atoms/Tarjeta'
 
 const DURACIONES = [15, 30, 45, 60, 90]
 
@@ -83,7 +84,7 @@ export default function NuevaCitaPage() {
 
   return (
     <div className="mx-auto max-w-xl">
-      <div className="rounded-xl border border-line bg-white">
+      <Tarjeta>
         <div className="border-b border-line px-6 py-4">
           <h2 className="text-lg font-semibold">Nueva cita</h2>
           <p className="text-xs text-ink-muted">
@@ -216,7 +217,7 @@ export default function NuevaCitaPage() {
             </Boton>
           </div>
         </form>
-      </div>
+      </Tarjeta>
     </div>
   )
 }

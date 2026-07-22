@@ -7,6 +7,9 @@ import { formatFechaCorta, formatHora } from '../utils/fecha'
 import { indexarPor } from '../utils/datos'
 import Avatar from '../components/atoms/Avatar'
 import Spinner from '../components/atoms/Spinner'
+import Alerta from '../components/atoms/Alerta'
+import Tarjeta from '../components/atoms/Tarjeta'
+import Boton from '../components/atoms/Boton'
 
 function Dato({ etiqueta, valor }) {
   return (
@@ -54,7 +57,7 @@ export default function FichaPacientePage() {
   }, [cargar])
 
   if (cargando) return <Spinner />
-  if (error) return <p className="rounded-lg bg-crit/10 px-4 py-3 text-crit">{error}</p>
+  if (error) return <Alerta>{error}</Alerta>
   if (!paciente) return null
 
   return (
@@ -66,7 +69,7 @@ export default function FichaPacientePage() {
         Volver a Pacientes
       </Link>
 
-      <div className="mb-6 rounded-xl border border-line bg-white p-5">
+      <Tarjeta className="mb-6 p-5">
         <div className="flex flex-wrap items-center gap-4">
           <Avatar nombre={paciente.nombre_completo} tamano="lg" />
           <div className="flex-1">
@@ -76,14 +79,11 @@ export default function FichaPacientePage() {
               {paciente.edad != null && ` · ${paciente.edad} años`}
             </p>
           </div>
-          <button
-            onClick={() => setEditando(true)}
-            className="rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-surface-plane"
-          >
+          <Boton variante="secundario" onClick={() => setEditando(true)}>
             Editar
-          </button>
+          </Boton>
         </div>
-      </div>
+      </Tarjeta>
 
       <div className="mb-4 flex gap-1 border-b border-line text-sm">
         <button
@@ -110,7 +110,7 @@ export default function FichaPacientePage() {
 
       {tab === 'datos' && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="rounded-xl border border-line bg-white p-5">
+          <Tarjeta className="p-5">
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-muted">
               Identificación
             </h3>
@@ -122,20 +122,20 @@ export default function FichaPacientePage() {
               />
               <Dato etiqueta="Edad" valor={paciente.edad != null ? `${paciente.edad} años` : null} />
             </dl>
-          </div>
-          <div className="rounded-xl border border-line bg-white p-5">
+          </Tarjeta>
+          <Tarjeta className="p-5">
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-muted">
               Contacto
             </h3>
             <dl className="space-y-2 text-sm">
               <Dato etiqueta="Teléfono" valor={paciente.telefono} />
             </dl>
-          </div>
+          </Tarjeta>
         </div>
       )}
 
       {tab === 'citas' && (
-        <div className="rounded-xl border border-line bg-white">
+        <Tarjeta>
           {citas.length === 0 ? (
             <p className="px-5 py-10 text-center text-sm text-ink-muted">
               Este paciente no tiene citas registradas.
@@ -166,7 +166,7 @@ export default function FichaPacientePage() {
               </tbody>
             </table>
           )}
-        </div>
+        </Tarjeta>
       )}
 
       {editando && (

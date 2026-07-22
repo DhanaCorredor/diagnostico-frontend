@@ -6,6 +6,7 @@ import AuthLayout from '../layouts/AuthLayout'
 import Input from '../components/atoms/Input'
 import Label from '../components/atoms/Label'
 import Boton from '../components/atoms/Boton'
+import Alerta from '../components/atoms/Alerta'
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -76,9 +77,7 @@ export default function LoginPage() {
           className="mb-4"
         />
 
-        {error && (
-          <p className="mb-4 rounded-lg bg-crit/10 px-3 py-2 text-sm text-crit">{error}</p>
-        )}
+        {error && <Alerta className="mb-4">{error}</Alerta>}
 
         <Boton type="submit" disabled={cargando} className="w-full">
           {cargando ? 'Entrando…' : 'Entrar'}

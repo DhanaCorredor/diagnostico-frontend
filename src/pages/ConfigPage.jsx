@@ -3,6 +3,8 @@ import { api, ApiError } from '../api/client'
 import Input from '../components/atoms/Input'
 import Boton from '../components/atoms/Boton'
 import Badge from '../components/atoms/Badge'
+import Alerta from '../components/atoms/Alerta'
+import Tarjeta from '../components/atoms/Tarjeta'
 
 const CATEGORIAS = [
   { valor: 'CONSULTA', etiqueta: 'Consulta' },
@@ -66,10 +68,10 @@ export default function ConfigPage() {
 
   return (
     <div className="space-y-6">
-      {error && <p className="rounded-lg bg-crit/10 px-4 py-3 text-sm text-crit">{error}</p>}
+      {error && <Alerta>{error}</Alerta>}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-line bg-white p-5">
+        <Tarjeta className="p-5">
           <h3 className="mb-1 font-semibold">Especialidades</h3>
           <p className="mb-3 text-xs text-ink-muted">Áreas médicas del centro.</p>
 
@@ -92,9 +94,9 @@ export default function ConfigPage() {
             />
             <Boton className="shrink-0">Añadir</Boton>
           </form>
-        </div>
+        </Tarjeta>
 
-        <div className="rounded-xl border border-line bg-white p-5">
+        <Tarjeta className="p-5">
           <h3 className="mb-1 font-semibold">Servicios y estudios</h3>
           <p className="mb-3 text-xs text-ink-muted">
             La duración de cada cita la elige recepción al agendar.
@@ -134,10 +136,10 @@ export default function ConfigPage() {
             </select>
             <Boton className="shrink-0">Añadir</Boton>
           </form>
-        </div>
+        </Tarjeta>
       </div>
 
-      <div className="rounded-xl border border-line bg-white p-5">
+      <Tarjeta className="p-5">
         <h3 className="mb-3 font-semibold">Seguridad</h3>
         <div className="space-y-2 text-sm">
           {[
@@ -153,7 +155,7 @@ export default function ConfigPage() {
             </div>
           ))}
         </div>
-      </div>
+      </Tarjeta>
     </div>
   )
 }

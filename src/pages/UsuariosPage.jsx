@@ -3,6 +3,8 @@ import { api } from '../api/client'
 import FormularioUsuario from '../components/FormularioUsuario'
 import Badge from '../components/atoms/Badge'
 import Spinner from '../components/atoms/Spinner'
+import Tarjeta from '../components/atoms/Tarjeta'
+import Boton from '../components/atoms/Boton'
 
 const ROL_BADGE = {
   ADMIN: { texto: 'Administrador', color: 'brand' },
@@ -46,15 +48,12 @@ export default function UsuariosPage() {
   }
 
   return (
-    <div className="rounded-xl border border-line bg-white">
+    <Tarjeta>
       <div className="flex items-center justify-between border-b border-line px-5 py-4">
         <h2 className="font-semibold">Usuarios del sistema</h2>
-        <button
-          onClick={() => setEditar({})}
-          className="rounded-lg bg-brand px-3 py-1.5 text-sm font-semibold text-white hover:bg-brand-dark"
-        >
+        <Boton tamano="sm" onClick={() => setEditar({})}>
           + Nuevo acceso
-        </button>
+        </Boton>
       </div>
 
       {cargando ? (
@@ -122,6 +121,6 @@ export default function UsuariosPage() {
           }}
         />
       )}
-    </div>
+    </Tarjeta>
   )
 }

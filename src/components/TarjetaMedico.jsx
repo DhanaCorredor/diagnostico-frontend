@@ -1,5 +1,6 @@
 import Avatar from './atoms/Avatar'
 import Badge from './atoms/Badge'
+import Tarjeta from './atoms/Tarjeta'
 
 const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 
@@ -24,7 +25,7 @@ export default function TarjetaMedico({ medico, disponibilidad }) {
   const franjas = resumirFranjas(disponibilidad)
 
   return (
-    <div className="rounded-xl border border-line bg-white p-5">
+    <Tarjeta className="p-5">
       <div className="flex items-center gap-3">
         <Avatar nombre={medico.nombre_completo} />
         <div>
@@ -64,6 +65,6 @@ export default function TarjetaMedico({ medico, disponibilidad }) {
           </div>
         )}
       </div>
-    </div>
+    </Tarjeta>
   )
 }

@@ -5,6 +5,7 @@ import { diaSemana, fechaLargaDesdeISO, formatHora, hoyISO, sumarDias } from '..
 import { indexarPor } from '../utils/datos'
 import DetalleCita from '../components/DetalleCita'
 import Spinner from '../components/atoms/Spinner'
+import Tarjeta from '../components/atoms/Tarjeta'
 
 const HORAS = Array.from({ length: 11 }, (_, i) => 7 + i)
 
@@ -92,7 +93,7 @@ export default function AgendaPage() {
   }
 
   return (
-    <div className="rounded-xl border border-line bg-white p-5">
+    <Tarjeta className="p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-semibold capitalize">{fechaLargaDesdeISO(fecha)}</h2>
         <div className="flex items-center gap-2 text-sm">
@@ -186,7 +187,7 @@ export default function AgendaPage() {
           }}
         />
       )}
-    </div>
+    </Tarjeta>
   )
 }
 
