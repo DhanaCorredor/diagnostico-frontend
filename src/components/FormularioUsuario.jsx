@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { api, ApiError } from '../api/client'
 import Modal from './Modal'
-import Campo, { claseInput } from './Campo'
+import Campo from './Campo'
+import Input from './atoms/Input'
+import Select from './atoms/Select'
+import Boton from './atoms/Boton'
 
 const ROLES = [
   { valor: 'ADMIN', etiqueta: 'Administrador' },
@@ -67,21 +70,12 @@ export default function FormularioUsuario({ usuario, especialidades, onCerrar, o
 
   const footer = (
     <>
-      <button
-        type="button"
-        onClick={onCerrar}
-        className="rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-surface-plane"
-      >
+      <Boton variante="secundario" type="button" onClick={onCerrar}>
         Cancelar
-      </button>
-      <button
-        type="submit"
-        form="form-usuario"
-        disabled={guardando}
-        className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-60"
-      >
+      </Boton>
+      <Boton type="submit" form="form-usuario" disabled={guardando}>
         {guardando ? 'Guardando…' : 'Guardar'}
-      </button>
+      </Boton>
     </>
   )
 
@@ -96,33 +90,31 @@ export default function FormularioUsuario({ usuario, especialidades, onCerrar, o
         {error && <p className="rounded-lg bg-crit/10 px-3 py-2 text-sm text-crit">{error}</p>}
 
         <Campo label="Nombre completo">
-          <input
+          <Input
             value={form.nombre_completo}
             onChange={(e) => set('nombre_completo', e.target.value)}
             required
             autoFocus
-            className={claseInput}
           />
         </Campo>
 
         <div className="grid grid-cols-2 gap-3">
           <Campo label="Correo">
-            <input
+            <Input
               type="email"
               value={form.email}
               onChange={(e) => set('email', e.target.value)}
               required
-              className={claseInput}
             />
           </Campo>
           <Campo label="Rol">
-            <select value={form.rol} onChange={(e) => set('rol', e.target.value)} className={claseInput}>
+            <Select value={form.rol} onChange={(e) => set('rol', e.target.value)}>
               {ROLES.map((r) => (
                 <option key={r.valor} value={r.valor}>
                   {r.etiqueta}
                 </option>
               ))}
-            </select>
+            </Select>
           </Campo>
         </div>
 
@@ -130,24 +122,22 @@ export default function FormularioUsuario({ usuario, especialidades, onCerrar, o
           label={editando ? 'Contraseña (dejar en blanco para no cambiar)' : 'Contraseña'}
           hint="Mínimo 8 caracteres."
         >
-          <input
+          <Input
             type="password"
             value={form.password}
             onChange={(e) => set('password', e.target.value)}
             required={!editando}
             minLength={8}
-            className={claseInput}
           />
         </Campo>
 
         {esMedico && (
           <>
             <Campo label="Matrícula (opcional)">
-              <input
+              <Input
                 value={form.matricula}
                 onChange={(e) => set('matricula', e.target.value)}
                 placeholder="MPPS 45.221"
-                className={claseInput}
               />
             </Campo>
             <div>

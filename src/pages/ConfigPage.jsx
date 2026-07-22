@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { api, ApiError } from '../api/client'
-import { claseInput } from '../components/Campo'
+import Input from '../components/atoms/Input'
+import Boton from '../components/atoms/Boton'
+import Badge from '../components/atoms/Badge'
 
 const CATEGORIAS = [
   { valor: 'CONSULTA', etiqueta: 'Consulta' },
@@ -73,9 +75,9 @@ export default function ConfigPage() {
 
           <div className="mb-4 flex flex-wrap gap-1.5">
             {especialidades.map((e) => (
-              <span key={e.id} className="rounded-full bg-brand-light px-2.5 py-0.5 text-xs text-brand-dark">
+              <Badge key={e.id} color="brand" tamano="sm">
                 {e.nombre}
-              </span>
+              </Badge>
             ))}
             {especialidades.length === 0 && (
               <span className="text-sm text-ink-muted">Aún no hay especialidades.</span>
@@ -83,15 +85,12 @@ export default function ConfigPage() {
           </div>
 
           <form onSubmit={crearEspecialidad} className="flex gap-2">
-            <input
+            <Input
               value={nuevaEsp}
               onChange={(e) => setNuevaEsp(e.target.value)}
               placeholder="Nueva especialidad…"
-              className={claseInput}
             />
-            <button className="shrink-0 rounded-lg bg-brand px-3 py-2 text-sm font-semibold text-white hover:bg-brand-dark">
-              Añadir
-            </button>
+            <Boton className="shrink-0">Añadir</Boton>
           </form>
         </div>
 
@@ -117,11 +116,10 @@ export default function ConfigPage() {
           </div>
 
           <form onSubmit={crearServicio} className="flex gap-2">
-            <input
+            <Input
               value={nuevoServ.nombre}
               onChange={(e) => setNuevoServ((s) => ({ ...s, nombre: e.target.value }))}
               placeholder="Nuevo servicio…"
-              className={claseInput}
             />
             <select
               value={nuevoServ.categoria}
@@ -134,9 +132,7 @@ export default function ConfigPage() {
                 </option>
               ))}
             </select>
-            <button className="shrink-0 rounded-lg bg-brand px-3 py-2 text-sm font-semibold text-white hover:bg-brand-dark">
-              Añadir
-            </button>
+            <Boton className="shrink-0">Añadir</Boton>
           </form>
         </div>
       </div>
@@ -151,7 +147,9 @@ export default function ConfigPage() {
           ].map((t) => (
             <div key={t} className="flex items-center justify-between">
               <span className="text-ink-2">{t}</span>
-              <span className="rounded-full bg-good/10 px-2 py-0.5 text-xs text-good">Activo</span>
+              <Badge color="good" tamano="sm">
+                Activo
+              </Badge>
             </div>
           ))}
         </div>

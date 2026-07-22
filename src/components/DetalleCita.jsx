@@ -4,7 +4,10 @@ import { formatFechaCorta, formatHora } from '../utils/fecha'
 import { indexarPor } from '../utils/datos'
 import EstadoBadge from './EstadoBadge'
 import Modal from './Modal'
-import Campo, { claseInput } from './Campo'
+import Campo from './Campo'
+import Input from './atoms/Input'
+import Select from './atoms/Select'
+import Boton from './atoms/Boton'
 
 const DURACIONES = [15, 30, 45, 60, 90]
 const ESTADOS_ACTIVOS = ['SCHEDULED', 'CONFIRMED']
@@ -99,21 +102,12 @@ export default function DetalleCita({
   if (editando) {
     const footer = (
       <>
-        <button
-          type="button"
-          onClick={() => setEditando(false)}
-          className="rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-surface-plane"
-        >
+        <Boton variante="secundario" type="button" onClick={() => setEditando(false)}>
           Volver
-        </button>
-        <button
-          type="submit"
-          form="form-editar-cita"
-          disabled={ocupado}
-          className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-60"
-        >
+        </Boton>
+        <Boton type="submit" form="form-editar-cita" disabled={ocupado}>
           {ocupado ? 'Guardando…' : 'Guardar cambios'}
-        </button>
+        </Boton>
       </>
     )
     return (
@@ -122,43 +116,43 @@ export default function DetalleCita({
           {cajaError}
           <div className="grid grid-cols-2 gap-3">
             <Campo label="Médico">
-              <select value={form.medico_id} onChange={(e) => set('medico_id', e.target.value)} className={claseInput}>
+              <Select value={form.medico_id} onChange={(e) => set('medico_id', e.target.value)}>
                 {medicos.map((m) => (
                   <option key={m.id} value={m.id}>
                     {m.nombre_completo}
                   </option>
                 ))}
-              </select>
+              </Select>
             </Campo>
             <Campo label="Servicio">
-              <select value={form.servicio_id} onChange={(e) => set('servicio_id', e.target.value)} className={claseInput}>
+              <Select value={form.servicio_id} onChange={(e) => set('servicio_id', e.target.value)}>
                 {servicios.map((s) => (
                   <option key={s.id} value={s.id}>
                     {s.nombre}
                   </option>
                 ))}
-              </select>
+              </Select>
             </Campo>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <Campo label="Fecha">
-              <input type="date" value={form.fecha} onChange={(e) => set('fecha', e.target.value)} required className={claseInput} />
+              <Input type="date" value={form.fecha} onChange={(e) => set('fecha', e.target.value)} required />
             </Campo>
             <Campo label="Hora">
-              <input type="time" step="900" value={form.hora} onChange={(e) => set('hora', e.target.value)} required className={claseInput} />
+              <Input type="time" step="900" value={form.hora} onChange={(e) => set('hora', e.target.value)} required />
             </Campo>
             <Campo label="Duración">
-              <select value={form.duracion_min} onChange={(e) => set('duracion_min', e.target.value)} className={claseInput}>
+              <Select value={form.duracion_min} onChange={(e) => set('duracion_min', e.target.value)}>
                 {DURACIONES.map((d) => (
                   <option key={d} value={d}>
                     {d} min
                   </option>
                 ))}
-              </select>
+              </Select>
             </Campo>
           </div>
           <Campo label="Motivo (opcional)">
-            <input value={form.motivo} onChange={(e) => set('motivo', e.target.value)} className={claseInput} />
+            <Input value={form.motivo} onChange={(e) => set('motivo', e.target.value)} />
           </Campo>
           <label className="flex items-center gap-2 text-sm text-ink-2">
             <input
@@ -176,37 +170,25 @@ export default function DetalleCita({
 
   const footer = puedeGestionar && activa && (
     <>
-      <button
-        onClick={() => marcarAsistencia('NO_SHOW')}
-        disabled={ocupado}
-        className="rounded-lg border border-line px-3 py-2 text-sm font-medium hover:bg-surface-plane disabled:opacity-60"
-      >
+      <Boton variante="secundario" tamano="sm" onClick={() => marcarAsistencia('NO_SHOW')} disabled={ocupado}>
         No asistió
-      </button>
-      <button
-        onClick={() => marcarAsistencia('COMPLETED')}
-        disabled={ocupado}
-        className="rounded-lg border border-good/40 px-3 py-2 text-sm font-medium text-good hover:bg-good/5 disabled:opacity-60"
-      >
+      </Boton>
+      <Boton variante="exito" tamano="sm" onClick={() => marcarAsistencia('COMPLETED')} disabled={ocupado}>
         Atendida
-      </button>
-      <button
-        onClick={cancelar}
-        disabled={ocupado}
-        className="rounded-lg border border-crit/40 px-3 py-2 text-sm font-medium text-crit hover:bg-crit/5 disabled:opacity-60"
-      >
+      </Boton>
+      <Boton variante="peligro" tamano="sm" onClick={cancelar} disabled={ocupado}>
         Cancelar cita
-      </button>
-      <button
+      </Boton>
+      <Boton
+        tamano="sm"
         onClick={() => {
           setError(null)
           setEditando(true)
         }}
         disabled={ocupado}
-        className="rounded-lg bg-brand px-3 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-60"
       >
         Editar
-      </button>
+      </Boton>
     </>
   )
 

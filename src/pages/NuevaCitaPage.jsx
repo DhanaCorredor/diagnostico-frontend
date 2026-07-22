@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api, ApiError } from '../api/client'
 import { hoyISO } from '../utils/fecha'
-import Campo, { claseInput } from '../components/Campo'
+import Campo from '../components/Campo'
+import Input from '../components/atoms/Input'
+import Select from '../components/atoms/Select'
+import Boton from '../components/atoms/Boton'
 
 const DURACIONES = [15, 30, 45, 60, 90]
 
@@ -107,35 +110,32 @@ export default function NuevaCitaPage() {
           <div className="grid grid-cols-3 gap-3">
             <div className="col-span-2">
               <Campo label="Paciente (nombre completo)">
-                <input
+                <Input
                   value={form.nombre_completo}
                   onChange={(e) => set('nombre_completo', e.target.value)}
                   required
                   autoFocus
-                  className={claseInput}
                 />
               </Campo>
             </div>
             <Campo label="Edad">
-              <input
+              <Input
                 type="number"
                 min="0"
                 max="120"
                 value={form.edad}
                 onChange={(e) => set('edad', e.target.value)}
                 required
-                className={claseInput}
               />
             </Campo>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <Campo label="Médico">
-              <select
+              <Select
                 value={form.medico_id}
                 onChange={(e) => set('medico_id', e.target.value)}
                 required
-                className={claseInput}
               >
                 <option value="">Selecciona…</option>
                 {medicos.map((m) => (
@@ -143,14 +143,13 @@ export default function NuevaCitaPage() {
                     {m.nombre_completo}
                   </option>
                 ))}
-              </select>
+              </Select>
             </Campo>
             <Campo label="Servicio">
-              <select
+              <Select
                 value={form.servicio_id}
                 onChange={(e) => set('servicio_id', e.target.value)}
                 required
-                className={claseInput}
               >
                 <option value="">Selecciona…</option>
                 {servicios.map((s) => (
@@ -158,51 +157,44 @@ export default function NuevaCitaPage() {
                     {s.nombre}
                   </option>
                 ))}
-              </select>
+              </Select>
             </Campo>
           </div>
 
           <div className="grid grid-cols-3 gap-3">
             <Campo label="Fecha">
-              <input
+              <Input
                 type="date"
                 value={form.fecha}
                 onChange={(e) => set('fecha', e.target.value)}
                 required
-                className={claseInput}
               />
             </Campo>
             <Campo label="Hora" hint=":00 · :15 · :30 · :45">
-              <input
+              <Input
                 type="time"
                 step="900"
                 value={form.hora}
                 onChange={(e) => set('hora', e.target.value)}
                 required
-                className={claseInput}
               />
             </Campo>
             <Campo label="Duración">
-              <select
+              <Select
                 value={form.duracion_min}
                 onChange={(e) => set('duracion_min', e.target.value)}
-                className={claseInput}
               >
                 {DURACIONES.map((d) => (
                   <option key={d} value={d}>
                     {d} min
                   </option>
                 ))}
-              </select>
+              </Select>
             </Campo>
           </div>
 
           <Campo label="Motivo (opcional)">
-            <input
-              value={form.motivo}
-              onChange={(e) => set('motivo', e.target.value)}
-              className={claseInput}
-            />
+            <Input value={form.motivo} onChange={(e) => set('motivo', e.target.value)} />
           </Campo>
 
           <label className="flex items-center gap-2 text-sm text-ink-2">
@@ -216,20 +208,12 @@ export default function NuevaCitaPage() {
           </label>
 
           <div className="flex justify-end gap-3 border-t border-line pt-4">
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              className="rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-surface-plane"
-            >
+            <Boton variante="secundario" type="button" onClick={() => navigate(-1)}>
               Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={guardando}
-              className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-60"
-            >
+            </Boton>
+            <Boton type="submit" disabled={guardando}>
               {guardando ? 'Guardando…' : 'Guardar cita'}
-            </button>
+            </Boton>
           </div>
         </form>
       </div>

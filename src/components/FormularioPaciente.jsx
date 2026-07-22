@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { api, ApiError } from '../api/client'
 import Modal from './Modal'
-import Campo, { claseInput } from './Campo'
+import Campo from './Campo'
+import Input from './atoms/Input'
+import Boton from './atoms/Boton'
 
 export default function FormularioPaciente({ paciente, onCerrar, onGuardado }) {
   const editando = Boolean(paciente)
@@ -47,21 +49,12 @@ export default function FormularioPaciente({ paciente, onCerrar, onGuardado }) {
 
   const footer = (
     <>
-      <button
-        type="button"
-        onClick={onCerrar}
-        className="rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-surface-plane"
-      >
+      <Boton variante="secundario" type="button" onClick={onCerrar}>
         Cancelar
-      </button>
-      <button
-        type="submit"
-        form="form-paciente"
-        disabled={guardando}
-        className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-60"
-      >
+      </Boton>
+      <Boton type="submit" form="form-paciente" disabled={guardando}>
         {guardando ? 'Guardando…' : 'Guardar'}
-      </button>
+      </Boton>
     </>
   )
 
@@ -76,52 +69,47 @@ export default function FormularioPaciente({ paciente, onCerrar, onGuardado }) {
         {error && <p className="rounded-lg bg-crit/10 px-3 py-2 text-sm text-crit">{error}</p>}
 
         <Campo label="Nombre completo">
-          <input
+          <Input
             value={form.nombre_completo}
             onChange={(e) => set('nombre_completo', e.target.value)}
             required
             autoFocus
-            className={claseInput}
           />
         </Campo>
 
         <div className="grid grid-cols-2 gap-3">
           <Campo label="Edad">
-            <input
+            <Input
               type="number"
               min="0"
               max="120"
               value={form.edad}
               onChange={(e) => set('edad', e.target.value)}
               required
-              className={claseInput}
             />
           </Campo>
           <Campo label="Cédula (opcional)">
-            <input
+            <Input
               value={form.cedula}
               onChange={(e) => set('cedula', e.target.value)}
               placeholder="V-12.345.678"
-              className={claseInput}
             />
           </Campo>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <Campo label="Teléfono (opcional)">
-            <input
+            <Input
               value={form.telefono}
               onChange={(e) => set('telefono', e.target.value)}
               placeholder="0414-555-1122"
-              className={claseInput}
             />
           </Campo>
           <Campo label="Fecha de nacimiento (opcional)">
-            <input
+            <Input
               type="date"
               value={form.fecha_nacimiento}
               onChange={(e) => set('fecha_nacimiento', e.target.value)}
-              className={claseInput}
             />
           </Campo>
         </div>
