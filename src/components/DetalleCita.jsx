@@ -1,9 +1,3 @@
-// Detalle de una cita (en un Modal), con acciones para ADMIN/RECEPCIÓN:
-//   - Cancelar          -> POST /citas/{id}/cancelar   (libera el cupo)
-//   - Atendida/No asistió-> POST /citas/{id}/asistencia
-//   - Editar / mover     -> PUT  /citas/{id}           (revalida las reglas)
-// Un MÉDICO ve la info en solo lectura (no gestiona citas).
-
 import { useState } from 'react'
 import { api, ApiError } from '../api/client'
 import { formatFechaCorta, formatHora } from '../utils/fecha'
@@ -15,7 +9,6 @@ import Campo, { claseInput } from './Campo'
 const DURACIONES = [15, 30, 45, 60, 90]
 const ESTADOS_ACTIVOS = ['SCHEDULED', 'CONFIRMED']
 
-// Duración (min) de una cita a partir de sus extremos.
 function duracionDe(cita) {
   return Math.round((new Date(cita.ends_at) - new Date(cita.starts_at)) / 60000)
 }
@@ -33,12 +26,11 @@ export default function DetalleCita({
   const serviciosMap = indexarPor(servicios, 'nombre')
 
   const [editando, setEditando] = useState(false)
-  const [error, setError] = useState(null) // { mensaje, candidatos? }
+  const [error, setError] = useState(null)
   const [ocupado, setOcupado] = useState(false)
 
   const activa = ESTADOS_ACTIVOS.includes(cita.estado)
 
-  // Estado del formulario de edición (prefijado con los datos de la cita).
   const [form, setForm] = useState({
     medico_id: cita.medico_id,
     servicio_id: cita.servicio_id,
@@ -52,7 +44,6 @@ export default function DetalleCita({
     setForm((f) => ({ ...f, [campo]: valor }))
   }
 
-  // Envuelve una acción: marca ocupado, captura errores y refresca al terminar.
   async function ejecutar(accion) {
     setError(null)
     setOcupado(true)
@@ -105,7 +96,6 @@ export default function DetalleCita({
     </div>
   )
 
-  // --- Modo edición --------------------------------------------------------
   if (editando) {
     const footer = (
       <>
@@ -184,7 +174,6 @@ export default function DetalleCita({
     )
   }
 
-  // --- Modo vista ----------------------------------------------------------
   const footer = puedeGestionar && activa && (
     <>
       <button

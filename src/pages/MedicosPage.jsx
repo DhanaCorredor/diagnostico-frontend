@@ -1,7 +1,3 @@
-// Página Médicos (ruta /medicos). Rejilla de tarjetas de médico.
-//
-// Pide los médicos y, en paralelo, la disponibilidad de cada uno.
-
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
 import TarjetaMedico from '../components/TarjetaMedico'
@@ -18,7 +14,6 @@ export default function MedicosPage() {
       setError('')
       try {
         const lista = await api.get('/medicos')
-        // La disponibilidad de cada médico se pide por separado; en paralelo.
         const franjas = await Promise.all(
           lista.map((m) => api.get(`/disponibilidad?medico_id=${m.id}`)),
         )

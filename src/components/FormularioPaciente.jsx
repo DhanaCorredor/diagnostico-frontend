@@ -1,10 +1,3 @@
-// Formulario de alta/edición de paciente (dentro de un Modal).
-//
-// Sirve para las dos cosas:
-//   - Alta:    sin `paciente` -> POST /pacientes
-//   - Edición: con `paciente`  -> PUT  /pacientes/{id}
-// Al guardar con éxito avisa al padre con `onGuardado(paciente)`.
-
 import { useState } from 'react'
 import { api, ApiError } from '../api/client'
 import Modal from './Modal'
@@ -32,7 +25,6 @@ export default function FormularioPaciente({ paciente, onCerrar, onGuardado }) {
     setError('')
     setGuardando(true)
 
-    // Solo enviamos los campos opcionales que tengan valor (los vacíos van a null).
     const cuerpo = {
       nombre_completo: form.nombre_completo.trim(),
       edad: Number(form.edad),
@@ -47,7 +39,6 @@ export default function FormularioPaciente({ paciente, onCerrar, onGuardado }) {
         : await api.post('/pacientes', cuerpo)
       onGuardado(guardado)
     } catch (err) {
-      // 409 = cédula duplicada; el backend nos da el mensaje exacto.
       if (err instanceof ApiError) setError(err.message)
       else setError('No se pudo guardar el paciente.')
       setGuardando(false)

@@ -1,11 +1,7 @@
-// Tarjeta de un médico: avatar, nombre, especialidades (N:M) y disponibilidad.
-
 import { iniciales } from '../utils/texto'
 
 const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 
-// Resume las franjas: agrupa por horario y muestra los días de forma compacta.
-// Ej.: [{Lun 07:30-17:30}...{Sáb ...}] -> "Lun–Sáb · 07:30–17:30".
 function resumirFranjas(franjas) {
   const grupos = {}
   for (const f of franjas) {

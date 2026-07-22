@@ -1,9 +1,3 @@
-// Formulario de alta/edición de un usuario del personal (dentro de un Modal).
-//
-//   - Alta:    sin `usuario` -> POST /usuarios (contraseña obligatoria).
-//   - Edición: con `usuario`  -> PUT  /usuarios/{id} (contraseña opcional).
-// La matrícula y las especialidades solo se envían si el rol es MÉDICO.
-
 import { useState } from 'react'
 import { api, ApiError } from '../api/client'
 import Modal from './Modal'
@@ -49,7 +43,6 @@ export default function FormularioUsuario({ usuario, especialidades, onCerrar, o
     setError('')
     setGuardando(true)
 
-    // Armamos el cuerpo según el rol y si estamos creando o editando.
     const cuerpo = {
       nombre_completo: form.nombre_completo.trim(),
       email: form.email.trim(),
@@ -59,7 +52,6 @@ export default function FormularioUsuario({ usuario, especialidades, onCerrar, o
       cuerpo.matricula = form.matricula.trim() || null
       cuerpo.especialidades = form.especialidades
     }
-    // En alta la contraseña es obligatoria; en edición, solo si se escribió.
     if (!editando || form.password) cuerpo.password = form.password
 
     try {
@@ -148,7 +140,6 @@ export default function FormularioUsuario({ usuario, especialidades, onCerrar, o
           />
         </Campo>
 
-        {/* Solo para médicos */}
         {esMedico && (
           <>
             <Campo label="Matrícula (opcional)">

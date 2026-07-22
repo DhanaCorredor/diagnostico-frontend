@@ -1,6 +1,3 @@
-// Pastilla de color para el estado de una cita.
-// Mapea cada valor de EstadoCita (backend) a su etiqueta y color de marca.
-
 const ESTADOS = {
   SCHEDULED: { texto: 'Agendada', clase: 'bg-warn/10 text-[#8a6100]' },
   CONFIRMED: { texto: 'Confirmada', clase: 'bg-good/10 text-good' },

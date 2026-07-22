@@ -1,10 +1,3 @@
-// Página Configuración (ruta /config, solo ADMIN).
-//
-// Gestión de catálogos (lo que tiene API en el MVP):
-//   - Especialidades: listar (GET) y crear (POST /especialidades).
-//   - Servicios/estudios: listar activos (GET), crear (POST) y desactivar (PUT).
-// Los "datos del centro" y los recordatorios del mockup son de fase 2.
-
 import { useEffect, useState } from 'react'
 import { api, ApiError } from '../api/client'
 import { claseInput } from '../components/Campo'
@@ -22,7 +15,6 @@ export default function ConfigPage() {
   const [servicios, setServicios] = useState([])
   const [error, setError] = useState('')
 
-  // Formularios de alta.
   const [nuevaEsp, setNuevaEsp] = useState('')
   const [nuevoServ, setNuevoServ] = useState({ nombre: '', categoria: 'CONSULTA' })
 
@@ -82,7 +74,6 @@ export default function ConfigPage() {
       {error && <p className="rounded-lg bg-crit/10 px-4 py-3 text-sm text-crit">{error}</p>}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Especialidades */}
         <div className="rounded-xl border border-line bg-white p-5">
           <h3 className="mb-1 font-semibold">Especialidades</h3>
           <p className="mb-3 text-xs text-ink-muted">Áreas médicas del centro.</p>
@@ -111,7 +102,6 @@ export default function ConfigPage() {
           </form>
         </div>
 
-        {/* Servicios / estudios */}
         <div className="rounded-xl border border-line bg-white p-5">
           <h3 className="mb-1 font-semibold">Servicios y estudios</h3>
           <p className="mb-3 text-xs text-ink-muted">
@@ -166,7 +156,6 @@ export default function ConfigPage() {
         </div>
       </div>
 
-      {/* Seguridad (informativo) */}
       <div className="rounded-xl border border-line bg-white p-5">
         <h3 className="mb-3 font-semibold">Seguridad</h3>
         <div className="space-y-2 text-sm">

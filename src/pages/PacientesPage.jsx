@@ -1,5 +1,3 @@
-// Página Pacientes (ruta /pacientes). Lista + buscador + alta de paciente.
-
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api/client'
@@ -28,7 +26,6 @@ export default function PacientesPage() {
     cargar()
   }, [])
 
-  // Filtro por nombre o cédula (en el cliente; la lista del MVP es pequeña).
   const termino = busqueda.trim().toLowerCase()
   const filtrados = termino
     ? pacientes.filter(
@@ -40,7 +37,6 @@ export default function PacientesPage() {
 
   return (
     <div className="space-y-4">
-      {/* Buscador */}
       <div className="relative max-w-sm">
         <svg
           className="absolute left-3 top-2.5 h-4 w-4 text-ink-muted"
