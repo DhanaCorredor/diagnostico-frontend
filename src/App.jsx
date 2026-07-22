@@ -16,7 +16,7 @@ import FichaPacientePage from './pages/FichaPacientePage'
 import MedicosPage from './pages/MedicosPage'
 import NuevaCitaPage from './pages/NuevaCitaPage'
 import UsuariosPage from './pages/UsuariosPage'
-import EnConstruccion from './pages/EnConstruccion'
+import ConfigPage from './pages/ConfigPage'
 
 // Roles con acceso a la gestión de recepción (pacientes, agendar…).
 const RECEP = ['ADMIN', 'RECEPCION']
@@ -82,7 +82,7 @@ export default function App() {
           path="/config"
           element={
             <ProtectedRoute roles={['ADMIN']}>
-              <EnConstruccion titulo="Configuración" />
+              <ConfigPage />
             </ProtectedRoute>
           }
         />
