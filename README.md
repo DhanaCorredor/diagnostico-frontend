@@ -90,18 +90,24 @@ as a bearer token on every request. The session user (and role) is read from
 │   ├── api/
 │   │   └── client.js       # HTTP client + JWT handling
 │   ├── auth/
-│   │   ├── AuthContext.jsx # session (user/token) context
-│   │   └── ProtectedRoute.jsx  # guard by auth + role
+│   │   ├── AuthContext.js   # session context object
+│   │   ├── AuthProvider.jsx # session provider (login/logout)
+│   │   ├── useAuth.js       # hook to read the session
+│   │   └── ProtectedRoute.jsx  # route guard by auth + role
 │   ├── layouts/
 │   │   ├── AuthLayout.jsx   # centered shell (login)
 │   │   └── AppLayout.jsx    # sidebar + topbar + content
-│   ├── components/         # Sidebar, Topbar, Modal, EstadoBadge, forms, cards
+│   ├── components/         # Sidebar, Topbar, Modal, Campo, EstadoBadge,
+│   │                       # forms, TarjetaMedico, DetalleCita
 │   ├── pages/              # one component per route
-│   └── utils/
-│       └── fecha.js        # date/time helpers
+│   └── utils/              # fecha (dates), texto (initials), datos (index by id)
 ├── public/                 # static assets served as-is
 └── vite.config.js          # Vite + React + Tailwind config
 ```
+
+> Appointments are managed from the calendar/dashboard: clicking an appointment
+> opens a detail dialog to **cancel**, **mark attendance** (attended / no-show)
+> or **edit/move** it (reception & admin).
 
 ## 🔗 Related
 
