@@ -10,6 +10,8 @@ import ProtectedRoute from './auth/ProtectedRoute'
 import AppLayout from './layouts/AppLayout'
 import LoginPage from './pages/LoginPage'
 import PanelPage from './pages/PanelPage'
+import PacientesPage from './pages/PacientesPage'
+import FichaPacientePage from './pages/FichaPacientePage'
 import EnConstruccion from './pages/EnConstruccion'
 
 // Roles con acceso a la gestión de recepción (pacientes, agendar…).
@@ -36,7 +38,7 @@ export default function App() {
           path="/pacientes"
           element={
             <ProtectedRoute roles={RECEP}>
-              <EnConstruccion titulo="Pacientes" />
+              <PacientesPage />
             </ProtectedRoute>
           }
         />
@@ -44,7 +46,7 @@ export default function App() {
           path="/pacientes/:id"
           element={
             <ProtectedRoute roles={RECEP}>
-              <EnConstruccion titulo="Ficha de paciente" />
+              <FichaPacientePage />
             </ProtectedRoute>
           }
         />

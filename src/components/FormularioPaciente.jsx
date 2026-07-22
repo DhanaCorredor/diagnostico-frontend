@@ -1,0 +1,153 @@
+// Formulario de alta/edición de paciente (dentro de un Modal).
+//
+// Sirve para las dos cosas:
+//   - Alta:    sin `paciente` -> POST /pacientes
+//   - Edición: con `paciente`  -> PUT  /pacientes/{id}
+// Al guardar con éxito avisa al padre con `onGuardado(paciente)`.
+
+import { useState } from 'react'
+import { api, ApiError } from '../api/client'
+import Modal from './Modal'
+
+// Campo de texto etiquetado (pequeño ayudante para no repetir clases).
+function Campo({ label, children, hint }) {
+  return (
+    <div>
+      <label className="mb-1 block text-sm font-medium">{label}</label>
+      {children}
+      {hint && <p className="mt-1 text-[11px] text-ink-muted">{hint}</p>}
+    </div>
+  )
+}
+
+const claseInput =
+  'w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20'
+
+export default function FormularioPaciente({ paciente, onCerrar, onGuardado }) {
+  const editando = Boolean(paciente)
+
+  const [form, setForm] = useState({
+    nombre_completo: paciente?.nombre_completo ?? '',
+    edad: paciente?.edad ?? '',
+    cedula: paciente?.cedula ?? '',
+    telefono: paciente?.telefono ?? '',
+    fecha_nacimiento: paciente?.fecha_nacimiento ?? '',
+  })
+  const [error, setError] = useState('')
+  const [guardando, setGuardando] = useState(false)
+
+  function set(campo, valor) {
+    setForm((f) => ({ ...f, [campo]: valor }))
+  }
+
+  async function onSubmit(e) {
+    e.preventDefault()
+    setError('')
+    setGuardando(true)
+
+    // Solo enviamos los campos opcionales que tengan valor (los vacíos van a null).
+    const cuerpo = {
+      nombre_completo: form.nombre_completo.trim(),
+      edad: Number(form.edad),
+      cedula: form.cedula.trim() || null,
+      telefono: form.telefono.trim() || null,
+      fecha_nacimiento: form.fecha_nacimiento || null,
+    }
+
+    try {
+      const guardado = editando
+        ? await api.put(`/pacientes/${paciente.id}`, cuerpo)
+        : await api.post('/pacientes', cuerpo)
+      onGuardado(guardado)
+    } catch (err) {
+      // 409 = cédula duplicada; el backend nos da el mensaje exacto.
+      if (err instanceof ApiError) setError(err.message)
+      else setError('No se pudo guardar el paciente.')
+      setGuardando(false)
+    }
+  }
+
+  const footer = (
+    <>
+      <button
+        type="button"
+        onClick={onCerrar}
+        className="rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-surface-plane"
+      >
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        form="form-paciente"
+        disabled={guardando}
+        className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-60"
+      >
+        {guardando ? 'Guardando…' : 'Guardar'}
+      </button>
+    </>
+  )
+
+  return (
+    <Modal
+      titulo={editando ? 'Editar paciente' : 'Nuevo paciente'}
+      subtitulo="Nombre y edad son obligatorios. La cédula es opcional."
+      onClose={onCerrar}
+      footer={footer}
+    >
+      <form id="form-paciente" onSubmit={onSubmit} className="space-y-4">
+        {error && <p className="rounded-lg bg-crit/10 px-3 py-2 text-sm text-crit">{error}</p>}
+
+        <Campo label="Nombre completo">
+          <input
+            value={form.nombre_completo}
+            onChange={(e) => set('nombre_completo', e.target.value)}
+            required
+            autoFocus
+            className={claseInput}
+          />
+        </Campo>
+
+        <div className="grid grid-cols-2 gap-3">
+          <Campo label="Edad">
+            <input
+              type="number"
+              min="0"
+              max="120"
+              value={form.edad}
+              onChange={(e) => set('edad', e.target.value)}
+              required
+              className={claseInput}
+            />
+          </Campo>
+          <Campo label="Cédula (opcional)">
+            <input
+              value={form.cedula}
+              onChange={(e) => set('cedula', e.target.value)}
+              placeholder="V-12.345.678"
+              className={claseInput}
+            />
+          </Campo>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <Campo label="Teléfono (opcional)">
+            <input
+              value={form.telefono}
+              onChange={(e) => set('telefono', e.target.value)}
+              placeholder="0414-555-1122"
+              className={claseInput}
+            />
+          </Campo>
+          <Campo label="Fecha de nacimiento (opcional)">
+            <input
+              type="date"
+              value={form.fecha_nacimiento}
+              onChange={(e) => set('fecha_nacimiento', e.target.value)}
+              className={claseInput}
+            />
+          </Campo>
+        </div>
+      </form>
+    </Modal>
+  )
+}
