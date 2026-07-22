@@ -28,9 +28,12 @@ export function formatFechaLarga(fecha = new Date()) {
   })
 }
 
-// Fecha corta "dd/mm/aaaa" a partir de un texto ISO.
+// Fecha corta "dd/mm/aaaa" a partir de un texto ISO (con o sin hora).
 export function formatFechaCorta(isoNaive) {
-  return new Date(isoNaive).toLocaleDateString('es-ES')
+  // Una fecha de solo día ("YYYY-MM-DD") se interpretaría como UTC y podría
+  // mostrarse un día antes (husos negativos); le añadimos la hora local.
+  const texto = isoNaive.length <= 10 ? `${isoNaive}T00:00:00` : isoNaive
+  return new Date(texto).toLocaleDateString('es-ES')
 }
 
 // Suma (o resta) días a una fecha "YYYY-MM-DD" y devuelve otra "YYYY-MM-DD".
