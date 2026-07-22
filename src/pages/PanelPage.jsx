@@ -1,18 +1,11 @@
-// Página Panel (ruta /). Resumen del día: KPIs + agenda de hoy.
-//
-// Pide al backend las citas de hoy y los catálogos (médicos, servicios y, si el
-// rol lo permite, pacientes) para poder mostrar nombres en vez de identificadores.
-// Al pulsar una cita se abre su detalle (con acciones para ADMIN/RECEPCIÓN).
-
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { api } from '../api/client'
-import { useAuth } from '../auth/AuthContext'
+import { useAuth } from '../auth/useAuth'
 import EstadoBadge from '../components/EstadoBadge'
 import DetalleCita from '../components/DetalleCita'
 import { formatHora, hoyISO } from '../utils/fecha'
 import { indexarPor } from '../utils/datos'
 
-// Colorcito de la barra lateral de cada fila, según el estado.
 const BARRA = {
   SCHEDULED: 'bg-warn',
   CONFIRMED: 'bg-good',
@@ -34,16 +27,16 @@ function Kpi({ titulo, valor, nota }) {
 export default function PanelPage() {
   const { user } = useAuth()
   const [citas, setCitas] = useState([])
-  const [medicos, setMedicos] = useState([]) // listas (para el detalle de cita)
+  const [medicos, setMedicos] = useState([])
   const [servicios, setServicios] = useState([])
-  const [pacientes, setPacientes] = useState({}) // mapa id -> nombre
+  const [pacientes, setPacientes] = useState({})
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
   const [citaSel, setCitaSel] = useState(null)
 
   const puedeGestionar = user.rol === 'ADMIN' || user.rol === 'RECEPCION'
 
-  async function cargar() {
+  const cargar = useCallback(async () => {
     setCargando(true)
     setError('')
     try {
@@ -62,12 +55,11 @@ export default function PanelPage() {
     } finally {
       setCargando(false)
     }
-  }
+  }, [puedeGestionar])
 
   useEffect(() => {
     cargar()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [puedeGestionar])
+  }, [cargar])
 
   const medicosMap = indexarPor(medicos, 'nombre_completo')
   const serviciosMap = indexarPor(servicios, 'nombre')
@@ -80,14 +72,12 @@ export default function PanelPage() {
 
   return (
     <div className="space-y-6">
-      {/* KPIs */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Kpi titulo="Citas hoy" valor={citas.length} />
         <Kpi titulo="Confirmadas" valor={confirmadas} nota={`${pendientes} pendientes de confirmar`} />
         <Kpi titulo="Pendientes" valor={pendientes} />
       </div>
 
-      {/* Agenda de hoy */}
       <div className="rounded-xl border border-line bg-white">
         <div className="flex items-center justify-between border-b border-line px-5 py-4">
           <h2 className="font-semibold">Agenda de hoy</h2>

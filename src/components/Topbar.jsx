@@ -1,11 +1,7 @@
-// Barra superior: título de la página, buscador y botón "Nueva cita".
-// El título se deduce de la ruta actual. El botón solo lo ven ADMIN y RECEPCIÓN.
-
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useAuth } from '../auth/AuthContext'
+import { useAuth } from '../auth/useAuth'
 import { formatFechaLarga } from '../utils/fecha'
 
-// Título por ruta (el primer segmento de la URL).
 const TITULOS = {
   '': 'Panel',
   agenda: 'Agenda',
@@ -21,7 +17,7 @@ export default function Topbar() {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const segmento = location.pathname.split('/')[1] // '' para '/'
+  const segmento = location.pathname.split('/')[1]
   const titulo = TITULOS[segmento] ?? 'Panel'
   const puedeAgendar = user.rol === 'ADMIN' || user.rol === 'RECEPCION'
 

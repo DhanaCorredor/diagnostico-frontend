@@ -1,7 +1,4 @@
-// Página Ficha de paciente (ruta /pacientes/:id).
-// Cabecera con datos + pestañas: Datos personales · Historial de citas.
-
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api/client'
 import EstadoBadge from '../components/EstadoBadge'
@@ -30,7 +27,7 @@ export default function FichaPacientePage() {
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
 
-  async function cargar() {
+  const cargar = useCallback(async () => {
     setCargando(true)
     setError('')
     try {
@@ -49,12 +46,11 @@ export default function FichaPacientePage() {
     } finally {
       setCargando(false)
     }
-  }
+  }, [id])
 
   useEffect(() => {
     cargar()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id])
+  }, [cargar])
 
   if (cargando) return <p className="text-ink-muted">Cargando…</p>
   if (error) return <p className="rounded-lg bg-crit/10 px-4 py-3 text-crit">{error}</p>
@@ -69,7 +65,6 @@ export default function FichaPacientePage() {
         Volver a Pacientes
       </Link>
 
-      {/* Cabecera */}
       <div className="mb-6 rounded-xl border border-line bg-white p-5">
         <div className="flex flex-wrap items-center gap-4">
           <div className="grid h-16 w-16 place-items-center rounded-full bg-brand-light text-xl font-semibold text-brand-dark">
@@ -91,7 +86,6 @@ export default function FichaPacientePage() {
         </div>
       </div>
 
-      {/* Pestañas */}
       <div className="mb-4 flex gap-1 border-b border-line text-sm">
         <button
           onClick={() => setTab('datos')}
@@ -115,7 +109,6 @@ export default function FichaPacientePage() {
         </button>
       </div>
 
-      {/* Tab: Datos personales */}
       {tab === 'datos' && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="rounded-xl border border-line bg-white p-5">
@@ -142,7 +135,6 @@ export default function FichaPacientePage() {
         </div>
       )}
 
-      {/* Tab: Historial de citas */}
       {tab === 'citas' && (
         <div className="rounded-xl border border-line bg-white">
           {citas.length === 0 ? (

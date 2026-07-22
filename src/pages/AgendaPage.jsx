@@ -1,33 +1,21 @@
-// Página Agenda (ruta /agenda). Rejilla médico × hora de un día.
-//
-// - Filas: médicos (filtrables). Columnas: horas del día (07–17).
-// - Las citas aparecen como "chips" en la celda de su médico y su hora.
-// - Al pulsar una cita se abre su detalle (con acciones para ADMIN/RECEPCIÓN).
-// - Las horas fuera de la disponibilidad del médico se grisan (bloqueadas).
-// - Un MÉDICO solo ve su propia agenda (el backend ya se lo filtra).
-
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { api } from '../api/client'
-import { useAuth } from '../auth/AuthContext'
+import { useAuth } from '../auth/useAuth'
 import { diaSemana, fechaLargaDesdeISO, formatHora, hoyISO, sumarDias } from '../utils/fecha'
 import { indexarPor } from '../utils/datos'
 import DetalleCita from '../components/DetalleCita'
 
-// Horas visibles (el centro atiende 07:30–17:30).
-const HORAS = Array.from({ length: 11 }, (_, i) => 7 + i) // 7..17
+const HORAS = Array.from({ length: 11 }, (_, i) => 7 + i)
 
-// ¿La hora `h` está dentro de alguna franja del médico ese día de la semana?
 function horaDisponible(franjas, dia, h) {
   return franjas.some((f) => {
     if (f.dia_semana !== dia) return false
     const ini = Number(f.hora_inicio.slice(0, 2)) * 60 + Number(f.hora_inicio.slice(3, 5))
     const fin = Number(f.hora_fin.slice(0, 2)) * 60 + Number(f.hora_fin.slice(3, 5))
-    // La celda [h:00, h+1:00) se solapa con la franja.
     return (h + 1) * 60 > ini && h * 60 < fin
   })
 }
 
-// Nombre corto para el chip: "Carlos Mendoza" -> "C. Mendoza".
 function nombreCorto(nombre = '') {
   const partes = nombre.split(' ').filter(Boolean)
   if (partes.length < 2) return nombre
@@ -48,8 +36,8 @@ export default function AgendaPage() {
   const [filtroMedico, setFiltroMedico] = useState('todos')
   const [citas, setCitas] = useState([])
   const [medicos, setMedicos] = useState([])
-  const [servicios, setServicios] = useState([]) // lista (para el selector de edición)
-  const [pacientes, setPacientes] = useState({}) // mapa id -> nombre
+  const [servicios, setServicios] = useState([])
+  const [pacientes, setPacientes] = useState({})
   const [dispPorMedico, setDispPorMedico] = useState({})
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
@@ -57,7 +45,7 @@ export default function AgendaPage() {
 
   const puedeGestionar = user.rol === 'ADMIN' || user.rol === 'RECEPCION'
 
-  async function cargar() {
+  const cargar = useCallback(async () => {
     setCargando(true)
     setError('')
     try {
@@ -85,19 +73,17 @@ export default function AgendaPage() {
     } finally {
       setCargando(false)
     }
-  }
+  }, [fecha, puedeGestionar])
 
   useEffect(() => {
     cargar()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fecha, puedeGestionar])
+  }, [cargar])
 
   const dia = diaSemana(fecha)
   const serviciosMap = indexarPor(servicios, 'nombre')
   const medicosVisibles =
     filtroMedico === 'todos' ? medicos : medicos.filter((m) => m.id === filtroMedico)
 
-  // Citas de un médico en una hora concreta.
   function citasDe(medicoId, h) {
     return citas.filter(
       (c) => c.medico_id === medicoId && new Date(c.starts_at).getHours() === h,
@@ -106,7 +92,6 @@ export default function AgendaPage() {
 
   return (
     <div className="rounded-xl border border-line bg-white p-5">
-      {/* Controles */}
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-semibold capitalize">{fechaLargaDesdeISO(fecha)}</h2>
         <div className="flex items-center gap-2 text-sm">
@@ -157,7 +142,6 @@ export default function AgendaPage() {
             className="grid gap-px bg-line text-sm"
             style={{ gridTemplateColumns: `160px repeat(${HORAS.length}, minmax(96px, 1fr))` }}
           >
-            {/* Cabecera */}
             <div className="sticky left-0 z-10 bg-surface-plane px-3 py-2 text-left text-[11px] font-semibold">
               Médico
             </div>
@@ -167,7 +151,6 @@ export default function AgendaPage() {
               </div>
             ))}
 
-            {/* Filas por médico */}
             {medicosVisibles.map((m) => (
               <FilaMedico
                 key={m.id}
@@ -206,7 +189,6 @@ export default function AgendaPage() {
   )
 }
 
-// Una fila del calendario (un médico y sus 11 celdas de hora).
 function FilaMedico({ medico, dia, franjas, citasDe, serviciosMap, pacientes, onSeleccionar }) {
   return (
     <>
