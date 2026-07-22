@@ -7,16 +7,10 @@ import Spinner from '../components/atoms/Spinner'
 import Alerta from '../components/atoms/Alerta'
 import Tarjeta from '../components/atoms/Tarjeta'
 import TarjetaKPI from '../components/molecules/TarjetaKPI'
+import MensajeLista from '../components/atoms/MensajeLista'
 import { formatHora, hoyISO } from '../utils/fecha'
 import { indexarPor } from '../utils/datos'
-
-const BARRA = {
-  SCHEDULED: 'bg-warn',
-  CONFIRMED: 'bg-good',
-  CANCELLED: 'bg-crit',
-  COMPLETED: 'bg-ink-muted',
-  NO_SHOW: 'bg-crit',
-}
+import { ESTADOS_CITA } from '../utils/citas'
 
 export default function PanelPage() {
   const { user } = useAuth()
@@ -81,9 +75,7 @@ export default function PanelPage() {
         </div>
 
         {ordenadas.length === 0 ? (
-          <p className="px-5 py-10 text-center text-sm text-ink-muted">
-            No hay citas para hoy.
-          </p>
+          <MensajeLista>No hay citas para hoy.</MensajeLista>
         ) : (
           <div className="divide-y divide-line">
             {ordenadas.map((c) => (
@@ -95,7 +87,7 @@ export default function PanelPage() {
                 <span className="tnum w-14 text-sm font-medium text-ink-2">
                   {formatHora(c.starts_at)}
                 </span>
-                <span className={`h-9 w-1 rounded-full ${BARRA[c.estado] ?? 'bg-ink-muted'}`} />
+                <span className={`h-9 w-1 rounded-full ${ESTADOS_CITA[c.estado]?.barra ?? 'bg-ink-muted'}`} />
                 <div className="flex-1">
                   <p className="text-sm font-medium">
                     {pacientes[c.paciente_id] ?? c.motivo ?? 'Paciente'}

@@ -5,12 +5,8 @@ import Badge from '../components/atoms/Badge'
 import Spinner from '../components/atoms/Spinner'
 import Tarjeta from '../components/atoms/Tarjeta'
 import Boton from '../components/atoms/Boton'
-
-const ROL_BADGE = {
-  ADMIN: { texto: 'Administrador', color: 'brand' },
-  RECEPCION: { texto: 'Recepción', color: 'aqua' },
-  MEDICO: { texto: 'Médico', color: 'warn' },
-}
+import MensajeLista from '../components/atoms/MensajeLista'
+import { ROLES } from '../utils/roles'
 
 export default function UsuariosPage() {
   const [usuarios, setUsuarios] = useState([])
@@ -59,7 +55,7 @@ export default function UsuariosPage() {
       {cargando ? (
         <Spinner className="px-5 py-10 text-center" />
       ) : error ? (
-        <p className="px-5 py-10 text-center text-sm text-crit">{error}</p>
+        <MensajeLista tipo="error">{error}</MensajeLista>
       ) : (
         <table className="w-full text-sm">
           <thead className="text-left text-xs uppercase tracking-wide text-ink-muted">
@@ -73,14 +69,14 @@ export default function UsuariosPage() {
           </thead>
           <tbody className="divide-y divide-line">
             {usuarios.map((u) => {
-              const badge = ROL_BADGE[u.rol] ?? { texto: u.rol, color: 'neutral' }
+              const badge = ROLES[u.rol] ?? { etiqueta: u.rol, color: 'neutral' }
               return (
                 <tr key={u.id} className="hover:bg-surface-plane">
                   <td className="px-5 py-3 font-medium">{u.nombre_completo}</td>
                   <td className="px-5 py-3 text-ink-2">{u.email}</td>
                   <td className="px-5 py-3">
                     <Badge color={badge.color} tamano="sm">
-                      {badge.texto}
+                      {badge.etiqueta}
                     </Badge>
                   </td>
                   <td className="px-5 py-3">

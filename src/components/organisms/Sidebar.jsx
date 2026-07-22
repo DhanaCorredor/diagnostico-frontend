@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/useAuth'
 import Avatar from '../atoms/Avatar'
+import { ROLES } from '../../utils/roles'
 
 const iconos = {
   panel: (
@@ -35,8 +36,6 @@ const NAV = [
   { to: '/config', icono: 'config', texto: 'Configuración', roles: ['ADMIN'] },
 ]
 
-const ROL_LABEL = { ADMIN: 'Administrador', RECEPCION: 'Recepción', MEDICO: 'Médico' }
-
 function claseEnlace({ isActive }) {
   const base = 'flex items-center gap-3 rounded-lg px-3 py-2 cursor-pointer'
   return isActive
@@ -56,7 +55,7 @@ export default function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 flex w-60 flex-col border-r border-line bg-white">
       <div className="flex items-center gap-3 px-5 py-5">
-        <img src="/isotipo.jpg" alt="Diagnóstico" className="h-9 w-9 object-contain" />
+        <img src="/isotipo.png" alt="Diagnóstico" className="h-9 w-9 object-contain" />
         <div>
           <p className="text-sm font-semibold leading-tight">Diagnóstico</p>
           <p className="text-[11px] text-ink-muted">Gestión de Citas</p>
@@ -89,7 +88,7 @@ export default function Sidebar() {
           <Avatar nombre={user.nombre_completo} tamano="sm" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium">{user.nombre_completo}</p>
-            <p className="text-[11px] text-ink-muted">{ROL_LABEL[user.rol] ?? user.rol}</p>
+            <p className="text-[11px] text-ink-muted">{ROLES[user.rol]?.etiqueta ?? user.rol}</p>
           </div>
           <button onClick={salir} title="Salir" className="text-ink-muted hover:text-crit">
             <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">

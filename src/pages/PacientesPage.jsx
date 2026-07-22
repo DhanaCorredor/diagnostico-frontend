@@ -6,6 +6,7 @@ import Spinner from '../components/atoms/Spinner'
 import Tarjeta from '../components/atoms/Tarjeta'
 import Boton from '../components/atoms/Boton'
 import BarraBusqueda from '../components/molecules/BarraBusqueda'
+import MensajeLista from '../components/atoms/MensajeLista'
 
 export default function PacientesPage() {
   const [pacientes, setPacientes] = useState([])
@@ -61,11 +62,11 @@ export default function PacientesPage() {
         {cargando ? (
           <Spinner className="px-5 py-10 text-center" />
         ) : error ? (
-          <p className="px-5 py-10 text-center text-sm text-crit">{error}</p>
+          <MensajeLista tipo="error">{error}</MensajeLista>
         ) : filtrados.length === 0 ? (
-          <p className="px-5 py-10 text-center text-sm text-ink-muted">
+          <MensajeLista>
             {termino ? 'Sin resultados para la búsqueda.' : 'Aún no hay pacientes.'}
-          </p>
+          </MensajeLista>
         ) : (
           <table className="w-full text-sm">
             <thead className="text-left text-xs uppercase tracking-wide text-ink-muted">

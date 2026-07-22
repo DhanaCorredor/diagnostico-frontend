@@ -10,6 +10,7 @@ import Spinner from '../components/atoms/Spinner'
 import Alerta from '../components/atoms/Alerta'
 import Tarjeta from '../components/atoms/Tarjeta'
 import Boton from '../components/atoms/Boton'
+import MensajeLista from '../components/atoms/MensajeLista'
 
 function Dato({ etiqueta, valor }) {
   return (
@@ -137,9 +138,7 @@ export default function FichaPacientePage() {
       {tab === 'citas' && (
         <Tarjeta>
           {citas.length === 0 ? (
-            <p className="px-5 py-10 text-center text-sm text-ink-muted">
-              Este paciente no tiene citas registradas.
-            </p>
+            <MensajeLista>Este paciente no tiene citas registradas.</MensajeLista>
           ) : (
             <table className="w-full text-sm">
               <thead className="text-left text-xs uppercase tracking-wide text-ink-muted">

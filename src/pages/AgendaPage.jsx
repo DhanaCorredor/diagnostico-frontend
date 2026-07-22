@@ -6,6 +6,8 @@ import { indexarPor } from '../utils/datos'
 import DetalleCita from '../components/organisms/DetalleCita'
 import Spinner from '../components/atoms/Spinner'
 import Tarjeta from '../components/atoms/Tarjeta'
+import MensajeLista from '../components/atoms/MensajeLista'
+import { ESTADOS_CITA } from '../utils/citas'
 
 const HORAS = Array.from({ length: 11 }, (_, i) => 7 + i)
 
@@ -22,14 +24,6 @@ function nombreCorto(nombre = '') {
   const partes = nombre.split(' ').filter(Boolean)
   if (partes.length < 2) return nombre
   return `${partes[0][0]}. ${partes[partes.length - 1]}`
-}
-
-const CHIP = {
-  SCHEDULED: 'bg-warn/10 text-[#8a6100]',
-  CONFIRMED: 'bg-good/10 text-good',
-  COMPLETED: 'bg-ink-muted/10 text-ink-2',
-  CANCELLED: 'bg-crit/10 text-crit',
-  NO_SHOW: 'bg-crit/10 text-crit',
 }
 
 export default function AgendaPage() {
@@ -135,9 +129,9 @@ export default function AgendaPage() {
       {cargando ? (
         <Spinner className="py-10 text-center" />
       ) : error ? (
-        <p className="py-10 text-center text-sm text-crit">{error}</p>
+        <MensajeLista tipo="error">{error}</MensajeLista>
       ) : medicosVisibles.length === 0 ? (
-        <p className="py-10 text-center text-sm text-ink-muted">No hay médicos que mostrar.</p>
+        <MensajeLista>No hay médicos que mostrar.</MensajeLista>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-line">
           <div
@@ -214,7 +208,7 @@ function FilaMedico({ medico, dia, franjas, citasDe, serviciosMap, pacientes, on
                 onClick={() => onSeleccionar(c)}
                 title={`${formatHora(c.starts_at)} · ${serviciosMap[c.servicio_id] ?? ''}`}
                 className={`block w-full rounded px-1.5 py-1 text-left text-[11px] leading-tight hover:brightness-95 ${
-                  CHIP[c.estado] ?? 'bg-brand-light text-brand-dark'
+                  ESTADOS_CITA[c.estado]?.chip ?? 'bg-brand-light text-brand-dark'
                 }`}
               >
                 <span className="tnum font-medium">{formatHora(c.starts_at)}</span>{' '}
