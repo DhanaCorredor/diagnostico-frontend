@@ -1,1 +1,37 @@
 @import "tailwindcss";
+
+/* Paleta y tipografía de la marca "Diagnóstico".
+   En Tailwind v4 el tema se define aquí con @theme (no en un tailwind.config.js).
+   Cada variable --color-x genera utilidades: bg-x, text-x, border-x, etc.
+   Los valores salen del mockup (mockup/index.html del repo backend). */
+@theme {
+  --color-brand: #276d6b;
+  --color-brand-dark: #1c4f4d;
+  --color-brand-light: #d7e7e5;
+
+  --color-aqua: #7ba845;
+
+  --color-ink: #0b0b0b;
+  --color-ink-2: #52514e;
+  --color-ink-muted: #898781;
+
+  --color-surface: #ffffff;
+  --color-surface-plane: #f2f6f5;
+
+  --color-line: #e3ebe9;
+
+  --color-good: #0ca30c;
+  --color-warn: #eda100;
+  --color-crit: #d03b3b;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+body {
+  background: var(--color-surface-plane);
+}
+
+/* Números tabulares: alinea cifras (horas, cédulas, contadores) en columnas. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
