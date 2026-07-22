@@ -109,6 +109,24 @@ as a bearer token on every request. The session user (and role) is read from
 > opens a detail dialog to **cancel**, **mark attendance** (attended / no-show)
 > or **edit/move** it (reception & admin).
 
+## ☁️ Deployment (Vercel)
+
+The app is a static Vite build (`dist/`) hosted on **Vercel**.
+
+1. Import the GitHub repo into Vercel — it auto-detects Vite (build `pnpm build`,
+   output `dist`) and pnpm from the lockfile.
+2. In **Project → Settings → Environment Variables**, add:
+   - `VITE_API_URL = https://diagnostico-api-jtbw.onrender.com`
+
+   Vite reads env vars at **build time**, so redeploy after changing it.
+3. Deploy. Deep links and page refreshes (e.g. `/agenda`) work thanks to
+   [`vercel.json`](vercel.json), which rewrites every path to `index.html`.
+
+> **⚠️ Backend CORS:** the API only accepts requests from the origin set in its
+> `FRONTEND_ORIGIN` env var. After the first deploy, set that variable (on Render)
+> to the Vercel URL — e.g. `https://diagnostico-frontend.vercel.app` — otherwise
+> the browser will block every request.
+
 ## 🔗 Related
 
 - **Backend:** [`diagnostico-backend`](../diagnostico-backend) — FastAPI + PostgreSQL API and project docs.
