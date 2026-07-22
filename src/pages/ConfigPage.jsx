@@ -5,7 +5,9 @@ import { claseInput } from '../components/Campo'
 const CATEGORIAS = [
   { valor: 'CONSULTA', etiqueta: 'Consulta' },
   { valor: 'ECOGRAFIA', etiqueta: 'Ecografía' },
+  { valor: 'DOPPLER', etiqueta: 'Doppler' },
   { valor: 'ESTUDIO_CARDIACO', etiqueta: 'Estudio cardíaco' },
+  { valor: 'PROMOCION', etiqueta: 'Promoción' },
   { valor: 'OTRO', etiqueta: 'Otro' },
 ]
 const CAT_LABEL = Object.fromEntries(CATEGORIAS.map((c) => [c.valor, c.etiqueta]))
