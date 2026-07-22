@@ -1,6 +1,3 @@
-// Ventana modal reutilizable: fondo oscuro + tarjeta centrada.
-// Recibe un título, el contenido (children) y, opcionalmente, un pie de botones.
-
 export default function Modal({ titulo, subtitulo, onClose, children, footer }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">

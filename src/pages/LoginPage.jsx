@@ -1,12 +1,6 @@
-// Página de Login (ruta /login).
-//
-// Formulario controlado: React guarda en el estado lo que se escribe en cada
-// campo. Al enviar, llama a `login()` del contexto de auth (que pide el token
-// al backend y recupera el usuario) y redirige a donde el usuario quería ir.
-
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useAuth } from '../auth/AuthContext'
+import { useAuth } from '../auth/useAuth'
 import { ApiError } from '../api/client'
 import AuthLayout from '../layouts/AuthLayout'
 
@@ -20,7 +14,6 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [cargando, setCargando] = useState(false)
 
-  // A dónde volver tras entrar (si nos mandaron aquí desde una ruta protegida).
   const destino = location.state?.from?.pathname ?? '/'
 
   async function onSubmit(e) {
@@ -31,7 +24,6 @@ export default function LoginPage() {
       await login(email, password)
       navigate(destino, { replace: true })
     } catch (err) {
-      // 401 = credenciales inválidas; cualquier otro, mensaje genérico.
       if (err instanceof ApiError && err.status === 401) {
         setError('Correo o contraseña incorrectos.')
       } else {

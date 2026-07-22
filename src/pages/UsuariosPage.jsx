@@ -1,6 +1,3 @@
-// Página Usuarios (ruta /usuarios, solo ADMIN). Personal del sistema.
-// Tabla + alta/edición + baja lógica (activar/desactivar).
-
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
 import FormularioUsuario from '../components/FormularioUsuario'
@@ -16,7 +13,7 @@ export default function UsuariosPage() {
   const [especialidades, setEspecialidades] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
-  const [editar, setEditar] = useState(null) // { } nuevo · usuario existente · null cerrado
+  const [editar, setEditar] = useState(null)
 
   async function cargar() {
     setCargando(true)

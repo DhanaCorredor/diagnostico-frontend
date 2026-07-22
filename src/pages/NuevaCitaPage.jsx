@@ -1,12 +1,3 @@
-// Página Nueva cita (ruta /citas/nueva). Formulario de agendado.
-//
-// Al guardar hace POST /citas, que aplica TODAS las reglas de negocio:
-//   - upsert de paciente por nombre + edad
-//   - la cita debe empezar en :00/:15/:30/:45
-//   - dentro de la disponibilidad del médico (salvo sobrecupo)
-//   - sin solaparse con otra cita del mismo médico
-// Cada regla que falla vuelve como error HTTP y aquí lo mostramos claro.
-
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api, ApiError } from '../api/client'
@@ -31,14 +22,13 @@ export default function NuevaCitaPage() {
     motivo: '',
     permitir_sobrecupo: false,
   })
-  const [error, setError] = useState(null) // { mensaje, candidatos? }
+  const [error, setError] = useState(null)
   const [guardando, setGuardando] = useState(false)
 
   function set(campo, valor) {
     setForm((f) => ({ ...f, [campo]: valor }))
   }
 
-  // Cargamos los desplegables (médicos y servicios) al entrar.
   useEffect(() => {
     async function cargar() {
       try {
@@ -56,7 +46,6 @@ export default function NuevaCitaPage() {
     e.preventDefault()
     setError(null)
 
-    // Validación previa: la hora debe caer en un cuarto de hora exacto.
     const minutos = Number(form.hora.slice(3, 5))
     if (minutos % 15 !== 0) {
       setError({ mensaje: 'La hora debe empezar en :00, :15, :30 o :45.' })
@@ -69,7 +58,7 @@ export default function NuevaCitaPage() {
       edad: Number(form.edad),
       medico_id: form.medico_id,
       servicio_id: form.servicio_id,
-      starts_at: `${form.fecha}T${form.hora}:00`, // hora local naive (sin zona)
+      starts_at: `${form.fecha}T${form.hora}:00`,
       duracion_min: Number(form.duracion_min),
       motivo: form.motivo.trim() || null,
       permitir_sobrecupo: form.permitir_sobrecupo,
@@ -80,7 +69,6 @@ export default function NuevaCitaPage() {
       navigate('/agenda')
     } catch (err) {
       if (err instanceof ApiError) {
-        // Ambigüedad de paciente (409): el backend adjunta los candidatos.
         const candidatos = err.detail?.candidatos
         setError({ mensaje: err.message, candidatos })
       } else {
@@ -116,7 +104,6 @@ export default function NuevaCitaPage() {
             </div>
           )}
 
-          {/* Paciente */}
           <div className="grid grid-cols-3 gap-3">
             <div className="col-span-2">
               <Campo label="Paciente (nombre completo)">
@@ -142,7 +129,6 @@ export default function NuevaCitaPage() {
             </Campo>
           </div>
 
-          {/* Médico y servicio */}
           <div className="grid grid-cols-2 gap-3">
             <Campo label="Médico">
               <select
@@ -176,7 +162,6 @@ export default function NuevaCitaPage() {
             </Campo>
           </div>
 
-          {/* Fecha, hora y duración */}
           <div className="grid grid-cols-3 gap-3">
             <Campo label="Fecha">
               <input
@@ -212,7 +197,6 @@ export default function NuevaCitaPage() {
             </Campo>
           </div>
 
-          {/* Motivo */}
           <Campo label="Motivo (opcional)">
             <input
               value={form.motivo}
@@ -221,7 +205,6 @@ export default function NuevaCitaPage() {
             />
           </Campo>
 
-          {/* Sobrecupo */}
           <label className="flex items-center gap-2 text-sm text-ink-2">
             <input
               type="checkbox"

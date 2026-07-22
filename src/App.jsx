@@ -1,10 +1,3 @@
-// Mapa de rutas de la app + guardas por rol.
-//
-// Estructura:
-//   /login                     -> pública (LoginPage)
-//   todo lo demás              -> dentro de <AppLayout> y protegido por sesión
-//   algunas rutas              -> además restringidas por rol (roles=[...])
-
 import { Navigate, Route, Routes } from 'react-router-dom'
 import ProtectedRoute from './auth/ProtectedRoute'
 import AppLayout from './layouts/AppLayout'
@@ -18,16 +11,13 @@ import NuevaCitaPage from './pages/NuevaCitaPage'
 import UsuariosPage from './pages/UsuariosPage'
 import ConfigPage from './pages/ConfigPage'
 
-// Roles con acceso a la gestión de recepción (pacientes, agendar…).
 const RECEP = ['ADMIN', 'RECEPCION']
 
 export default function App() {
   return (
     <Routes>
-      {/* Pública */}
       <Route path="/login" element={<LoginPage />} />
 
-      {/* Privadas: exigen sesión y comparten el layout (sidebar + topbar) */}
       <Route
         element={
           <ProtectedRoute>
@@ -88,7 +78,6 @@ export default function App() {
         />
       </Route>
 
-      {/* Cualquier otra ruta -> al panel */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

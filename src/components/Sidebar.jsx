@@ -1,10 +1,7 @@
-// Barra lateral: navegación (filtrada por rol), datos del usuario y salir.
-
 import { NavLink, useNavigate } from 'react-router-dom'
-import { useAuth } from '../auth/AuthContext'
+import { useAuth } from '../auth/useAuth'
 import { iniciales } from '../utils/texto'
 
-// Iconos SVG (los del mockup). Cada uno es un pequeño componente.
 const iconos = {
   panel: (
     <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -28,7 +25,6 @@ const iconos = {
   ),
 }
 
-// Cada enlace declara qué roles pueden verlo.
 const NAV = [
   { to: '/', icono: 'panel', texto: 'Panel', roles: ['ADMIN', 'RECEPCION', 'MEDICO'], end: true },
   { to: '/agenda', icono: 'agenda', texto: 'Agenda', roles: ['ADMIN', 'RECEPCION', 'MEDICO'] },
@@ -39,7 +35,6 @@ const NAV = [
   { to: '/config', icono: 'config', texto: 'Configuración', roles: ['ADMIN'] },
 ]
 
-// Etiqueta legible del rol y sus iniciales para el avatar.
 const ROL_LABEL = { ADMIN: 'Administrador', RECEPCION: 'Recepción', MEDICO: 'Médico' }
 
 function claseEnlace({ isActive }) {
@@ -61,7 +56,6 @@ export default function Sidebar() {
 
   return (
     <aside className="fixed inset-y-0 left-0 flex w-60 flex-col border-r border-line bg-white">
-      {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-5">
         <div className="grid h-9 w-9 place-items-center rounded-lg bg-brand font-bold text-white">
           D
@@ -72,7 +66,6 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Navegación */}
       <nav className="mt-2 flex-1 space-y-1 px-3 text-sm">
         {NAV.filter((item) => item.roles.includes(user.rol)).map((item, i) =>
           item.divisor ? (
@@ -94,7 +87,6 @@ export default function Sidebar() {
         )}
       </nav>
 
-      {/* Usuario + salir */}
       <div className="border-t border-line px-3 py-3">
         <div className="flex items-center gap-3 rounded-lg px-2 py-2">
           <div className="grid h-8 w-8 place-items-center rounded-full bg-brand-light text-sm font-semibold text-brand-dark">
