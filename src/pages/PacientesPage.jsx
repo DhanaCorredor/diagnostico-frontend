@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api/client'
 import FormularioPaciente from '../components/FormularioPaciente'
+import Spinner from '../components/atoms/Spinner'
 
 export default function PacientesPage() {
   const [pacientes, setPacientes] = useState([])
@@ -70,7 +71,7 @@ export default function PacientesPage() {
         </div>
 
         {cargando ? (
-          <p className="px-5 py-10 text-center text-sm text-ink-muted">Cargando…</p>
+          <Spinner className="px-5 py-10 text-center" />
         ) : error ? (
           <p className="px-5 py-10 text-center text-sm text-crit">{error}</p>
         ) : filtrados.length === 0 ? (

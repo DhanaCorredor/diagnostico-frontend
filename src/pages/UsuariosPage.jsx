@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
 import FormularioUsuario from '../components/FormularioUsuario'
+import Badge from '../components/atoms/Badge'
+import Spinner from '../components/atoms/Spinner'
 
 const ROL_BADGE = {
-  ADMIN: { texto: 'Administrador', clase: 'bg-brand-light text-brand-dark' },
-  RECEPCION: { texto: 'Recepción', clase: 'bg-[#eef4e3] text-aqua' },
-  MEDICO: { texto: 'Médico', clase: 'bg-warn/10 text-[#8a6100]' },
+  ADMIN: { texto: 'Administrador', color: 'brand' },
+  RECEPCION: { texto: 'Recepción', color: 'aqua' },
+  MEDICO: { texto: 'Médico', color: 'warn' },
 }
 
 export default function UsuariosPage() {
@@ -56,7 +58,7 @@ export default function UsuariosPage() {
       </div>
 
       {cargando ? (
-        <p className="px-5 py-10 text-center text-sm text-ink-muted">Cargando…</p>
+        <Spinner className="px-5 py-10 text-center" />
       ) : error ? (
         <p className="px-5 py-10 text-center text-sm text-crit">{error}</p>
       ) : (
@@ -72,15 +74,15 @@ export default function UsuariosPage() {
           </thead>
           <tbody className="divide-y divide-line">
             {usuarios.map((u) => {
-              const badge = ROL_BADGE[u.rol] ?? { texto: u.rol, clase: 'bg-surface-plane text-ink-2' }
+              const badge = ROL_BADGE[u.rol] ?? { texto: u.rol, color: 'neutral' }
               return (
                 <tr key={u.id} className="hover:bg-surface-plane">
                   <td className="px-5 py-3 font-medium">{u.nombre_completo}</td>
                   <td className="px-5 py-3 text-ink-2">{u.email}</td>
                   <td className="px-5 py-3">
-                    <span className={`rounded-full px-2 py-0.5 text-xs ${badge.clase}`}>
+                    <Badge color={badge.color} tamano="sm">
                       {badge.texto}
-                    </span>
+                    </Badge>
                   </td>
                   <td className="px-5 py-3">
                     {u.activo ? (

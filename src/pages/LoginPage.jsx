@@ -3,6 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth'
 import { ApiError } from '../api/client'
 import AuthLayout from '../layouts/AuthLayout'
+import Input from '../components/atoms/Input'
+import Label from '../components/atoms/Label'
+import Boton from '../components/atoms/Boton'
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -53,37 +56,33 @@ export default function LoginPage() {
         <h1 className="mb-1 text-xl font-semibold">Iniciar sesión</h1>
         <p className="mb-6 text-sm text-ink-2">Acceso solo para personal autorizado.</p>
 
-        <label className="mb-1 block text-sm font-medium">Correo</label>
-        <input
+        <Label>Correo</Label>
+        <Input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
           autoFocus
           placeholder="tu@diagnostico.com"
-          className="mb-4 w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+          className="mb-4"
         />
 
-        <label className="mb-1 block text-sm font-medium">Contraseña</label>
-        <input
+        <Label>Contraseña</Label>
+        <Input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="mb-4 w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+          className="mb-4"
         />
 
         {error && (
           <p className="mb-4 rounded-lg bg-crit/10 px-3 py-2 text-sm text-crit">{error}</p>
         )}
 
-        <button
-          type="submit"
-          disabled={cargando}
-          className="w-full rounded-lg bg-brand py-2.5 text-sm font-semibold text-white transition hover:bg-brand-dark disabled:opacity-60"
-        >
+        <Boton type="submit" disabled={cargando} className="w-full">
           {cargando ? 'Entrando…' : 'Entrar'}
-        </button>
+        </Boton>
 
         <p className="mt-4 text-center text-xs text-ink-muted">
           🔒 Conexión segura · Datos cifrados

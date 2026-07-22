@@ -4,8 +4,9 @@ import { api } from '../api/client'
 import EstadoBadge from '../components/EstadoBadge'
 import FormularioPaciente from '../components/FormularioPaciente'
 import { formatFechaCorta, formatHora } from '../utils/fecha'
-import { iniciales } from '../utils/texto'
 import { indexarPor } from '../utils/datos'
+import Avatar from '../components/atoms/Avatar'
+import Spinner from '../components/atoms/Spinner'
 
 function Dato({ etiqueta, valor }) {
   return (
@@ -52,7 +53,7 @@ export default function FichaPacientePage() {
     cargar()
   }, [cargar])
 
-  if (cargando) return <p className="text-ink-muted">Cargando…</p>
+  if (cargando) return <Spinner />
   if (error) return <p className="rounded-lg bg-crit/10 px-4 py-3 text-crit">{error}</p>
   if (!paciente) return null
 
@@ -67,9 +68,7 @@ export default function FichaPacientePage() {
 
       <div className="mb-6 rounded-xl border border-line bg-white p-5">
         <div className="flex flex-wrap items-center gap-4">
-          <div className="grid h-16 w-16 place-items-center rounded-full bg-brand-light text-xl font-semibold text-brand-dark">
-            {iniciales(paciente.nombre_completo)}
-          </div>
+          <Avatar nombre={paciente.nombre_completo} tamano="lg" />
           <div className="flex-1">
             <h2 className="text-xl font-semibold">{paciente.nombre_completo}</h2>
             <p className="text-sm text-ink-2">

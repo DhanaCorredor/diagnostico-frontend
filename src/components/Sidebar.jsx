@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth'
-import { iniciales } from '../utils/texto'
+import Avatar from './atoms/Avatar'
 
 const iconos = {
   panel: (
@@ -38,8 +38,7 @@ const NAV = [
 const ROL_LABEL = { ADMIN: 'Administrador', RECEPCION: 'Recepción', MEDICO: 'Médico' }
 
 function claseEnlace({ isActive }) {
-  const base =
-    'flex items-center gap-3 rounded-lg px-3 py-2 cursor-pointer'
+  const base = 'flex items-center gap-3 rounded-lg px-3 py-2 cursor-pointer'
   return isActive
     ? `${base} bg-[#e8f2f0] font-semibold text-brand-dark`
     : `${base} text-ink-2 hover:bg-surface-plane`
@@ -89,9 +88,7 @@ export default function Sidebar() {
 
       <div className="border-t border-line px-3 py-3">
         <div className="flex items-center gap-3 rounded-lg px-2 py-2">
-          <div className="grid h-8 w-8 place-items-center rounded-full bg-brand-light text-sm font-semibold text-brand-dark">
-            {iniciales(user.nombre_completo)}
-          </div>
+          <Avatar nombre={user.nombre_completo} tamano="sm" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium">{user.nombre_completo}</p>
             <p className="text-[11px] text-ink-muted">{ROL_LABEL[user.rol] ?? user.rol}</p>

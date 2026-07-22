@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
 import TarjetaMedico from '../components/TarjetaMedico'
+import Spinner from '../components/atoms/Spinner'
 
 export default function MedicosPage() {
   const [medicos, setMedicos] = useState([])
@@ -32,7 +33,7 @@ export default function MedicosPage() {
     cargar()
   }, [])
 
-  if (cargando) return <p className="text-ink-muted">Cargando…</p>
+  if (cargando) return <Spinner />
   if (error) return <p className="rounded-lg bg-crit/10 px-4 py-3 text-crit">{error}</p>
 
   return (

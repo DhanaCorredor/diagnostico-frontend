@@ -3,6 +3,7 @@ import { api } from '../api/client'
 import { useAuth } from '../auth/useAuth'
 import EstadoBadge from '../components/EstadoBadge'
 import DetalleCita from '../components/DetalleCita'
+import Spinner from '../components/atoms/Spinner'
 import { formatHora, hoyISO } from '../utils/fecha'
 import { indexarPor } from '../utils/datos'
 
@@ -67,7 +68,7 @@ export default function PanelPage() {
   const pendientes = citas.filter((c) => c.estado === 'SCHEDULED').length
   const ordenadas = [...citas].sort((a, b) => a.starts_at.localeCompare(b.starts_at))
 
-  if (cargando) return <p className="text-ink-muted">Cargando…</p>
+  if (cargando) return <Spinner />
   if (error) return <p className="rounded-lg bg-crit/10 px-4 py-3 text-crit">{error}</p>
 
   return (

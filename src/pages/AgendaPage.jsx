@@ -4,6 +4,7 @@ import { useAuth } from '../auth/useAuth'
 import { diaSemana, fechaLargaDesdeISO, formatHora, hoyISO, sumarDias } from '../utils/fecha'
 import { indexarPor } from '../utils/datos'
 import DetalleCita from '../components/DetalleCita'
+import Spinner from '../components/atoms/Spinner'
 
 const HORAS = Array.from({ length: 11 }, (_, i) => 7 + i)
 
@@ -131,7 +132,7 @@ export default function AgendaPage() {
       </div>
 
       {cargando ? (
-        <p className="py-10 text-center text-sm text-ink-muted">Cargando…</p>
+        <Spinner className="py-10 text-center" />
       ) : error ? (
         <p className="py-10 text-center text-sm text-crit">{error}</p>
       ) : medicosVisibles.length === 0 ? (
