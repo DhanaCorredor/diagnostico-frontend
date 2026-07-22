@@ -62,15 +62,6 @@ export default function ConfigPage() {
     }
   }
 
-  async function desactivarServicio(id) {
-    try {
-      await api.put(`/servicios/${id}`, { activo: false })
-      cargar()
-    } catch {
-      setError('No se pudo desactivar el servicio.')
-    }
-  }
-
   return (
     <div className="space-y-6">
       {error && <p className="rounded-lg bg-crit/10 px-4 py-3 text-sm text-crit">{error}</p>}
@@ -116,16 +107,8 @@ export default function ConfigPage() {
                 key={s.id}
                 className="flex items-center justify-between rounded-lg bg-surface-plane px-3 py-2"
               >
-                <span>
-                  {s.nombre}
-                  <span className="ml-2 text-xs text-ink-muted">{CAT_LABEL[s.categoria] ?? s.categoria}</span>
-                </span>
-                <button
-                  onClick={() => desactivarServicio(s.id)}
-                  className="text-xs text-crit hover:underline"
-                >
-                  Desactivar
-                </button>
+                <span>{s.nombre}</span>
+                <span className="text-xs text-ink-muted">{CAT_LABEL[s.categoria] ?? s.categoria}</span>
               </div>
             ))}
             {servicios.length === 0 && (
