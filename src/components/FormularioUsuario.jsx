@@ -1,0 +1,201 @@
+// Formulario de alta/edición de un usuario del personal (dentro de un Modal).
+//
+//   - Alta:    sin `usuario` -> POST /usuarios (contraseña obligatoria).
+//   - Edición: con `usuario`  -> PUT  /usuarios/{id} (contraseña opcional).
+// La matrícula y las especialidades solo se envían si el rol es MÉDICO.
+
+import { useState } from 'react'
+import { api, ApiError } from '../api/client'
+import Modal from './Modal'
+
+const ROLES = [
+  { valor: 'ADMIN', etiqueta: 'Administrador' },
+  { valor: 'RECEPCION', etiqueta: 'Recepción' },
+  { valor: 'MEDICO', etiqueta: 'Médico' },
+]
+
+const claseInput =
+  'w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20'
+
+function Campo({ label, hint, children }) {
+  return (
+    <div>
+      <label className="mb-1 block text-sm font-medium">{label}</label>
+      {children}
+      {hint && <p className="mt-1 text-[11px] text-ink-muted">{hint}</p>}
+    </div>
+  )
+}
+
+export default function FormularioUsuario({ usuario, especialidades, onCerrar, onGuardado }) {
+  const editando = Boolean(usuario)
+
+  const [form, setForm] = useState({
+    nombre_completo: usuario?.nombre_completo ?? '',
+    email: usuario?.email ?? '',
+    rol: usuario?.rol ?? 'RECEPCION',
+    password: '',
+    matricula: usuario?.matricula ?? '',
+    especialidades: usuario?.especialidades?.map((e) => e.id) ?? [],
+  })
+  const [error, setError] = useState('')
+  const [guardando, setGuardando] = useState(false)
+
+  const esMedico = form.rol === 'MEDICO'
+
+  function set(campo, valor) {
+    setForm((f) => ({ ...f, [campo]: valor }))
+  }
+
+  function toggleEspecialidad(id) {
+    setForm((f) => ({
+      ...f,
+      especialidades: f.especialidades.includes(id)
+        ? f.especialidades.filter((x) => x !== id)
+        : [...f.especialidades, id],
+    }))
+  }
+
+  async function onSubmit(e) {
+    e.preventDefault()
+    setError('')
+    setGuardando(true)
+
+    // Armamos el cuerpo según el rol y si estamos creando o editando.
+    const cuerpo = {
+      nombre_completo: form.nombre_completo.trim(),
+      email: form.email.trim(),
+      rol: form.rol,
+    }
+    if (esMedico) {
+      cuerpo.matricula = form.matricula.trim() || null
+      cuerpo.especialidades = form.especialidades
+    }
+    // En alta la contraseña es obligatoria; en edición, solo si se escribió.
+    if (!editando || form.password) cuerpo.password = form.password
+
+    try {
+      if (editando) await api.put(`/usuarios/${usuario.id}`, cuerpo)
+      else await api.post('/usuarios', cuerpo)
+      onGuardado()
+    } catch (err) {
+      if (err instanceof ApiError) setError(err.message)
+      else setError('No se pudo guardar el usuario.')
+      setGuardando(false)
+    }
+  }
+
+  const footer = (
+    <>
+      <button
+        type="button"
+        onClick={onCerrar}
+        className="rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-surface-plane"
+      >
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        form="form-usuario"
+        disabled={guardando}
+        className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-60"
+      >
+        {guardando ? 'Guardando…' : 'Guardar'}
+      </button>
+    </>
+  )
+
+  return (
+    <Modal
+      titulo={editando ? 'Editar usuario' : 'Nuevo acceso'}
+      subtitulo="Personal interno que inicia sesión en el sistema."
+      onClose={onCerrar}
+      footer={footer}
+    >
+      <form id="form-usuario" onSubmit={onSubmit} className="space-y-4">
+        {error && <p className="rounded-lg bg-crit/10 px-3 py-2 text-sm text-crit">{error}</p>}
+
+        <Campo label="Nombre completo">
+          <input
+            value={form.nombre_completo}
+            onChange={(e) => set('nombre_completo', e.target.value)}
+            required
+            autoFocus
+            className={claseInput}
+          />
+        </Campo>
+
+        <div className="grid grid-cols-2 gap-3">
+          <Campo label="Correo">
+            <input
+              type="email"
+              value={form.email}
+              onChange={(e) => set('email', e.target.value)}
+              required
+              className={claseInput}
+            />
+          </Campo>
+          <Campo label="Rol">
+            <select value={form.rol} onChange={(e) => set('rol', e.target.value)} className={claseInput}>
+              {ROLES.map((r) => (
+                <option key={r.valor} value={r.valor}>
+                  {r.etiqueta}
+                </option>
+              ))}
+            </select>
+          </Campo>
+        </div>
+
+        <Campo
+          label={editando ? 'Contraseña (dejar en blanco para no cambiar)' : 'Contraseña'}
+          hint="Mínimo 8 caracteres."
+        >
+          <input
+            type="password"
+            value={form.password}
+            onChange={(e) => set('password', e.target.value)}
+            required={!editando}
+            minLength={8}
+            className={claseInput}
+          />
+        </Campo>
+
+        {/* Solo para médicos */}
+        {esMedico && (
+          <>
+            <Campo label="Matrícula (opcional)">
+              <input
+                value={form.matricula}
+                onChange={(e) => set('matricula', e.target.value)}
+                placeholder="MPPS 45.221"
+                className={claseInput}
+              />
+            </Campo>
+            <div>
+              <label className="mb-1 block text-sm font-medium">Especialidades</label>
+              <div className="flex max-h-40 flex-wrap gap-2 overflow-y-auto rounded-lg border border-line p-2">
+                {especialidades.map((e) => {
+                  const activa = form.especialidades.includes(e.id)
+                  return (
+                    <button
+                      type="button"
+                      key={e.id}
+                      onClick={() => toggleEspecialidad(e.id)}
+                      className={`rounded-full px-2.5 py-1 text-xs ${
+                        activa
+                          ? 'bg-brand text-white'
+                          : 'bg-surface-plane text-ink-2 hover:bg-brand-light'
+                      }`}
+                    >
+                      {e.nombre}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          </>
+        )}
+      </form>
+    </Modal>
+  )
+}
