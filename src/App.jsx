@@ -14,6 +14,7 @@ import AgendaPage from './pages/AgendaPage'
 import PacientesPage from './pages/PacientesPage'
 import FichaPacientePage from './pages/FichaPacientePage'
 import MedicosPage from './pages/MedicosPage'
+import NuevaCitaPage from './pages/NuevaCitaPage'
 import EnConstruccion from './pages/EnConstruccion'
 
 // Roles con acceso a la gestión de recepción (pacientes, agendar…).
@@ -64,7 +65,7 @@ export default function App() {
           path="/citas/nueva"
           element={
             <ProtectedRoute roles={RECEP}>
-              <EnConstruccion titulo="Nueva cita" />
+              <NuevaCitaPage />
             </ProtectedRoute>
           }
         />
