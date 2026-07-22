@@ -1,16 +1,8 @@
 // Tarjeta de un médico: avatar, nombre, especialidades (N:M) y disponibilidad.
 
-const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
+import { iniciales } from '../utils/texto'
 
-function iniciales(nombre = '') {
-  return nombre
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0])
-    .join('')
-    .toUpperCase()
-}
+const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 
 // Resume las franjas: agrupa por horario y muestra los días de forma compacta.
 // Ej.: [{Lun 07:30-17:30}...{Sáb ...}] -> "Lun–Sáb · 07:30–17:30".

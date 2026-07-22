@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import { api } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 import { diaSemana, fechaLargaDesdeISO, formatHora, hoyISO, sumarDias } from '../utils/fecha'
+import { indexarPor } from '../utils/datos'
 
 // Horas visibles (el centro atiende 07:30–17:30).
 const HORAS = Array.from({ length: 11 }, (_, i) => 7 + i) // 7..17
@@ -74,8 +75,8 @@ export default function AgendaPage() {
 
         setCitas(citasDia)
         setMedicos(listaMedicos)
-        setServicios(Object.fromEntries(listaServicios.map((s) => [s.id, s.nombre])))
-        setPacientes(Object.fromEntries(listaPacientes.map((p) => [p.id, p.nombre_completo])))
+        setServicios(indexarPor(listaServicios, 'nombre'))
+        setPacientes(indexarPor(listaPacientes, 'nombre_completo'))
         setDispPorMedico(dispMapa)
       } catch {
         setError('No se pudo cargar la agenda.')

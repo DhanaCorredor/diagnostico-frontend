@@ -7,25 +7,13 @@
 import { useState } from 'react'
 import { api, ApiError } from '../api/client'
 import Modal from './Modal'
+import Campo, { claseInput } from './Campo'
 
 const ROLES = [
   { valor: 'ADMIN', etiqueta: 'Administrador' },
   { valor: 'RECEPCION', etiqueta: 'Recepción' },
   { valor: 'MEDICO', etiqueta: 'Médico' },
 ]
-
-const claseInput =
-  'w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20'
-
-function Campo({ label, hint, children }) {
-  return (
-    <div>
-      <label className="mb-1 block text-sm font-medium">{label}</label>
-      {children}
-      {hint && <p className="mt-1 text-[11px] text-ink-muted">{hint}</p>}
-    </div>
-  )
-}
 
 export default function FormularioUsuario({ usuario, especialidades, onCerrar, onGuardado }) {
   const editando = Boolean(usuario)

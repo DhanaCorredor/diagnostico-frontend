@@ -7,6 +7,7 @@
 
 import { useEffect, useState } from 'react'
 import { api, ApiError } from '../api/client'
+import { claseInput } from '../components/Campo'
 
 const CATEGORIAS = [
   { valor: 'CONSULTA', etiqueta: 'Consulta' },
@@ -15,9 +16,6 @@ const CATEGORIAS = [
   { valor: 'OTRO', etiqueta: 'Otro' },
 ]
 const CAT_LABEL = Object.fromEntries(CATEGORIAS.map((c) => [c.valor, c.etiqueta]))
-
-const claseInput =
-  'w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20'
 
 export default function ConfigPage() {
   const [especialidades, setEspecialidades] = useState([])
