@@ -10,6 +10,7 @@ import ProtectedRoute from './auth/ProtectedRoute'
 import AppLayout from './layouts/AppLayout'
 import LoginPage from './pages/LoginPage'
 import PanelPage from './pages/PanelPage'
+import AgendaPage from './pages/AgendaPage'
 import PacientesPage from './pages/PacientesPage'
 import FichaPacientePage from './pages/FichaPacientePage'
 import MedicosPage from './pages/MedicosPage'
@@ -33,7 +34,7 @@ export default function App() {
         }
       >
         <Route path="/" element={<PanelPage />} />
-        <Route path="/agenda" element={<EnConstruccion titulo="Agenda" />} />
+        <Route path="/agenda" element={<AgendaPage />} />
 
         <Route
           path="/pacientes"

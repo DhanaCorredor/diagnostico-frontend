@@ -32,3 +32,23 @@ export function formatFechaLarga(fecha = new Date()) {
 export function formatFechaCorta(isoNaive) {
   return new Date(isoNaive).toLocaleDateString('es-ES')
 }
+
+// Suma (o resta) días a una fecha "YYYY-MM-DD" y devuelve otra "YYYY-MM-DD".
+export function sumarDias(fechaISO, dias) {
+  const d = new Date(`${fechaISO}T00:00:00`)
+  d.setDate(d.getDate() + dias)
+  const mes = String(d.getMonth() + 1).padStart(2, '0')
+  const dia = String(d.getDate()).padStart(2, '0')
+  return `${d.getFullYear()}-${mes}-${dia}`
+}
+
+// Día de la semana (0=domingo … 6=sábado) de una fecha "YYYY-MM-DD".
+// Coincide con la convención de `dia_semana` del backend.
+export function diaSemana(fechaISO) {
+  return new Date(`${fechaISO}T00:00:00`).getDay()
+}
+
+// Fecha "YYYY-MM-DD" en texto largo: "miércoles, 22 de julio de 2026".
+export function fechaLargaDesdeISO(fechaISO) {
+  return formatFechaLarga(new Date(`${fechaISO}T00:00:00`))
+}
