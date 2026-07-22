@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api/client'
-import FormularioPaciente from '../components/FormularioPaciente'
+import FormularioPaciente from '../components/organisms/FormularioPaciente'
 import Spinner from '../components/atoms/Spinner'
 import Tarjeta from '../components/atoms/Tarjeta'
 import Boton from '../components/atoms/Boton'

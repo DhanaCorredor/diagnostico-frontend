@@ -1,6 +1,6 @@
-import Avatar from './atoms/Avatar'
-import Badge from './atoms/Badge'
-import Tarjeta from './atoms/Tarjeta'
+import Avatar from '../atoms/Avatar'
+import Badge from '../atoms/Badge'
+import Tarjeta from '../atoms/Tarjeta'
 
 const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 

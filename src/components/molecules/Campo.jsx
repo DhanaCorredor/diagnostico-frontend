@@ -1,4 +1,4 @@
-import Label from './atoms/Label'
+import Label from '../atoms/Label'
 
 export default function Campo({ label, hint, children }) {
   return (

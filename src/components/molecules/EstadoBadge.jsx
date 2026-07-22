@@ -1,4 +1,4 @@
-import Badge from './atoms/Badge'
+import Badge from '../atoms/Badge'
 
 const ESTADOS = {
   SCHEDULED: { texto: 'Agendada', color: 'warn' },

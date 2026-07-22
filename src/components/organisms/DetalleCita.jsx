@@ -1,13 +1,13 @@
 import { useState } from 'react'
-import { api, ApiError } from '../api/client'
-import { formatFechaCorta, formatHora } from '../utils/fecha'
-import { indexarPor } from '../utils/datos'
-import EstadoBadge from './EstadoBadge'
-import Modal from './Modal'
-import Campo from './Campo'
-import Input from './atoms/Input'
-import Select from './atoms/Select'
-import Boton from './atoms/Boton'
+import { api, ApiError } from '../../api/client'
+import { formatFechaCorta, formatHora } from '../../utils/fecha'
+import { indexarPor } from '../../utils/datos'
+import EstadoBadge from '../molecules/EstadoBadge'
+import Modal from '../molecules/Modal'
+import Campo from '../molecules/Campo'
+import Input from '../atoms/Input'
+import Select from '../atoms/Select'
+import Boton from '../atoms/Boton'
 
 const DURACIONES = [15, 30, 45, 60, 90]
 const ESTADOS_ACTIVOS = ['SCHEDULED', 'CONFIRMED']

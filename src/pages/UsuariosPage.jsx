@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
-import FormularioUsuario from '../components/FormularioUsuario'
+import FormularioUsuario from '../components/organisms/FormularioUsuario'
 import Badge from '../components/atoms/Badge'
 import Spinner from '../components/atoms/Spinner'
 import Tarjeta from '../components/atoms/Tarjeta'

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
-import TarjetaMedico from '../components/TarjetaMedico'
+import TarjetaMedico from '../components/organisms/TarjetaMedico'
 import Spinner from '../components/atoms/Spinner'
 import Alerta from '../components/atoms/Alerta'
 

@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { api, ApiError } from '../api/client'
-import Modal from './Modal'
-import Campo from './Campo'
-import Input from './atoms/Input'
-import Select from './atoms/Select'
-import Boton from './atoms/Boton'
-import Alerta from './atoms/Alerta'
+import { api, ApiError } from '../../api/client'
+import Modal from '../molecules/Modal'
+import Campo from '../molecules/Campo'
+import Input from '../atoms/Input'
+import Select from '../atoms/Select'
+import Boton from '../atoms/Boton'
+import Alerta from '../atoms/Alerta'
 
 const ROLES = [
   { valor: 'ADMIN', etiqueta: 'Administrador' },

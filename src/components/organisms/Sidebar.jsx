@@ -1,6 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { useAuth } from '../auth/useAuth'
-import Avatar from './atoms/Avatar'
+import { useAuth } from '../../auth/useAuth'
+import Avatar from '../atoms/Avatar'
 
 const iconos = {
   panel: (

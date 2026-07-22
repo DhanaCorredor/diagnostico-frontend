@@ -3,7 +3,7 @@ import { api } from '../api/client'
 import { useAuth } from '../auth/useAuth'
 import { diaSemana, fechaLargaDesdeISO, formatHora, hoyISO, sumarDias } from '../utils/fecha'
 import { indexarPor } from '../utils/datos'
-import DetalleCita from '../components/DetalleCita'
+import DetalleCita from '../components/organisms/DetalleCita'
 import Spinner from '../components/atoms/Spinner'
 import Tarjeta from '../components/atoms/Tarjeta'
 
