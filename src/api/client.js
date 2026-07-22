@@ -2,6 +2,12 @@ const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 
 const TOKEN_KEY = 'diagnostico_token'
 
+let unauthorizedHandler = null
+
+export function setUnauthorizedHandler(fn) {
+  unauthorizedHandler = fn
+}
+
 export function getToken() {
   return localStorage.getItem(TOKEN_KEY)
 }
@@ -46,6 +52,7 @@ async function apiFetch(path, { method = 'GET', body, auth = true } = {}) {
   }
 
   if (!res.ok) {
+    if (res.status === 401 && auth) unauthorizedHandler?.()
     const detail = data?.detail ?? data
     const message =
       typeof detail === 'string'
