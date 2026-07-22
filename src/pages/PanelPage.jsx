@@ -8,13 +8,7 @@ import { api } from '../api/client'
 import { useAuth } from '../auth/AuthContext'
 import EstadoBadge from '../components/EstadoBadge'
 import { formatHora, hoyISO } from '../utils/fecha'
-
-// Convierte una lista [{id, ...}] en un mapa { id: nombre } para buscar rápido.
-function mapaNombres(lista, campo = 'nombre') {
-  const m = {}
-  for (const item of lista) m[item.id] = item[campo]
-  return m
-}
+import { indexarPor } from '../utils/datos'
 
 // Colorcito de la barra lateral de cada fila, según el estado.
 const BARRA = {
@@ -59,9 +53,9 @@ export default function PanelPage() {
           puedeVerPacientes ? api.get('/pacientes') : Promise.resolve([]),
         ])
         setCitas(citasHoy)
-        setMedicos(mapaNombres(listaMedicos, 'nombre_completo'))
-        setServicios(mapaNombres(listaServicios, 'nombre'))
-        setPacientes(mapaNombres(listaPacientes, 'nombre_completo'))
+        setMedicos(indexarPor(listaMedicos, 'nombre_completo'))
+        setServicios(indexarPor(listaServicios, 'nombre'))
+        setPacientes(indexarPor(listaPacientes, 'nombre_completo'))
       } catch {
         setError('No se pudieron cargar los datos del panel.')
       } finally {

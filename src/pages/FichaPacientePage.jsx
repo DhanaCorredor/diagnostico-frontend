@@ -7,16 +7,8 @@ import { api } from '../api/client'
 import EstadoBadge from '../components/EstadoBadge'
 import FormularioPaciente from '../components/FormularioPaciente'
 import { formatFechaCorta, formatHora } from '../utils/fecha'
-
-function iniciales(nombre = '') {
-  return nombre
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0])
-    .join('')
-    .toUpperCase()
-}
+import { iniciales } from '../utils/texto'
+import { indexarPor } from '../utils/datos'
 
 function Dato({ etiqueta, valor }) {
   return (
@@ -50,8 +42,8 @@ export default function FichaPacientePage() {
       ])
       setPaciente(pac)
       setCitas(hist)
-      setMedicos(Object.fromEntries(listaMedicos.map((m) => [m.id, m.nombre_completo])))
-      setServicios(Object.fromEntries(listaServicios.map((s) => [s.id, s.nombre])))
+      setMedicos(indexarPor(listaMedicos, 'nombre_completo'))
+      setServicios(indexarPor(listaServicios, 'nombre'))
     } catch {
       setError('No se pudo cargar la ficha del paciente.')
     } finally {

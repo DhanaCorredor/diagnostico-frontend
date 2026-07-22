@@ -2,6 +2,7 @@
 
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
+import { iniciales } from '../utils/texto'
 
 // Iconos SVG (los del mockup). Cada uno es un pequeño componente.
 const iconos = {
@@ -40,16 +41,6 @@ const NAV = [
 
 // Etiqueta legible del rol y sus iniciales para el avatar.
 const ROL_LABEL = { ADMIN: 'Administrador', RECEPCION: 'Recepción', MEDICO: 'Médico' }
-
-function iniciales(nombre) {
-  return nombre
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0])
-    .join('')
-    .toUpperCase()
-}
 
 function claseEnlace({ isActive }) {
   const base =

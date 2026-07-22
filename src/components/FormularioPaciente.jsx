@@ -8,20 +8,7 @@
 import { useState } from 'react'
 import { api, ApiError } from '../api/client'
 import Modal from './Modal'
-
-// Campo de texto etiquetado (pequeño ayudante para no repetir clases).
-function Campo({ label, children, hint }) {
-  return (
-    <div>
-      <label className="mb-1 block text-sm font-medium">{label}</label>
-      {children}
-      {hint && <p className="mt-1 text-[11px] text-ink-muted">{hint}</p>}
-    </div>
-  )
-}
-
-const claseInput =
-  'w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20'
+import Campo, { claseInput } from './Campo'
 
 export default function FormularioPaciente({ paciente, onCerrar, onGuardado }) {
   const editando = Boolean(paciente)
