@@ -15,6 +15,7 @@ import PacientesPage from './pages/PacientesPage'
 import FichaPacientePage from './pages/FichaPacientePage'
 import MedicosPage from './pages/MedicosPage'
 import NuevaCitaPage from './pages/NuevaCitaPage'
+import UsuariosPage from './pages/UsuariosPage'
 import EnConstruccion from './pages/EnConstruccion'
 
 // Roles con acceso a la gestión de recepción (pacientes, agendar…).
@@ -73,7 +74,7 @@ export default function App() {
           path="/usuarios"
           element={
             <ProtectedRoute roles={['ADMIN']}>
-              <EnConstruccion titulo="Usuarios" />
+              <UsuariosPage />
             </ProtectedRoute>
           }
         />
