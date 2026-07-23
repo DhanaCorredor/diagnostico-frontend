@@ -8,7 +8,7 @@ import Boton from '../components/atoms/Boton'
 import Tarjeta from '../components/atoms/Tarjeta'
 import CamposCita from '../components/molecules/CamposCita'
 
-export default function NuevaCitaPage() {
+export default function CitaPage() {
   const navigate = useNavigate()
   const [medicos, setMedicos] = useState([])
   const [servicios, setServicios] = useState([])

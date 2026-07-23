@@ -66,7 +66,7 @@ src/
 | `FormularioUsuario` | alta/edición de personal: nombre + email + rol (+ matrícula/especialidades si médico) |
 | `DetalleCita` | detalle de una cita + **acciones** (cancelar · asistencia · editar/mover) |
 
-> `TablaPacientes` / `TablaUsuarios` / cuadro médico usan la molécula reutilizable **`Tabla`** (config de columnas). Otras secciones de una sola vista se dejaron **inline**: `Calendario` (la rejilla vive en `AgendaPage`), `PanelResumen` (en `PanelPage`), `FichaCabecera`/`FichaTabs` (en `FichaPacientePage`). `FormularioCita` = `NuevaCitaPage` + `CamposCita`. `ListaNotasClinicas` → **fase 2**.
+> `TablaPacientes` / `TablaUsuarios` / cuadro médico usan la molécula reutilizable **`Tabla`** (config de columnas). Otras secciones de una sola vista se dejaron **inline**: `Calendario` (la rejilla vive en `AgendaPage`), `PanelResumen` (en `PanelPage`), `FichaCabecera`/`FichaTabs` (en `FichaPacientePage`). `FormularioCita` = `CitaPage` + `CamposCita`. `ListaNotasClinicas` → **fase 2**.
 
 ## 🖼️ Plantillas (layouts)
 
@@ -85,7 +85,7 @@ src/
 | `PacientesPage` | `/pacientes` | ADMIN · RECEPCION | `Tabla` + `BarraBusqueda` + `FormularioPaciente` |
 | `FichaPacientePage` | `/pacientes/:id` | ADMIN · RECEPCION | cabecera + pestañas (Datos · Historial) |
 | `MedicosPage` | `/medicos` | ADMIN · RECEPCION | `Tabla` (lista: médico · especialidades · disponibilidad) |
-| `NuevaCitaPage` | `/citas/nueva` | ADMIN · RECEPCION | Paciente + `CamposCita` |
+| `CitaPage` | `/citas/nueva` | ADMIN · RECEPCION | Paciente + `CamposCita` |
 | `UsuariosPage` | `/usuarios` | **solo ADMIN** | `Tabla` + `FormularioUsuario` |
 | `ConfigPage` | `/config` | **solo ADMIN** | especialidades + servicios |
 
@@ -103,7 +103,7 @@ src/
 
 ## 🔑 Comportamientos clave (dónde vive la lógica)
 
-- **Nueva cita** (`NuevaCitaPage` + `CamposCita`) → `POST /citas`: **upsert de paciente** por nombre + edad; el backend valida **disponibilidad** (con **sobrecupo**) y **cero solapamientos por médico**.
+- **Nueva cita** (`CitaPage` + `CamposCita`) → `POST /citas`: **upsert de paciente** por nombre + edad; el backend valida **disponibilidad** (con **sobrecupo**) y **cero solapamientos por médico**.
 - **`AgendaPage`** → pide la disponibilidad de cada médico y **grisa** las horas fuera de ella; recepción puede **forzar sobrecupo**.
 - **Acciones sobre la cita** (`DetalleCita`) → cancelar (libera cupo), marcar asistencia (atendida/no-show), editar/mover (revalida reglas).
 - **`EstadoBadge` + `ESTADOS_CITA`** → mapea `EstadoCita` (SCHEDULED · CONFIRMED · CANCELLED · COMPLETED · NO_SHOW) a color y etiqueta.

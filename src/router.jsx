@@ -7,7 +7,7 @@ import AgendaPage from './pages/AgendaPage'
 import PacientesPage from './pages/PacientesPage'
 import FichaPacientePage from './pages/FichaPacientePage'
 import MedicosPage from './pages/MedicosPage'
-import NuevaCitaPage from './pages/NuevaCitaPage'
+import CitaPage from './pages/CitaPage'
 import UsuariosPage from './pages/UsuariosPage'
 import ConfigPage from './pages/ConfigPage'
 
@@ -56,7 +56,7 @@ export default function AppRouter() {
           path="/citas/nueva"
           element={
             <ProtectedRoute roles={RECEP}>
-              <NuevaCitaPage />
+              <CitaPage />
             </ProtectedRoute>
           }
         />
