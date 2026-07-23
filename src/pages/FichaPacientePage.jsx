@@ -1,11 +1,16 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../api/client'
-import EstadoBadge from '../components/EstadoBadge'
-import FormularioPaciente from '../components/FormularioPaciente'
+import EstadoBadge from '../components/molecules/EstadoBadge'
+import FormularioPaciente from '../components/organisms/FormularioPaciente'
 import { formatFechaCorta, formatHora } from '../utils/fecha'
-import { iniciales } from '../utils/texto'
 import { indexarPor } from '../utils/datos'
+import Avatar from '../components/atoms/Avatar'
+import Spinner from '../components/atoms/Spinner'
+import Alerta from '../components/atoms/Alerta'
+import Tarjeta from '../components/atoms/Tarjeta'
+import Boton from '../components/atoms/Boton'
+import MensajeLista from '../components/atoms/MensajeLista'
 
 function Dato({ etiqueta, valor }) {
   return (
@@ -52,8 +57,8 @@ export default function FichaPacientePage() {
     cargar()
   }, [cargar])
 
-  if (cargando) return <p className="text-ink-muted">Cargando…</p>
-  if (error) return <p className="rounded-lg bg-crit/10 px-4 py-3 text-crit">{error}</p>
+  if (cargando) return <Spinner />
+  if (error) return <Alerta>{error}</Alerta>
   if (!paciente) return null
 
   return (
@@ -65,11 +70,9 @@ export default function FichaPacientePage() {
         Volver a Pacientes
       </Link>
 
-      <div className="mb-6 rounded-xl border border-line bg-white p-5">
+      <Tarjeta className="mb-6 p-5">
         <div className="flex flex-wrap items-center gap-4">
-          <div className="grid h-16 w-16 place-items-center rounded-full bg-brand-light text-xl font-semibold text-brand-dark">
-            {iniciales(paciente.nombre_completo)}
-          </div>
+          <Avatar nombre={paciente.nombre_completo} tamano="lg" />
           <div className="flex-1">
             <h2 className="text-xl font-semibold">{paciente.nombre_completo}</h2>
             <p className="text-sm text-ink-2">
@@ -77,14 +80,11 @@ export default function FichaPacientePage() {
               {paciente.edad != null && ` · ${paciente.edad} años`}
             </p>
           </div>
-          <button
-            onClick={() => setEditando(true)}
-            className="rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-surface-plane"
-          >
+          <Boton variante="secundario" onClick={() => setEditando(true)}>
             Editar
-          </button>
+          </Boton>
         </div>
-      </div>
+      </Tarjeta>
 
       <div className="mb-4 flex gap-1 border-b border-line text-sm">
         <button
@@ -111,7 +111,7 @@ export default function FichaPacientePage() {
 
       {tab === 'datos' && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="rounded-xl border border-line bg-white p-5">
+          <Tarjeta className="p-5">
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-muted">
               Identificación
             </h3>
@@ -123,24 +123,22 @@ export default function FichaPacientePage() {
               />
               <Dato etiqueta="Edad" valor={paciente.edad != null ? `${paciente.edad} años` : null} />
             </dl>
-          </div>
-          <div className="rounded-xl border border-line bg-white p-5">
+          </Tarjeta>
+          <Tarjeta className="p-5">
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-muted">
               Contacto
             </h3>
             <dl className="space-y-2 text-sm">
               <Dato etiqueta="Teléfono" valor={paciente.telefono} />
             </dl>
-          </div>
+          </Tarjeta>
         </div>
       )}
 
       {tab === 'citas' && (
-        <div className="rounded-xl border border-line bg-white">
+        <Tarjeta>
           {citas.length === 0 ? (
-            <p className="px-5 py-10 text-center text-sm text-ink-muted">
-              Este paciente no tiene citas registradas.
-            </p>
+            <MensajeLista>Este paciente no tiene citas registradas.</MensajeLista>
           ) : (
             <table className="w-full text-sm">
               <thead className="text-left text-xs uppercase tracking-wide text-ink-muted">
@@ -167,7 +165,7 @@ export default function FichaPacientePage() {
               </tbody>
             </table>
           )}
-        </div>
+        </Tarjeta>
       )}
 
       {editando && (

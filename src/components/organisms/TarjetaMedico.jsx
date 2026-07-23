@@ -1,4 +1,6 @@
-import { iniciales } from '../utils/texto'
+import Avatar from '../atoms/Avatar'
+import Badge from '../atoms/Badge'
+import Tarjeta from '../atoms/Tarjeta'
 
 const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 
@@ -23,11 +25,9 @@ export default function TarjetaMedico({ medico, disponibilidad }) {
   const franjas = resumirFranjas(disponibilidad)
 
   return (
-    <div className="rounded-xl border border-line bg-white p-5">
+    <Tarjeta className="p-5">
       <div className="flex items-center gap-3">
-        <div className="grid h-11 w-11 place-items-center rounded-full bg-brand-light font-semibold text-brand-dark">
-          {iniciales(medico.nombre_completo)}
-        </div>
+        <Avatar nombre={medico.nombre_completo} />
         <div>
           <p className="font-medium">{medico.nombre_completo}</p>
           <p className="text-xs text-ink-muted">
@@ -41,12 +41,9 @@ export default function TarjetaMedico({ medico, disponibilidad }) {
       {medico.especialidades.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-1.5">
           {medico.especialidades.map((e) => (
-            <span
-              key={e.id}
-              className="rounded-full bg-brand-light px-2 py-0.5 text-xs text-brand-dark"
-            >
+            <Badge key={e.id} color="brand" tamano="sm">
               {e.nombre}
-            </span>
+            </Badge>
           ))}
         </div>
       )}
@@ -68,6 +65,6 @@ export default function TarjetaMedico({ medico, disponibilidad }) {
           </div>
         )}
       </div>
-    </div>
+    </Tarjeta>
   )
 }

@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../api/client'
-import FormularioPaciente from '../components/FormularioPaciente'
+import FormularioPaciente from '../components/organisms/FormularioPaciente'
+import Spinner from '../components/atoms/Spinner'
+import Tarjeta from '../components/atoms/Tarjeta'
+import Boton from '../components/atoms/Boton'
+import BarraBusqueda from '../components/molecules/BarraBusqueda'
+import MensajeLista from '../components/atoms/MensajeLista'
 
 export default function PacientesPage() {
   const [pacientes, setPacientes] = useState([])
@@ -37,46 +42,31 @@ export default function PacientesPage() {
 
   return (
     <div className="space-y-4">
-      <div className="relative max-w-sm">
-        <svg
-          className="absolute left-3 top-2.5 h-4 w-4 text-ink-muted"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
-        >
-          <circle cx="11" cy="11" r="8" />
-          <path d="M21 21l-4-4" />
-        </svg>
-        <input
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-          placeholder="Buscar por nombre o cédula…"
-          className="w-full rounded-lg border border-line bg-white py-2 pl-9 pr-3 text-sm outline-none focus:border-brand"
-        />
-      </div>
+      <BarraBusqueda
+        value={busqueda}
+        onChange={(e) => setBusqueda(e.target.value)}
+        placeholder="Buscar por nombre o cédula…"
+        className="max-w-sm"
+      />
 
-      <div className="rounded-xl border border-line bg-white">
+      <Tarjeta>
         <div className="flex items-center justify-between border-b border-line px-5 py-4">
           <h2 className="font-semibold">
             Pacientes <span className="ml-1 text-sm font-normal text-ink-muted">({filtrados.length})</span>
           </h2>
-          <button
-            onClick={() => setCreando(true)}
-            className="rounded-lg bg-brand px-3 py-1.5 text-sm font-semibold text-white hover:bg-brand-dark"
-          >
+          <Boton tamano="sm" onClick={() => setCreando(true)}>
             + Nuevo paciente
-          </button>
+          </Boton>
         </div>
 
         {cargando ? (
-          <p className="px-5 py-10 text-center text-sm text-ink-muted">Cargando…</p>
+          <Spinner className="px-5 py-10 text-center" />
         ) : error ? (
-          <p className="px-5 py-10 text-center text-sm text-crit">{error}</p>
+          <MensajeLista tipo="error">{error}</MensajeLista>
         ) : filtrados.length === 0 ? (
-          <p className="px-5 py-10 text-center text-sm text-ink-muted">
+          <MensajeLista>
             {termino ? 'Sin resultados para la búsqueda.' : 'Aún no hay pacientes.'}
-          </p>
+          </MensajeLista>
         ) : (
           <table className="w-full text-sm">
             <thead className="text-left text-xs uppercase tracking-wide text-ink-muted">
@@ -107,7 +97,7 @@ export default function PacientesPage() {
             </tbody>
           </table>
         )}
-      </div>
+      </Tarjeta>
 
       {creando && (
         <FormularioPaciente

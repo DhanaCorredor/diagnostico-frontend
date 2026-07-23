@@ -6,8 +6,9 @@ served by the backend (separate repo: [`diagnostico-backend`](../diagnostico-bac
 over HTTP/JSON, authenticated with a JWT bearer token.
 
 > Bootcamp final project — MVP. The frontend is used only by the center's staff
-> (administration, reception and doctors). Project documentation lives in the backend
-> repo, under `docs/` (in Spanish).
+> (administration, reception and doctors). Most project documentation lives in the
+> backend repo under `docs/` (in Spanish); the frontend **component map** is here in
+> [`docs/COMPONENTES.md`](docs/COMPONENTES.md).
 
 ## 🧱 Tech stack
 
@@ -83,25 +84,26 @@ as a bearer token on every request. The session user (and role) is read from
 ```
 ├── index.html              # HTML entry point
 ├── .env.example            # env template (VITE_API_URL)
+├── vercel.json             # SPA rewrite (deep links → index.html)
+├── docs/
+│   └── COMPONENTES.md      # component map (atomic-design lite)
+├── public/                 # static assets (logo, favicon)
 ├── src/
 │   ├── main.jsx            # React entry (Router + Auth providers)
 │   ├── App.jsx             # routes + role guards
 │   ├── index.css           # Tailwind v4 + brand theme (@theme)
 │   ├── api/
 │   │   └── client.js       # HTTP client + JWT handling
-│   ├── auth/
-│   │   ├── AuthContext.js   # session context object
-│   │   ├── AuthProvider.jsx # session provider (login/logout)
-│   │   ├── useAuth.js       # hook to read the session
-│   │   └── ProtectedRoute.jsx  # route guard by auth + role
-│   ├── layouts/
-│   │   ├── AuthLayout.jsx   # centered shell (login)
-│   │   └── AppLayout.jsx    # sidebar + topbar + content
-│   ├── components/         # Sidebar, Topbar, Modal, Campo, EstadoBadge,
-│   │                       # forms, TarjetaMedico, DetalleCita
+│   ├── auth/               # AuthContext, AuthProvider, useAuth, ProtectedRoute
+│   ├── components/
+│   │   ├── atoms/          # Boton, Input, Select, Label, Badge, Avatar,
+│   │   │                   # Spinner, Tarjeta, Alerta, MensajeLista
+│   │   ├── molecules/      # Campo, Modal, EstadoBadge, TarjetaKPI,
+│   │   │                   # BarraBusqueda, CamposCita
+│   │   └── organisms/      # Sidebar, Topbar, forms, TarjetaMedico, DetalleCita
+│   ├── layouts/            # AuthLayout, AppLayout
 │   ├── pages/              # one component per route
-│   └── utils/              # fecha (dates), texto (initials), datos (index by id)
-├── public/                 # static assets served as-is
+│   └── utils/              # fecha, texto, datos, citas (state meta), roles (role meta)
 └── vite.config.js          # Vite + React + Tailwind config
 ```
 

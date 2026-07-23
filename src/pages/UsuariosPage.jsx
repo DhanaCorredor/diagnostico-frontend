@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
-import FormularioUsuario from '../components/FormularioUsuario'
-
-const ROL_BADGE = {
-  ADMIN: { texto: 'Administrador', clase: 'bg-brand-light text-brand-dark' },
-  RECEPCION: { texto: 'Recepción', clase: 'bg-[#eef4e3] text-aqua' },
-  MEDICO: { texto: 'Médico', clase: 'bg-warn/10 text-[#8a6100]' },
-}
+import FormularioUsuario from '../components/organisms/FormularioUsuario'
+import Badge from '../components/atoms/Badge'
+import Spinner from '../components/atoms/Spinner'
+import Tarjeta from '../components/atoms/Tarjeta'
+import Boton from '../components/atoms/Boton'
+import MensajeLista from '../components/atoms/MensajeLista'
+import { ROLES } from '../utils/roles'
 
 export default function UsuariosPage() {
   const [usuarios, setUsuarios] = useState([])
@@ -44,21 +44,18 @@ export default function UsuariosPage() {
   }
 
   return (
-    <div className="rounded-xl border border-line bg-white">
+    <Tarjeta>
       <div className="flex items-center justify-between border-b border-line px-5 py-4">
         <h2 className="font-semibold">Usuarios del sistema</h2>
-        <button
-          onClick={() => setEditar({})}
-          className="rounded-lg bg-brand px-3 py-1.5 text-sm font-semibold text-white hover:bg-brand-dark"
-        >
+        <Boton tamano="sm" onClick={() => setEditar({})}>
           + Nuevo acceso
-        </button>
+        </Boton>
       </div>
 
       {cargando ? (
-        <p className="px-5 py-10 text-center text-sm text-ink-muted">Cargando…</p>
+        <Spinner className="px-5 py-10 text-center" />
       ) : error ? (
-        <p className="px-5 py-10 text-center text-sm text-crit">{error}</p>
+        <MensajeLista tipo="error">{error}</MensajeLista>
       ) : (
         <table className="w-full text-sm">
           <thead className="text-left text-xs uppercase tracking-wide text-ink-muted">
@@ -72,15 +69,15 @@ export default function UsuariosPage() {
           </thead>
           <tbody className="divide-y divide-line">
             {usuarios.map((u) => {
-              const badge = ROL_BADGE[u.rol] ?? { texto: u.rol, clase: 'bg-surface-plane text-ink-2' }
+              const badge = ROLES[u.rol] ?? { etiqueta: u.rol, color: 'neutral' }
               return (
                 <tr key={u.id} className="hover:bg-surface-plane">
                   <td className="px-5 py-3 font-medium">{u.nombre_completo}</td>
                   <td className="px-5 py-3 text-ink-2">{u.email}</td>
                   <td className="px-5 py-3">
-                    <span className={`rounded-full px-2 py-0.5 text-xs ${badge.clase}`}>
-                      {badge.texto}
-                    </span>
+                    <Badge color={badge.color} tamano="sm">
+                      {badge.etiqueta}
+                    </Badge>
                   </td>
                   <td className="px-5 py-3">
                     {u.activo ? (
@@ -120,6 +117,6 @@ export default function UsuariosPage() {
           }}
         />
       )}
-    </div>
+    </Tarjeta>
   )
 }

@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { api, ApiError } from '../api/client'
-import { formatFechaCorta, formatHora } from '../utils/fecha'
-import { indexarPor } from '../utils/datos'
-import EstadoBadge from './EstadoBadge'
-import Modal from './Modal'
-import Campo, { claseInput } from './Campo'
+import { api, ApiError } from '../../api/client'
+import { formatFechaCorta, formatHora } from '../../utils/fecha'
+import { indexarPor } from '../../utils/datos'
+import EstadoBadge from '../molecules/EstadoBadge'
+import Modal from '../molecules/Modal'
+import Boton from '../atoms/Boton'
+import CamposCita from '../molecules/CamposCita'
 
-const DURACIONES = [15, 30, 45, 60, 90]
 const ESTADOS_ACTIVOS = ['SCHEDULED', 'CONFIRMED']
 
 function duracionDe(cita) {
@@ -99,76 +99,19 @@ export default function DetalleCita({
   if (editando) {
     const footer = (
       <>
-        <button
-          type="button"
-          onClick={() => setEditando(false)}
-          className="rounded-lg border border-line px-4 py-2 text-sm font-medium hover:bg-surface-plane"
-        >
+        <Boton variante="secundario" type="button" onClick={() => setEditando(false)}>
           Volver
-        </button>
-        <button
-          type="submit"
-          form="form-editar-cita"
-          disabled={ocupado}
-          className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-60"
-        >
+        </Boton>
+        <Boton type="submit" form="form-editar-cita" disabled={ocupado}>
           {ocupado ? 'Guardando…' : 'Guardar cambios'}
-        </button>
+        </Boton>
       </>
     )
     return (
       <Modal titulo="Editar cita" subtitulo="Se revalidan disponibilidad y solapamientos." onClose={onCerrar} footer={footer}>
         <form id="form-editar-cita" onSubmit={guardarEdicion} className="space-y-4">
           {cajaError}
-          <div className="grid grid-cols-2 gap-3">
-            <Campo label="Médico">
-              <select value={form.medico_id} onChange={(e) => set('medico_id', e.target.value)} className={claseInput}>
-                {medicos.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.nombre_completo}
-                  </option>
-                ))}
-              </select>
-            </Campo>
-            <Campo label="Servicio">
-              <select value={form.servicio_id} onChange={(e) => set('servicio_id', e.target.value)} className={claseInput}>
-                {servicios.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.nombre}
-                  </option>
-                ))}
-              </select>
-            </Campo>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            <Campo label="Fecha">
-              <input type="date" value={form.fecha} onChange={(e) => set('fecha', e.target.value)} required className={claseInput} />
-            </Campo>
-            <Campo label="Hora">
-              <input type="time" step="900" value={form.hora} onChange={(e) => set('hora', e.target.value)} required className={claseInput} />
-            </Campo>
-            <Campo label="Duración">
-              <select value={form.duracion_min} onChange={(e) => set('duracion_min', e.target.value)} className={claseInput}>
-                {DURACIONES.map((d) => (
-                  <option key={d} value={d}>
-                    {d} min
-                  </option>
-                ))}
-              </select>
-            </Campo>
-          </div>
-          <Campo label="Motivo (opcional)">
-            <input value={form.motivo} onChange={(e) => set('motivo', e.target.value)} className={claseInput} />
-          </Campo>
-          <label className="flex items-center gap-2 text-sm text-ink-2">
-            <input
-              type="checkbox"
-              checked={form.permitir_sobrecupo}
-              onChange={(e) => set('permitir_sobrecupo', e.target.checked)}
-              className="h-4 w-4 rounded border-line text-brand focus:ring-brand"
-            />
-            Forzar cupo extra (sobrecupo)
-          </label>
+          <CamposCita form={form} set={set} medicos={medicos} servicios={servicios} />
         </form>
       </Modal>
     )
@@ -176,37 +119,25 @@ export default function DetalleCita({
 
   const footer = puedeGestionar && activa && (
     <>
-      <button
-        onClick={() => marcarAsistencia('NO_SHOW')}
-        disabled={ocupado}
-        className="rounded-lg border border-line px-3 py-2 text-sm font-medium hover:bg-surface-plane disabled:opacity-60"
-      >
+      <Boton variante="secundario" tamano="sm" onClick={() => marcarAsistencia('NO_SHOW')} disabled={ocupado}>
         No asistió
-      </button>
-      <button
-        onClick={() => marcarAsistencia('COMPLETED')}
-        disabled={ocupado}
-        className="rounded-lg border border-good/40 px-3 py-2 text-sm font-medium text-good hover:bg-good/5 disabled:opacity-60"
-      >
+      </Boton>
+      <Boton variante="exito" tamano="sm" onClick={() => marcarAsistencia('COMPLETED')} disabled={ocupado}>
         Atendida
-      </button>
-      <button
-        onClick={cancelar}
-        disabled={ocupado}
-        className="rounded-lg border border-crit/40 px-3 py-2 text-sm font-medium text-crit hover:bg-crit/5 disabled:opacity-60"
-      >
+      </Boton>
+      <Boton variante="peligro" tamano="sm" onClick={cancelar} disabled={ocupado}>
         Cancelar cita
-      </button>
-      <button
+      </Boton>
+      <Boton
+        tamano="sm"
         onClick={() => {
           setError(null)
           setEditando(true)
         }}
         disabled={ocupado}
-        className="rounded-lg bg-brand px-3 py-2 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-60"
       >
         Editar
-      </button>
+      </Boton>
     </>
   )
 
