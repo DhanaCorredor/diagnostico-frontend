@@ -6,6 +6,7 @@ import EstadoBadge from '../molecules/EstadoBadge'
 import Modal from '../molecules/Modal'
 import Boton from '../atoms/Boton'
 import CamposCita from '../molecules/CamposCita'
+import Dato from '../molecules/Dato'
 
 const ESTADOS_ACTIVOS = ['SCHEDULED', 'CONFIRMED']
 
@@ -149,30 +150,15 @@ export default function DetalleCita({
         <EstadoBadge estado={cita.estado} />
       </div>
       <dl className="space-y-2 text-sm">
-        <div className="flex justify-between">
-          <dt className="text-ink-2">Médico</dt>
-          <dd className="font-medium">{medicosMap[cita.medico_id] ?? '—'}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="text-ink-2">Servicio</dt>
-          <dd className="font-medium">{serviciosMap[cita.servicio_id] ?? '—'}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="text-ink-2">Fecha</dt>
-          <dd className="font-medium">{formatFechaCorta(cita.starts_at)}</dd>
-        </div>
-        <div className="flex justify-between">
-          <dt className="text-ink-2">Horario</dt>
-          <dd className="tnum font-medium">
-            {formatHora(cita.starts_at)}–{formatHora(cita.ends_at)}
-          </dd>
-        </div>
-        {cita.motivo && (
-          <div className="flex justify-between">
-            <dt className="text-ink-2">Motivo</dt>
-            <dd className="font-medium">{cita.motivo}</dd>
-          </div>
-        )}
+        <Dato etiqueta="Médico" valor={medicosMap[cita.medico_id]} />
+        <Dato etiqueta="Servicio" valor={serviciosMap[cita.servicio_id]} />
+        <Dato etiqueta="Fecha" valor={formatFechaCorta(cita.starts_at)} />
+        <Dato
+          etiqueta="Horario"
+          valor={`${formatHora(cita.starts_at)}–${formatHora(cita.ends_at)}`}
+          tnum
+        />
+        {cita.motivo && <Dato etiqueta="Motivo" valor={cita.motivo} />}
       </dl>
       {!activa && (
         <p className="rounded-lg bg-surface-plane px-3 py-2 text-xs text-ink-muted">
