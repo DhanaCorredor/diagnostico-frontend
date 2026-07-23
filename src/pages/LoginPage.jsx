@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth'
-import { ApiError } from '../api/client'
+import { ApiError } from '../config/api'
 import AuthLayout from '../layouts/AuthLayout'
 import Input from '../components/atoms/Input'
 import Label from '../components/atoms/Label'

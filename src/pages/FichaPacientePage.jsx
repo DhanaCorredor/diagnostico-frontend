@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { api } from '../api/client'
+import { api } from '../config/api'
 import EstadoBadge from '../components/molecules/EstadoBadge'
 import FormularioPaciente from '../components/organisms/FormularioPaciente'
 import { formatFechaCorta, formatHora } from '../utils/fecha'

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { api } from '../api/client'
+import { api } from '../config/api'
 import FormularioPaciente from '../components/organisms/FormularioPaciente'
 import Boton from '../components/atoms/Boton'
 import BarraBusqueda from '../components/molecules/BarraBusqueda'

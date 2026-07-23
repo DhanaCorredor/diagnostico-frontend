@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { api, getToken, setToken, setUnauthorizedHandler } from '../api/client'
+import { api } from '../config/api'
+import { getToken, setToken, setUnauthorizedHandler } from '../config/configClient'
 import { AuthContext } from './AuthContext'
 
 export function AuthProvider({ children }) {

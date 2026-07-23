@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { api, ApiError } from '../../api/client'
+import { api, ApiError } from '../../config/api'
 import Modal from '../molecules/Modal'
 import Campo from '../molecules/Campo'
 import Input from '../atoms/Input'

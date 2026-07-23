@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { api, ApiError } from '../api/client'
+import { api, ApiError } from '../config/api'
 import { hoyISO } from '../utils/fecha'
 import Campo from '../components/molecules/Campo'
 import Input from '../components/atoms/Input'

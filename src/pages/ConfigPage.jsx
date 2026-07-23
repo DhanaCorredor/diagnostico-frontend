@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api, ApiError } from '../api/client'
+import { api, ApiError } from '../config/api'
 import Input from '../components/atoms/Input'
 import Boton from '../components/atoms/Boton'
 import Badge from '../components/atoms/Badge'

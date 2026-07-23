@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { api, ApiError } from '../../api/client'
+import { api, ApiError } from '../../config/api'
 import { formatFechaCorta, formatHora } from '../../utils/fecha'
 import { indexarPor } from '../../utils/datos'
 import EstadoBadge from '../molecules/EstadoBadge'

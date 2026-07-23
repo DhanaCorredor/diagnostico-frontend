@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api } from '../api/client'
+import { api } from '../config/api'
 import FormularioUsuario from '../components/organisms/FormularioUsuario'
 import Badge from '../components/atoms/Badge'
 import Boton from '../components/atoms/Boton'
