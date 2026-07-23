@@ -11,15 +11,7 @@ import Alerta from '../components/atoms/Alerta'
 import Tarjeta from '../components/atoms/Tarjeta'
 import Boton from '../components/atoms/Boton'
 import MensajeLista from '../components/atoms/MensajeLista'
-
-function Dato({ etiqueta, valor }) {
-  return (
-    <div className="flex justify-between">
-      <dt className="text-ink-2">{etiqueta}</dt>
-      <dd className="font-medium">{valor ?? '—'}</dd>
-    </div>
-  )
-}
+import Dato from '../components/molecules/Dato'
 
 export default function FichaPacientePage() {
   const { id } = useParams()
