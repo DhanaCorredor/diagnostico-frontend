@@ -1,8 +1,27 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api/client'
-import TarjetaMedico from '../components/organisms/TarjetaMedico'
-import Spinner from '../components/atoms/Spinner'
-import Alerta from '../components/atoms/Alerta'
+import Avatar from '../components/atoms/Avatar'
+import Badge from '../components/atoms/Badge'
+import Tabla from '../components/molecules/Tabla'
+
+const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
+
+function resumirFranjas(franjas) {
+  const grupos = {}
+  for (const f of franjas) {
+    const horario = `${f.hora_inicio.slice(0, 5)}–${f.hora_fin.slice(0, 5)}`
+    ;(grupos[horario] ??= []).push(f.dia_semana)
+  }
+  return Object.entries(grupos).map(([horario, dias]) => {
+    const ordenados = [...new Set(dias)].sort((a, b) => a - b)
+    const consecutivos = ordenados[ordenados.length - 1] - ordenados[0] === ordenados.length - 1
+    const etiquetaDias =
+      ordenados.length > 1 && consecutivos
+        ? `${DIAS[ordenados[0]]}–${DIAS[ordenados[ordenados.length - 1]]}`
+        : ordenados.map((d) => DIAS[d]).join(', ')
+    return `${etiquetaDias} · ${horario}`
+  })
+}
 
 export default function MedicosPage() {
   const [medicos, setMedicos] = useState([])
@@ -34,31 +53,58 @@ export default function MedicosPage() {
     cargar()
   }, [])
 
-  if (cargando) return <Spinner />
-  if (error) return <Alerta>{error}</Alerta>
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="font-semibold">
-          Médicos <span className="ml-1 text-sm font-normal text-ink-muted">({medicos.length})</span>
-        </h2>
-        <p className="text-xs text-ink-muted">
-          Especialidades y horario de atención de cada médico.
-        </p>
-      </div>
-
-      {medicos.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-line bg-white px-5 py-10 text-center text-sm text-ink-muted">
-          No hay médicos registrados.
-        </p>
-      ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {medicos.map((m) => (
-            <TarjetaMedico key={m.id} medico={m} disponibilidad={dispPorMedico[m.id] ?? []} />
+  const columnas = [
+    {
+      header: 'Médico',
+      className: 'font-medium',
+      render: (m) => (
+        <div className="flex items-center gap-2">
+          <Avatar nombre={m.nombre_completo} tamano="sm" />
+          {m.nombre_completo}
+        </div>
+      ),
+    },
+    {
+      header: 'Especialidades',
+      render: (m) => (
+        <div className="flex flex-wrap gap-1">
+          {m.especialidades.map((e) => (
+            <Badge key={e.id} color="brand" tamano="sm">
+              {e.nombre}
+            </Badge>
           ))}
         </div>
-      )}
-    </div>
+      ),
+    },
+    {
+      header: 'Disponibilidad',
+      className: 'text-ink-2',
+      render: (m) => {
+        const franjas = resumirFranjas(dispPorMedico[m.id] ?? [])
+        return franjas.length === 0 ? (
+          <span className="text-ink-muted">Sin definir</span>
+        ) : (
+          <div className="space-y-0.5">
+            {franjas.map((f) => (
+              <div key={f} className="tnum">
+                {f}
+              </div>
+            ))}
+          </div>
+        )
+      },
+    },
+  ]
+
+  return (
+    <Tabla
+      titulo="Médicos"
+      contador={medicos.length}
+      columnas={columnas}
+      filas={medicos}
+      cargando={cargando}
+      error={error}
+      vacio="No hay médicos registrados."
+    />
   )
 }

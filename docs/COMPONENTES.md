@@ -51,6 +51,8 @@ src/
 | `TarjetaKPI` | `Tarjeta` + título/número/nota | KPIs del panel |
 | `BarraBusqueda` | input + icono | buscar paciente/cédula |
 | `CamposCita` | `Campo` + `Input` + `Select` | campos compartidos de **nueva/editar cita** |
+| `Tabla` | `Tarjeta` + `thead`/`tbody` + estados | tabla reutilizable (config de columnas): Pacientes · Usuarios · Médicos |
+| `Dato` | `dt` + `dd` | fila "etiqueta: valor" (ficha de paciente, detalle de cita) |
 
 > `EnlaceNav`, `SelectorVista` (Día/Semana), `FranjaHoraria`, `ItemNota` (del plan) → no se hicieron: la nav va inline en `Sidebar`; solo hay vista Día; la disponibilidad se pinta directa; las notas clínicas son **fase 2**.
 
@@ -62,10 +64,9 @@ src/
 | `Topbar` | título de la página + botón "Nueva cita" |
 | `FormularioPaciente` | alta/edición: **nombre + edad** (cédula opcional) |
 | `FormularioUsuario` | alta/edición de personal: nombre + email + rol (+ matrícula/especialidades si médico) |
-| `TarjetaMedico` | avatar + **especialidades (N:M)** + disponibilidad |
 | `DetalleCita` | detalle de una cita + **acciones** (cancelar · asistencia · editar/mover) |
 
-> Las **tablas y secciones de una sola vista** se dejaron **inline** en su página (para no meter abstracción de más): `TablaPacientes`/`TablaUsuarios` (en sus páginas), `Calendario` (la rejilla vive en `AgendaPage`), `PanelResumen` (en `PanelPage`), `FichaCabecera`/`FichaTabs` (en `FichaPacientePage`). `FormularioCita` = `NuevaCitaPage` + `CamposCita`. `ListaNotasClinicas` → **fase 2**.
+> `TablaPacientes` / `TablaUsuarios` / cuadro médico usan la molécula reutilizable **`Tabla`** (config de columnas). Otras secciones de una sola vista se dejaron **inline**: `Calendario` (la rejilla vive en `AgendaPage`), `PanelResumen` (en `PanelPage`), `FichaCabecera`/`FichaTabs` (en `FichaPacientePage`). `FormularioCita` = `NuevaCitaPage` + `CamposCita`. `ListaNotasClinicas` → **fase 2**.
 
 ## 🖼️ Plantillas (layouts)
 
@@ -81,11 +82,11 @@ src/
 | `LoginPage` | `/login` | todos | `AuthLayout` |
 | `PanelPage` | `/` | todos | `TarjetaKPI` + agenda del día (→ `DetalleCita`) |
 | `AgendaPage` | `/agenda` | todos | rejilla médico×hora (→ `DetalleCita`) |
-| `PacientesPage` | `/pacientes` | ADMIN · RECEPCION | tabla + `BarraBusqueda` + `FormularioPaciente` |
+| `PacientesPage` | `/pacientes` | ADMIN · RECEPCION | `Tabla` + `BarraBusqueda` + `FormularioPaciente` |
 | `FichaPacientePage` | `/pacientes/:id` | ADMIN · RECEPCION | cabecera + pestañas (Datos · Historial) |
-| `MedicosPage` | `/medicos` | ADMIN · RECEPCION | grid de `TarjetaMedico` |
+| `MedicosPage` | `/medicos` | ADMIN · RECEPCION | `Tabla` (lista: médico · especialidades · disponibilidad) |
 | `NuevaCitaPage` | `/citas/nueva` | ADMIN · RECEPCION | Paciente + `CamposCita` |
-| `UsuariosPage` | `/usuarios` | **solo ADMIN** | tabla + `FormularioUsuario` |
+| `UsuariosPage` | `/usuarios` | **solo ADMIN** | `Tabla` + `FormularioUsuario` |
 | `ConfigPage` | `/config` | **solo ADMIN** | especialidades + servicios |
 
 > **Guardas por rol** (`App.jsx`): RECEPCIÓN **no** ve `/usuarios` ni `/config`; MEDICO ve `Panel` y su `Agenda` (**solo lectura**, sin botón "Nueva cita"). Historia clínica → **fase 2**.
