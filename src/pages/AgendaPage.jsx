@@ -78,7 +78,11 @@ export default function AgendaPage() {
   const dia = diaSemana(fecha)
   const serviciosMap = indexarPor(servicios, 'nombre')
   const medicosVisibles =
-    filtroMedico === 'todos' ? medicos : medicos.filter((m) => m.id === filtroMedico)
+    user.rol === 'MEDICO'
+      ? medicos.filter((m) => m.id === user.id)
+      : filtroMedico === 'todos'
+        ? medicos
+        : medicos.filter((m) => m.id === filtroMedico)
 
   function citasDe(medicoId, h) {
     return citas.filter(
@@ -91,18 +95,20 @@ export default function AgendaPage() {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-semibold capitalize">{fechaLargaDesdeISO(fecha)}</h2>
         <div className="flex items-center gap-2 text-sm">
-          <select
-            value={filtroMedico}
-            onChange={(e) => setFiltroMedico(e.target.value)}
-            className="rounded-lg border border-line px-3 py-1.5 outline-none focus:border-brand"
-          >
-            <option value="todos">Todos los médicos</option>
-            {medicos.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.nombre_completo}
-              </option>
-            ))}
-          </select>
+          {user.rol !== 'MEDICO' && (
+            <select
+              value={filtroMedico}
+              onChange={(e) => setFiltroMedico(e.target.value)}
+              className="rounded-lg border border-line px-3 py-1.5 outline-none focus:border-brand"
+            >
+              <option value="todos">Todos los médicos</option>
+              {medicos.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.nombre_completo}
+                </option>
+              ))}
+            </select>
+          )}
           <div className="flex gap-1">
             <button
               onClick={() => setFecha(sumarDias(fecha, -1))}
