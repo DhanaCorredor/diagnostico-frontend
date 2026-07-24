@@ -74,7 +74,7 @@ as a bearer token on every request. The session user (and role) is read from
 | `/agenda` | Day calendar (doctor × hour, availability blocking) | all |
 | `/pacientes` | Patients list + create | ADMIN · RECEPCION |
 | `/pacientes/:id` | Patient file (data + appointment history) | ADMIN · RECEPCION |
-| `/medicos` | Doctors grid (specialties + availability) | ADMIN · RECEPCION |
+| `/medicos` | Doctors list (specialties + availability) | ADMIN · RECEPCION |
 | `/citas/nueva` | New appointment form | ADMIN · RECEPCION |
 | `/usuarios` | Staff management (CRUD) | ADMIN |
 | `/config` | Catalog management (specialties, services) | ADMIN |
