@@ -31,7 +31,7 @@ src/
 | Componente | Uso |
 |-----------|-----|
 | `Boton` | variantes: primario · secundario · peligro · éxito (tamaños sm/md) |
-| `Input` · `Select` · `Label` | controles de formulario (comparten `estilos.js` → `controlBase`) |
+| `Input` · `Select` · `Label` | controles de formulario (comparten `styles.js` → `controlBase`) |
 | `Badge` | pastilla de color (estado de cita, rol) — 7 colores |
 | `Avatar` | iniciales del usuario/paciente (sm/md/lg) |
 | `Spinner` | estado de carga ("Cargando…") |
@@ -95,11 +95,11 @@ src/
 
 | Archivo | Contenido |
 |---------|-----------|
-| `fecha.js` | `hoyISO`, `formatHora`, `formatFechaCorta`/`Larga`, `sumarDias`, `diaSemana`… |
-| `texto.js` | `iniciales` (para `Avatar`) |
-| `datos.js` | `indexarPor` (lista → mapa por id) |
-| `citas.js` | `ESTADOS_CITA` (estado → texto · color · barra · chip) |
-| `roles.js` | `ROLES` (rol → etiqueta · color) |
+| `date.js` | `todayISO`, `formatTime`, `formatShortDate`/`LongDate`, `addDays`, `weekday`… |
+| `text.js` | `initials` (para `Avatar`) |
+| `data.js` | `indexBy` (lista → mapa por id) |
+| `citas.js` | `APPOINTMENT_STATES` (estado → text · color · bar · chip) |
+| `roles.js` | `ROLES` (rol → label · color) |
 
 ## 🔑 Comportamientos clave (dónde vive la lógica)
 
