@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { api } from '../config/api'
 import Avatar from '../components/atoms/Avatar'
 import Badge from '../components/atoms/Badge'
-import Tabla from '../components/molecules/Tabla'
+import Table from '../components/molecules/Table'
 
 const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 
@@ -23,7 +23,7 @@ function resumirFranjas(franjas) {
   })
 }
 
-export default function MedicosPage() {
+export default function DoctorsPage() {
   const [medicos, setMedicos] = useState([])
   const [dispPorMedico, setDispPorMedico] = useState({})
   const [loading, setLoading] = useState(true)
@@ -97,7 +97,7 @@ export default function MedicosPage() {
   ]
 
   return (
-    <Tabla
+    <Table
       title="Médicos"
       count={medicos.length}
       columns={columns}

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { api } from '../config/api'
-import FormularioUsuario from '../components/organisms/FormularioUsuario'
+import UserForm from '../components/organisms/UserForm'
 import Badge from '../components/atoms/Badge'
-import Boton from '../components/atoms/Boton'
-import Tabla from '../components/molecules/Tabla'
+import Button from '../components/atoms/Button'
+import Table from '../components/molecules/Table'
 import { ROLES } from '../utils/roles'
 
-export default function UsuariosPage() {
+export default function UsersPage() {
   const [usuarios, setUsuarios] = useState([])
   const [especialidades, setEspecialidades] = useState([])
   const [loading, setLoading] = useState(true)
@@ -85,12 +85,12 @@ export default function UsuariosPage() {
 
   return (
     <>
-      <Tabla
+      <Table
         title="Usuarios del sistema"
         action={
-          <Boton size="sm" onClick={() => setEditing({})}>
+          <Button size="sm" onClick={() => setEditing({})}>
             + Nuevo acceso
-          </Boton>
+          </Button>
         }
         columns={columns}
         rows={usuarios}
@@ -100,7 +100,7 @@ export default function UsuariosPage() {
       />
 
       {editing && (
-        <FormularioUsuario
+        <UserForm
           usuario={editing.id ? editing : null}
           especialidades={especialidades}
           onClose={() => setEditing(null)}

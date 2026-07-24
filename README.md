@@ -90,20 +90,22 @@ as a bearer token on every request. The session user (and role) is read from
 ├── public/                 # static assets (logo, favicon)
 ├── src/
 │   ├── main.jsx            # React entry (Router + Auth providers)
-│   ├── App.jsx             # routes + role guards
+│   ├── App.jsx             # mounts the router
+│   ├── router.jsx          # route definitions + role guards
 │   ├── index.css           # Tailwind v4 + brand theme (@theme)
-│   ├── api/
-│   │   └── client.js       # HTTP client + JWT handling
+│   ├── config/
+│   │   ├── configClient.js # HTTP client config + JWT handling
+│   │   └── api.js          # api.get/post/put/del
 │   ├── auth/               # AuthContext, AuthProvider, useAuth, ProtectedRoute
 │   ├── components/
-│   │   ├── atoms/          # Boton, Input, Select, Label, Badge, Avatar,
-│   │   │                   # Spinner, Tarjeta, Alerta, MensajeLista
-│   │   ├── molecules/      # Campo, Modal, EstadoBadge, TarjetaKPI,
-│   │   │                   # BarraBusqueda, CamposCita
-│   │   └── organisms/      # Sidebar, Topbar, forms, TarjetaMedico, DetalleCita
+│   │   ├── atoms/          # Button, Input, Select, Label, Badge, Avatar,
+│   │   │                   # Spinner, Card, Alert, ListMessage
+│   │   ├── molecules/      # Field, Modal, StatusBadge, KpiCard, SearchBar,
+│   │   │                   # AppointmentFields, Table, DataRow
+│   │   └── organisms/      # Sidebar, Topbar, PatientForm, UserForm, AppointmentDetail
 │   ├── layouts/            # AuthLayout, AppLayout
 │   ├── pages/              # one component per route
-│   └── utils/              # fecha, texto, datos, citas (state meta), roles (role meta)
+│   └── utils/              # date, text, data, citas (state meta), roles (role meta)
 └── vite.config.js          # Vite + React + Tailwind config
 ```
 

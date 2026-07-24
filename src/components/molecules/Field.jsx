@@ -1,6 +1,6 @@
 import Label from '../atoms/Label'
 
-export default function Campo({ label, hint, children }) {
+export default function Field({ label, hint, children }) {
   return (
     <div>
       <Label>{label}</Label>

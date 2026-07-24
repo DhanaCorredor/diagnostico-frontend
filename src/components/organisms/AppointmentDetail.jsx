@@ -2,11 +2,11 @@ import { useState } from 'react'
 import { api, ApiError } from '../../config/api'
 import { formatShortDate, formatTime } from '../../utils/date'
 import { indexBy } from '../../utils/data'
-import EstadoBadge from '../molecules/EstadoBadge'
+import StatusBadge from '../molecules/StatusBadge'
 import Modal from '../molecules/Modal'
-import Boton from '../atoms/Boton'
-import CamposCita from '../molecules/CamposCita'
-import Dato from '../molecules/Dato'
+import Button from '../atoms/Button'
+import AppointmentFields from '../molecules/AppointmentFields'
+import DataRow from '../molecules/DataRow'
 
 const ESTADOS_ACTIVOS = ['SCHEDULED', 'CONFIRMED']
 
@@ -14,7 +14,7 @@ function duracionDe(cita) {
   return Math.round((new Date(cita.ends_at) - new Date(cita.starts_at)) / 60000)
 }
 
-export default function DetalleCita({
+export default function AppointmentDetail({
   cita,
   nombrePaciente,
   medicos,
@@ -100,19 +100,19 @@ export default function DetalleCita({
   if (editing) {
     const footer = (
       <>
-        <Boton variant="secondary" type="button" onClick={() => setEditing(false)}>
+        <Button variant="secondary" type="button" onClick={() => setEditing(false)}>
           Volver
-        </Boton>
-        <Boton type="submit" form="form-editar-cita" disabled={busy}>
+        </Button>
+        <Button type="submit" form="form-editar-cita" disabled={busy}>
           {busy ? 'Guardando…' : 'Guardar cambios'}
-        </Boton>
+        </Button>
       </>
     )
     return (
       <Modal title="Editar cita" subtitle="Se revalidan disponibilidad y solapamientos." onClose={onClose} footer={footer}>
         <form id="form-editar-cita" onSubmit={saveEdit} className="space-y-4">
           {cajaError}
-          <CamposCita form={form} set={set} medicos={medicos} servicios={servicios} />
+          <AppointmentFields form={form} set={set} medicos={medicos} servicios={servicios} />
         </form>
       </Modal>
     )
@@ -120,16 +120,16 @@ export default function DetalleCita({
 
   const footer = canManage && activa && (
     <>
-      <Boton variant="secondary" size="sm" onClick={() => markAttendance('NO_SHOW')} disabled={busy}>
+      <Button variant="secondary" size="sm" onClick={() => markAttendance('NO_SHOW')} disabled={busy}>
         No asistió
-      </Boton>
-      <Boton variant="success" size="sm" onClick={() => markAttendance('COMPLETED')} disabled={busy}>
+      </Button>
+      <Button variant="success" size="sm" onClick={() => markAttendance('COMPLETED')} disabled={busy}>
         Atendida
-      </Boton>
-      <Boton variant="danger" size="sm" onClick={cancel} disabled={busy}>
+      </Button>
+      <Button variant="danger" size="sm" onClick={cancel} disabled={busy}>
         Cancelar cita
-      </Boton>
-      <Boton
+      </Button>
+      <Button
         size="sm"
         onClick={() => {
           setError(null)
@@ -138,7 +138,7 @@ export default function DetalleCita({
         disabled={busy}
       >
         Editar
-      </Boton>
+      </Button>
     </>
   )
 
@@ -147,18 +147,18 @@ export default function DetalleCita({
       {cajaError}
       <div className="flex items-center justify-between">
         <p className="text-lg font-semibold">{nombrePaciente ?? 'Paciente'}</p>
-        <EstadoBadge estado={cita.estado} />
+        <StatusBadge estado={cita.estado} />
       </div>
       <dl className="space-y-2 text-sm">
-        <Dato label="Médico" value={medicosMap[cita.medico_id]} />
-        <Dato label="Servicio" value={serviciosMap[cita.servicio_id]} />
-        <Dato label="Fecha" value={formatShortDate(cita.starts_at)} />
-        <Dato
+        <DataRow label="Médico" value={medicosMap[cita.medico_id]} />
+        <DataRow label="Servicio" value={serviciosMap[cita.servicio_id]} />
+        <DataRow label="Fecha" value={formatShortDate(cita.starts_at)} />
+        <DataRow
           label="Horario"
           value={`${formatTime(cita.starts_at)}–${formatTime(cita.ends_at)}`}
           tnum
         />
-        {cita.motivo && <Dato label="Motivo" value={cita.motivo} />}
+        {cita.motivo && <DataRow label="Motivo" value={cita.motivo} />}
       </dl>
       {!activa && (
         <p className="rounded-lg bg-surface-plane px-3 py-2 text-xs text-ink-muted">

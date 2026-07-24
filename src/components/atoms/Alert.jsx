@@ -4,7 +4,7 @@ const TYPES = {
   info: 'bg-surface-plane text-ink-2',
 }
 
-export default function Alerta({ type = 'error', className = '', children }) {
+export default function Alert({ type = 'error', className = '', children }) {
   return (
     <p className={`rounded-lg px-3 py-2 text-sm ${TYPES[type]} ${className}`}>{children}</p>
   )

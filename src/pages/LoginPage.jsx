@@ -5,8 +5,8 @@ import { ApiError } from '../config/api'
 import AuthLayout from '../layouts/AuthLayout'
 import Input from '../components/atoms/Input'
 import Label from '../components/atoms/Label'
-import Boton from '../components/atoms/Boton'
-import Alerta from '../components/atoms/Alerta'
+import Button from '../components/atoms/Button'
+import Alert from '../components/atoms/Alert'
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -69,11 +69,11 @@ export default function LoginPage() {
           className="mb-4"
         />
 
-        {error && <Alerta className="mb-4">{error}</Alerta>}
+        {error && <Alert className="mb-4">{error}</Alert>}
 
-        <Boton type="submit" disabled={loading} className="w-full">
+        <Button type="submit" disabled={loading} className="w-full">
           {loading ? 'Entrando…' : 'Entrar'}
-        </Boton>
+        </Button>
 
         <p className="mt-4 text-center text-xs text-ink-muted">
           🔒 Conexión segura · Datos cifrados

@@ -4,11 +4,11 @@ import AppLayout from './layouts/AppLayout'
 import LoginPage from './pages/LoginPage'
 import PanelPage from './pages/PanelPage'
 import AgendaPage from './pages/AgendaPage'
-import PacientesPage from './pages/PacientesPage'
-import FichaPacientePage from './pages/FichaPacientePage'
-import MedicosPage from './pages/MedicosPage'
+import PatientsPage from './pages/PatientsPage'
+import PatientFilePage from './pages/PatientFilePage'
+import DoctorsPage from './pages/DoctorsPage'
 import CitaPage from './pages/CitaPage'
-import UsuariosPage from './pages/UsuariosPage'
+import UsersPage from './pages/UsersPage'
 import ConfigPage from './pages/ConfigPage'
 
 const RECEP = ['ADMIN', 'RECEPCION']
@@ -32,7 +32,7 @@ export default function AppRouter() {
           path="/pacientes"
           element={
             <ProtectedRoute roles={RECEP}>
-              <PacientesPage />
+              <PatientsPage />
             </ProtectedRoute>
           }
         />
@@ -40,7 +40,7 @@ export default function AppRouter() {
           path="/pacientes/:id"
           element={
             <ProtectedRoute roles={RECEP}>
-              <FichaPacientePage />
+              <PatientFilePage />
             </ProtectedRoute>
           }
         />
@@ -48,7 +48,7 @@ export default function AppRouter() {
           path="/medicos"
           element={
             <ProtectedRoute roles={RECEP}>
-              <MedicosPage />
+              <DoctorsPage />
             </ProtectedRoute>
           }
         />
@@ -64,7 +64,7 @@ export default function AppRouter() {
           path="/usuarios"
           element={
             <ProtectedRoute roles={['ADMIN']}>
-              <UsuariosPage />
+              <UsersPage />
             </ProtectedRoute>
           }
         />

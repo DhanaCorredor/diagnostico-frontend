@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../config/api'
-import FormularioPaciente from '../components/organisms/FormularioPaciente'
-import Boton from '../components/atoms/Boton'
-import BarraBusqueda from '../components/molecules/BarraBusqueda'
-import Tabla from '../components/molecules/Tabla'
+import PatientForm from '../components/organisms/PatientForm'
+import Button from '../components/atoms/Button'
+import SearchBar from '../components/molecules/SearchBar'
+import Table from '../components/molecules/Table'
 
-export default function PacientesPage() {
+export default function PatientsPage() {
   const [pacientes, setPacientes] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -60,20 +60,20 @@ export default function PacientesPage() {
 
   return (
     <div className="space-y-4">
-      <BarraBusqueda
+      <SearchBar
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Buscar por nombre o cédula…"
         className="max-w-sm"
       />
 
-      <Tabla
+      <Table
         title="Pacientes"
         count={filtered.length}
         action={
-          <Boton size="sm" onClick={() => setCreating(true)}>
+          <Button size="sm" onClick={() => setCreating(true)}>
             + Nuevo paciente
-          </Boton>
+          </Button>
         }
         columns={columns}
         rows={filtered}
@@ -83,7 +83,7 @@ export default function PacientesPage() {
       />
 
       {creating && (
-        <FormularioPaciente
+        <PatientForm
           onClose={() => setCreating(false)}
           onSaved={() => {
             setCreating(false)

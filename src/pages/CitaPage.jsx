@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api, ApiError } from '../config/api'
 import { todayISO } from '../utils/date'
-import Campo from '../components/molecules/Campo'
+import Field from '../components/molecules/Field'
 import Input from '../components/atoms/Input'
-import Boton from '../components/atoms/Boton'
-import Tarjeta from '../components/atoms/Tarjeta'
-import CamposCita from '../components/molecules/CamposCita'
+import Button from '../components/atoms/Button'
+import Card from '../components/atoms/Card'
+import AppointmentFields from '../components/molecules/AppointmentFields'
 
 export default function CitaPage() {
   const navigate = useNavigate()
@@ -82,7 +82,7 @@ export default function CitaPage() {
 
   return (
     <div className="mx-auto max-w-xl">
-      <Tarjeta>
+      <Card>
         <div className="border-b border-line px-6 py-4">
           <h2 className="text-lg font-semibold">Nueva cita</h2>
           <p className="text-xs text-ink-muted">
@@ -108,16 +108,16 @@ export default function CitaPage() {
 
           <div className="grid grid-cols-3 gap-3">
             <div className="col-span-2">
-              <Campo label="Paciente (nombre completo)">
+              <Field label="Paciente (nombre completo)">
                 <Input
                   value={form.nombre_completo}
                   onChange={(e) => set('nombre_completo', e.target.value)}
                   required
                   autoFocus
                 />
-              </Campo>
+              </Field>
             </div>
-            <Campo label="Edad">
+            <Field label="Edad">
               <Input
                 type="number"
                 min="0"
@@ -126,21 +126,21 @@ export default function CitaPage() {
                 onChange={(e) => set('edad', e.target.value)}
                 required
               />
-            </Campo>
+            </Field>
           </div>
 
-          <CamposCita form={form} set={set} medicos={medicos} servicios={servicios} />
+          <AppointmentFields form={form} set={set} medicos={medicos} servicios={servicios} />
 
           <div className="flex justify-end gap-3 border-t border-line pt-4">
-            <Boton variant="secondary" type="button" onClick={() => navigate(-1)}>
+            <Button variant="secondary" type="button" onClick={() => navigate(-1)}>
               Cancelar
-            </Boton>
-            <Boton type="submit" disabled={saving}>
+            </Button>
+            <Button type="submit" disabled={saving}>
               {saving ? 'Guardando…' : 'Guardar cita'}
-            </Boton>
+            </Button>
           </div>
         </form>
-      </Tarjeta>
+      </Card>
     </div>
   )
 }

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { api, ApiError } from '../config/api'
 import Input from '../components/atoms/Input'
-import Boton from '../components/atoms/Boton'
+import Button from '../components/atoms/Button'
 import Badge from '../components/atoms/Badge'
-import Alerta from '../components/atoms/Alerta'
-import Tarjeta from '../components/atoms/Tarjeta'
+import Alert from '../components/atoms/Alert'
+import Card from '../components/atoms/Card'
 
 const CATEGORIAS = [
   { value: 'CONSULTA', label: 'Consulta' },
@@ -68,10 +68,10 @@ export default function ConfigPage() {
 
   return (
     <div className="space-y-6">
-      {error && <Alerta>{error}</Alerta>}
+      {error && <Alert>{error}</Alert>}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Tarjeta className="p-5">
+        <Card className="p-5">
           <h3 className="mb-1 font-semibold">Especialidades</h3>
           <p className="mb-3 text-xs text-ink-muted">Áreas médicas del centro.</p>
 
@@ -92,11 +92,11 @@ export default function ConfigPage() {
               onChange={(e) => setNuevaEsp(e.target.value)}
               placeholder="Nueva especialidad…"
             />
-            <Boton className="shrink-0">Añadir</Boton>
+            <Button className="shrink-0">Añadir</Button>
           </form>
-        </Tarjeta>
+        </Card>
 
-        <Tarjeta className="p-5">
+        <Card className="p-5">
           <h3 className="mb-1 font-semibold">Servicios y estudios</h3>
           <p className="mb-3 text-xs text-ink-muted">
             La duración de cada cita la elige recepción al agendar.
@@ -134,12 +134,12 @@ export default function ConfigPage() {
                 </option>
               ))}
             </select>
-            <Boton className="shrink-0">Añadir</Boton>
+            <Button className="shrink-0">Añadir</Button>
           </form>
-        </Tarjeta>
+        </Card>
       </div>
 
-      <Tarjeta className="p-5">
+      <Card className="p-5">
         <h3 className="mb-3 font-semibold">Seguridad</h3>
         <div className="space-y-2 text-sm">
           {[
@@ -155,7 +155,7 @@ export default function ConfigPage() {
             </div>
           ))}
         </div>
-      </Tarjeta>
+      </Card>
     </div>
   )
 }

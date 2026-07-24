@@ -10,7 +10,7 @@ const SIZES = {
   md: 'px-4 py-2',
 }
 
-export default function Boton({ variant = 'primary', size = 'md', className = '', ...props }) {
+export default function Button({ variant = 'primary', size = 'md', className = '', ...props }) {
   return (
     <button
       className={`rounded-lg text-sm font-semibold transition disabled:opacity-60 ${VARIANTS[variant]} ${SIZES[size]} ${className}`}

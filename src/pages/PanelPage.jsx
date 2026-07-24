@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../config/api'
 import { useAuth } from '../auth/useAuth'
-import EstadoBadge from '../components/molecules/EstadoBadge'
-import DetalleCita from '../components/organisms/DetalleCita'
+import StatusBadge from '../components/molecules/StatusBadge'
+import AppointmentDetail from '../components/organisms/AppointmentDetail'
 import Spinner from '../components/atoms/Spinner'
-import Alerta from '../components/atoms/Alerta'
-import Tarjeta from '../components/atoms/Tarjeta'
-import TarjetaKPI from '../components/molecules/TarjetaKPI'
-import MensajeLista from '../components/atoms/MensajeLista'
+import Alert from '../components/atoms/Alert'
+import Card from '../components/atoms/Card'
+import KpiCard from '../components/molecules/KpiCard'
+import ListMessage from '../components/atoms/ListMessage'
 import { formatTime, todayISO } from '../utils/date'
 import { indexBy } from '../utils/data'
 import { APPOINTMENT_STATES } from '../utils/citas'
@@ -56,17 +56,17 @@ export default function PanelPage() {
   const ordenadas = [...citas].sort((a, b) => a.starts_at.localeCompare(b.starts_at))
 
   if (loading) return <Spinner />
-  if (error) return <Alerta>{error}</Alerta>
+  if (error) return <Alert>{error}</Alert>
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <TarjetaKPI title="Citas hoy" value={citas.length} />
-        <TarjetaKPI title="Confirmadas" value={confirmadas} nota={`${pendientes} pendientes de confirmar`} />
-        <TarjetaKPI title="Pendientes" value={pendientes} />
+        <KpiCard title="Citas hoy" value={citas.length} />
+        <KpiCard title="Confirmadas" value={confirmadas} nota={`${pendientes} pendientes de confirmar`} />
+        <KpiCard title="Pendientes" value={pendientes} />
       </div>
 
-      <Tarjeta>
+      <Card>
         <div className="flex items-center justify-between border-b border-line px-5 py-4">
           <h2 className="font-semibold">Agenda de hoy</h2>
           <span className="text-xs text-ink-muted">
@@ -75,7 +75,7 @@ export default function PanelPage() {
         </div>
 
         {ordenadas.length === 0 ? (
-          <MensajeLista>No hay citas para hoy.</MensajeLista>
+          <ListMessage>No hay citas para hoy.</ListMessage>
         ) : (
           <div className="divide-y divide-line">
             {ordenadas.map((c) => (
@@ -96,15 +96,15 @@ export default function PanelPage() {
                     {medicosMap[c.medico_id] ?? 'Médico'} · {serviciosMap[c.servicio_id] ?? 'Servicio'}
                   </p>
                 </div>
-                <EstadoBadge estado={c.estado} />
+                <StatusBadge estado={c.estado} />
               </button>
             ))}
           </div>
         )}
-      </Tarjeta>
+      </Card>
 
       {citaSel && (
-        <DetalleCita
+        <AppointmentDetail
           cita={citaSel}
           nombrePaciente={pacientes[citaSel.paciente_id]}
           medicos={medicos}

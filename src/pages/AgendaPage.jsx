@@ -3,10 +3,10 @@ import { api } from '../config/api'
 import { useAuth } from '../auth/useAuth'
 import { weekday, longDateFromISO, formatTime, todayISO, addDays } from '../utils/date'
 import { indexBy } from '../utils/data'
-import DetalleCita from '../components/organisms/DetalleCita'
+import AppointmentDetail from '../components/organisms/AppointmentDetail'
 import Spinner from '../components/atoms/Spinner'
-import Tarjeta from '../components/atoms/Tarjeta'
-import MensajeLista from '../components/atoms/MensajeLista'
+import Card from '../components/atoms/Card'
+import ListMessage from '../components/atoms/ListMessage'
 import { APPOINTMENT_STATES } from '../utils/citas'
 
 const HORAS = Array.from({ length: 11 }, (_, i) => 7 + i)
@@ -91,7 +91,7 @@ export default function AgendaPage() {
   }
 
   return (
-    <Tarjeta className="p-5">
+    <Card className="p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-semibold capitalize">{longDateFromISO(fecha)}</h2>
         <div className="flex items-center gap-2 text-sm">
@@ -135,9 +135,9 @@ export default function AgendaPage() {
       {loading ? (
         <Spinner className="py-10 text-center" />
       ) : error ? (
-        <MensajeLista type="error">{error}</MensajeLista>
+        <ListMessage type="error">{error}</ListMessage>
       ) : medicosVisibles.length === 0 ? (
-        <MensajeLista>No hay médicos que mostrar.</MensajeLista>
+        <ListMessage>No hay médicos que mostrar.</ListMessage>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-line">
           <div
@@ -154,7 +154,7 @@ export default function AgendaPage() {
             ))}
 
             {medicosVisibles.map((m) => (
-              <FilaMedico
+              <DoctorRow
                 key={m.id}
                 medico={m}
                 dia={dia}
@@ -174,7 +174,7 @@ export default function AgendaPage() {
       </p>
 
       {citaSel && (
-        <DetalleCita
+        <AppointmentDetail
           cita={citaSel}
           nombrePaciente={pacientes[citaSel.paciente_id]}
           medicos={medicos}
@@ -187,11 +187,11 @@ export default function AgendaPage() {
           }}
         />
       )}
-    </Tarjeta>
+    </Card>
   )
 }
 
-function FilaMedico({ medico, dia, franjas, citasDe, serviciosMap, pacientes, onSelect }) {
+function DoctorRow({ medico, dia, franjas, citasDe, serviciosMap, pacientes, onSelect }) {
   return (
     <>
       <div className="sticky left-0 z-10 bg-white px-3 py-2 shadow-[1px_0_0_var(--color-line)]">

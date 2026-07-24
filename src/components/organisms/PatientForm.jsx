@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { api, ApiError } from '../../config/api'
 import Modal from '../molecules/Modal'
-import Campo from '../molecules/Campo'
+import Field from '../molecules/Field'
 import Input from '../atoms/Input'
-import Boton from '../atoms/Boton'
-import Alerta from '../atoms/Alerta'
+import Button from '../atoms/Button'
+import Alert from '../atoms/Alert'
 
-export default function FormularioPaciente({ paciente, onClose, onSaved }) {
+export default function PatientForm({ paciente, onClose, onSaved }) {
   const editing = Boolean(paciente)
 
   const [form, setForm] = useState({
@@ -50,12 +50,12 @@ export default function FormularioPaciente({ paciente, onClose, onSaved }) {
 
   const footer = (
     <>
-      <Boton variant="secondary" type="button" onClick={onClose}>
+      <Button variant="secondary" type="button" onClick={onClose}>
         Cancelar
-      </Boton>
-      <Boton type="submit" form="form-paciente" disabled={saving}>
+      </Button>
+      <Button type="submit" form="form-paciente" disabled={saving}>
         {saving ? 'Guardando…' : 'Guardar'}
-      </Boton>
+      </Button>
     </>
   )
 
@@ -67,19 +67,19 @@ export default function FormularioPaciente({ paciente, onClose, onSaved }) {
       footer={footer}
     >
       <form id="form-paciente" onSubmit={onSubmit} className="space-y-4">
-        {error && <Alerta>{error}</Alerta>}
+        {error && <Alert>{error}</Alert>}
 
-        <Campo label="Nombre completo">
+        <Field label="Nombre completo">
           <Input
             value={form.nombre_completo}
             onChange={(e) => set('nombre_completo', e.target.value)}
             required
             autoFocus
           />
-        </Campo>
+        </Field>
 
         <div className="grid grid-cols-2 gap-3">
-          <Campo label="Edad">
+          <Field label="Edad">
             <Input
               type="number"
               min="0"
@@ -88,31 +88,31 @@ export default function FormularioPaciente({ paciente, onClose, onSaved }) {
               onChange={(e) => set('edad', e.target.value)}
               required
             />
-          </Campo>
-          <Campo label="Cédula (opcional)">
+          </Field>
+          <Field label="Cédula (opcional)">
             <Input
               value={form.cedula}
               onChange={(e) => set('cedula', e.target.value)}
               placeholder="V-12.345.678"
             />
-          </Campo>
+          </Field>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <Campo label="Teléfono (opcional)">
+          <Field label="Teléfono (opcional)">
             <Input
               value={form.telefono}
               onChange={(e) => set('telefono', e.target.value)}
               placeholder="0414-555-1122"
             />
-          </Campo>
-          <Campo label="Fecha de nacimiento (opcional)">
+          </Field>
+          <Field label="Fecha de nacimiento (opcional)">
             <Input
               type="date"
               value={form.fecha_nacimiento}
               onChange={(e) => set('fecha_nacimiento', e.target.value)}
             />
-          </Campo>
+          </Field>
         </div>
       </form>
     </Modal>

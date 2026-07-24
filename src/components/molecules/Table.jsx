@@ -1,10 +1,10 @@
-import Tarjeta from '../atoms/Tarjeta'
+import Card from '../atoms/Card'
 import Spinner from '../atoms/Spinner'
-import MensajeLista from '../atoms/MensajeLista'
+import ListMessage from '../atoms/ListMessage'
 
-export default function Tabla({ title, count, action, columns, rows, loading, error, empty }) {
+export default function Table({ title, count, action, columns, rows, loading, error, empty }) {
   return (
-    <Tarjeta>
+    <Card>
       <div className="flex items-center justify-between border-b border-line px-5 py-4">
         <h2 className="font-semibold">
           {title}
@@ -18,9 +18,9 @@ export default function Tabla({ title, count, action, columns, rows, loading, er
       {loading ? (
         <Spinner className="px-5 py-10 text-center" />
       ) : error ? (
-        <MensajeLista type="error">{error}</MensajeLista>
+        <ListMessage type="error">{error}</ListMessage>
       ) : rows.length === 0 ? (
-        <MensajeLista>{empty}</MensajeLista>
+        <ListMessage>{empty}</ListMessage>
       ) : (
         <table className="w-full text-sm">
           <thead className="text-left text-xs uppercase tracking-wide text-ink-muted">
@@ -43,6 +43,6 @@ export default function Tabla({ title, count, action, columns, rows, loading, er
           </tbody>
         </table>
       )}
-    </Tarjeta>
+    </Card>
   )
 }

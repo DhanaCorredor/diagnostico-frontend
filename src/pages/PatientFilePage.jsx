@@ -1,19 +1,19 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { api } from '../config/api'
-import EstadoBadge from '../components/molecules/EstadoBadge'
-import FormularioPaciente from '../components/organisms/FormularioPaciente'
+import StatusBadge from '../components/molecules/StatusBadge'
+import PatientForm from '../components/organisms/PatientForm'
 import { formatShortDate, formatTime } from '../utils/date'
 import { indexBy } from '../utils/data'
 import Avatar from '../components/atoms/Avatar'
 import Spinner from '../components/atoms/Spinner'
-import Alerta from '../components/atoms/Alerta'
-import Tarjeta from '../components/atoms/Tarjeta'
-import Boton from '../components/atoms/Boton'
-import MensajeLista from '../components/atoms/MensajeLista'
-import Dato from '../components/molecules/Dato'
+import Alert from '../components/atoms/Alert'
+import Card from '../components/atoms/Card'
+import Button from '../components/atoms/Button'
+import ListMessage from '../components/atoms/ListMessage'
+import DataRow from '../components/molecules/DataRow'
 
-export default function FichaPacientePage() {
+export default function PatientFilePage() {
   const { id } = useParams()
   const [paciente, setPaciente] = useState(null)
   const [citas, setCitas] = useState([])
@@ -50,7 +50,7 @@ export default function FichaPacientePage() {
   }, [load])
 
   if (loading) return <Spinner />
-  if (error) return <Alerta>{error}</Alerta>
+  if (error) return <Alert>{error}</Alert>
   if (!paciente) return null
 
   return (
@@ -62,7 +62,7 @@ export default function FichaPacientePage() {
         Volver a Pacientes
       </Link>
 
-      <Tarjeta className="mb-6 p-5">
+      <Card className="mb-6 p-5">
         <div className="flex flex-wrap items-center gap-4">
           <Avatar name={paciente.nombre_completo} size="lg" />
           <div className="flex-1">
@@ -72,11 +72,11 @@ export default function FichaPacientePage() {
               {paciente.edad != null && ` · ${paciente.edad} años`}
             </p>
           </div>
-          <Boton variant="secondary" onClick={() => setEditing(true)}>
+          <Button variant="secondary" onClick={() => setEditing(true)}>
             Editar
-          </Boton>
+          </Button>
         </div>
-      </Tarjeta>
+      </Card>
 
       <div className="mb-4 flex gap-1 border-b border-line text-sm">
         <button
@@ -103,34 +103,34 @@ export default function FichaPacientePage() {
 
       {tab === 'datos' && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <Tarjeta className="p-5">
+          <Card className="p-5">
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-muted">
               Identificación
             </h3>
             <dl className="space-y-2 text-sm">
-              <Dato label="Cédula" value={paciente.cedula} />
-              <Dato
+              <DataRow label="Cédula" value={paciente.cedula} />
+              <DataRow
                 label="Fecha de nacimiento"
                 value={paciente.fecha_nacimiento && formatShortDate(paciente.fecha_nacimiento)}
               />
-              <Dato label="Edad" value={paciente.edad != null ? `${paciente.edad} años` : null} />
+              <DataRow label="Edad" value={paciente.edad != null ? `${paciente.edad} años` : null} />
             </dl>
-          </Tarjeta>
-          <Tarjeta className="p-5">
+          </Card>
+          <Card className="p-5">
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-muted">
               Contacto
             </h3>
             <dl className="space-y-2 text-sm">
-              <Dato label="Teléfono" value={paciente.telefono} />
+              <DataRow label="Teléfono" value={paciente.telefono} />
             </dl>
-          </Tarjeta>
+          </Card>
         </div>
       )}
 
       {tab === 'citas' && (
-        <Tarjeta>
+        <Card>
           {citas.length === 0 ? (
-            <MensajeLista>Este paciente no tiene citas registradas.</MensajeLista>
+            <ListMessage>Este paciente no tiene citas registradas.</ListMessage>
           ) : (
             <table className="w-full text-sm">
               <thead className="text-left text-xs uppercase tracking-wide text-ink-muted">
@@ -150,18 +150,18 @@ export default function FichaPacientePage() {
                     <td className="px-5 py-3">{medicos[c.medico_id] ?? 'Médico'}</td>
                     <td className="px-5 py-3 text-ink-2">{servicios[c.servicio_id] ?? 'Servicio'}</td>
                     <td className="px-5 py-3">
-                      <EstadoBadge estado={c.estado} />
+                      <StatusBadge estado={c.estado} />
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           )}
-        </Tarjeta>
+        </Card>
       )}
 
       {editing && (
-        <FormularioPaciente
+        <PatientForm
           paciente={paciente}
           onClose={() => setEditing(false)}
           onSaved={() => {
