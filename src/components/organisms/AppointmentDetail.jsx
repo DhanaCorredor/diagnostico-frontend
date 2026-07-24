@@ -59,7 +59,7 @@ export default function AppointmentDetail({
   }
 
   function cancel() {
-    run(() => api.post(`/citas/${cita.id}/cancel`))
+    run(() => api.post(`/citas/${cita.id}/cancelar`))
   }
   function markAttendance(estado) {
     run(() => api.post(`/citas/${cita.id}/asistencia`, { estado }))
