@@ -7,8 +7,8 @@ over HTTP/JSON, authenticated with a JWT bearer token.
 
 > Bootcamp final project — MVP. The frontend is used only by the center's staff
 > (administration, reception and doctors). Most project documentation lives in the
-> backend repo under `docs/` (in Spanish); the frontend **component map** is here in
-> [`docs/COMPONENTES.md`](docs/COMPONENTES.md).
+> backend repo under `docs/` (in Spanish). Frontend docs (in Spanish):
+> [component map](docs/COMPONENTES.md) · [architecture & design patterns](docs/ARQUITECTURA.md) · [use cases](docs/CASOS-DE-USO.md).
 
 ## 🧱 Tech stack
 
