@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api, ApiError } from '../config/api'
-import { hoyISO } from '../utils/fecha'
+import { todayISO } from '../utils/date'
 import Campo from '../components/molecules/Campo'
 import Input from '../components/atoms/Input'
 import Boton from '../components/atoms/Boton'
@@ -18,30 +18,30 @@ export default function CitaPage() {
     edad: '',
     medico_id: '',
     servicio_id: '',
-    fecha: hoyISO(),
+    fecha: todayISO(),
     hora: '09:00',
     duracion_min: 30,
     motivo: '',
     permitir_sobrecupo: false,
   })
   const [error, setError] = useState(null)
-  const [guardando, setGuardando] = useState(false)
+  const [saving, setSaving] = useState(false)
 
-  function set(campo, valor) {
-    setForm((f) => ({ ...f, [campo]: valor }))
+  function set(field, value) {
+    setForm((f) => ({ ...f, [field]: value }))
   }
 
   useEffect(() => {
-    async function cargar() {
+    async function load() {
       try {
         const [ms, ss] = await Promise.all([api.get('/medicos'), api.get('/servicios')])
         setMedicos(ms)
         setServicios(ss)
       } catch {
-        setError({ mensaje: 'No se pudieron cargar médicos y servicios.' })
+        setError({ mensaje: 'No se pudieron load médicos y servicios.' })
       }
     }
-    cargar()
+    load()
   }, [])
 
   async function onSubmit(e) {
@@ -54,8 +54,8 @@ export default function CitaPage() {
       return
     }
 
-    setGuardando(true)
-    const cuerpo = {
+    setSaving(true)
+    const body = {
       nombre_completo: form.nombre_completo.trim(),
       edad: Number(form.edad),
       medico_id: form.medico_id,
@@ -67,7 +67,7 @@ export default function CitaPage() {
     }
 
     try {
-      await api.post('/citas', cuerpo)
+      await api.post('/citas', body)
       navigate('/agenda')
     } catch (err) {
       if (err instanceof ApiError) {
@@ -76,7 +76,7 @@ export default function CitaPage() {
       } else {
         setError({ mensaje: 'No se pudo agendar la cita.' })
       }
-      setGuardando(false)
+      setSaving(false)
     }
   }
 
@@ -132,11 +132,11 @@ export default function CitaPage() {
           <CamposCita form={form} set={set} medicos={medicos} servicios={servicios} />
 
           <div className="flex justify-end gap-3 border-t border-line pt-4">
-            <Boton variante="secundario" type="button" onClick={() => navigate(-1)}>
+            <Boton variant="secondary" type="button" onClick={() => navigate(-1)}>
               Cancelar
             </Boton>
-            <Boton type="submit" disabled={guardando}>
-              {guardando ? 'Guardando…' : 'Guardar cita'}
+            <Boton type="submit" disabled={saving}>
+              {saving ? 'Guardando…' : 'Guardar cita'}
             </Boton>
           </div>
         </form>

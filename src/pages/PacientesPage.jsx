@@ -8,37 +8,37 @@ import Tabla from '../components/molecules/Tabla'
 
 export default function PacientesPage() {
   const [pacientes, setPacientes] = useState([])
-  const [cargando, setCargando] = useState(true)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [busqueda, setBusqueda] = useState('')
-  const [creando, setCreando] = useState(false)
+  const [search, setSearch] = useState('')
+  const [creating, setCreating] = useState(false)
 
-  async function cargar() {
-    setCargando(true)
+  async function load() {
+    setLoading(true)
     setError('')
     try {
       setPacientes(await api.get('/pacientes'))
     } catch {
-      setError('No se pudieron cargar los pacientes.')
+      setError('No se pudieron load los pacientes.')
     } finally {
-      setCargando(false)
+      setLoading(false)
     }
   }
 
   useEffect(() => {
-    cargar()
+    load()
   }, [])
 
-  const termino = busqueda.trim().toLowerCase()
-  const filtrados = termino
+  const term = search.trim().toLowerCase()
+  const filtered = term
     ? pacientes.filter(
         (p) =>
-          p.nombre_completo.toLowerCase().includes(termino) ||
-          (p.cedula ?? '').toLowerCase().includes(termino),
+          p.nombre_completo.toLowerCase().includes(term) ||
+          (p.cedula ?? '').toLowerCase().includes(term),
       )
     : pacientes
 
-  const columnas = [
+  const columns = [
     { header: 'Paciente', className: 'font-medium', render: (p) => p.nombre_completo },
     {
       header: 'Cédula',
@@ -61,33 +61,33 @@ export default function PacientesPage() {
   return (
     <div className="space-y-4">
       <BarraBusqueda
-        value={busqueda}
-        onChange={(e) => setBusqueda(e.target.value)}
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
         placeholder="Buscar por nombre o cédula…"
         className="max-w-sm"
       />
 
       <Tabla
-        titulo="Pacientes"
-        contador={filtrados.length}
-        accion={
-          <Boton tamano="sm" onClick={() => setCreando(true)}>
+        title="Pacientes"
+        count={filtered.length}
+        action={
+          <Boton size="sm" onClick={() => setCreating(true)}>
             + Nuevo paciente
           </Boton>
         }
-        columnas={columnas}
-        filas={filtrados}
-        cargando={cargando}
+        columns={columns}
+        rows={filtered}
+        loading={loading}
         error={error}
-        vacio={termino ? 'Sin resultados para la búsqueda.' : 'Aún no hay pacientes.'}
+        empty={term ? 'Sin resultados para la búsqueda.' : 'Aún no hay pacientes.'}
       />
 
-      {creando && (
+      {creating && (
         <FormularioPaciente
-          onCerrar={() => setCreando(false)}
-          onGuardado={() => {
-            setCreando(false)
-            cargar()
+          onClose={() => setCreating(false)}
+          onSaved={() => {
+            setCreating(false)
+            load()
           }}
         />
       )}

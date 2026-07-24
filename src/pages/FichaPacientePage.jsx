@@ -3,8 +3,8 @@ import { Link, useParams } from 'react-router-dom'
 import { api } from '../config/api'
 import EstadoBadge from '../components/molecules/EstadoBadge'
 import FormularioPaciente from '../components/organisms/FormularioPaciente'
-import { formatFechaCorta, formatHora } from '../utils/fecha'
-import { indexarPor } from '../utils/datos'
+import { formatShortDate, formatTime } from '../utils/date'
+import { indexBy } from '../utils/data'
 import Avatar from '../components/atoms/Avatar'
 import Spinner from '../components/atoms/Spinner'
 import Alerta from '../components/atoms/Alerta'
@@ -20,12 +20,12 @@ export default function FichaPacientePage() {
   const [medicos, setMedicos] = useState({})
   const [servicios, setServicios] = useState({})
   const [tab, setTab] = useState('datos')
-  const [editando, setEditando] = useState(false)
-  const [cargando, setCargando] = useState(true)
+  const [editing, setEditing] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  const cargar = useCallback(async () => {
-    setCargando(true)
+  const load = useCallback(async () => {
+    setLoading(true)
     setError('')
     try {
       const [pac, hist, listaMedicos, listaServicios] = await Promise.all([
@@ -36,20 +36,20 @@ export default function FichaPacientePage() {
       ])
       setPaciente(pac)
       setCitas(hist)
-      setMedicos(indexarPor(listaMedicos, 'nombre_completo'))
-      setServicios(indexarPor(listaServicios, 'nombre'))
+      setMedicos(indexBy(listaMedicos, 'nombre_completo'))
+      setServicios(indexBy(listaServicios, 'nombre'))
     } catch {
-      setError('No se pudo cargar la ficha del paciente.')
+      setError('No se pudo load la ficha del paciente.')
     } finally {
-      setCargando(false)
+      setLoading(false)
     }
   }, [id])
 
   useEffect(() => {
-    cargar()
-  }, [cargar])
+    load()
+  }, [load])
 
-  if (cargando) return <Spinner />
+  if (loading) return <Spinner />
   if (error) return <Alerta>{error}</Alerta>
   if (!paciente) return null
 
@@ -64,7 +64,7 @@ export default function FichaPacientePage() {
 
       <Tarjeta className="mb-6 p-5">
         <div className="flex flex-wrap items-center gap-4">
-          <Avatar nombre={paciente.nombre_completo} tamano="lg" />
+          <Avatar name={paciente.nombre_completo} size="lg" />
           <div className="flex-1">
             <h2 className="text-xl font-semibold">{paciente.nombre_completo}</h2>
             <p className="text-sm text-ink-2">
@@ -72,7 +72,7 @@ export default function FichaPacientePage() {
               {paciente.edad != null && ` · ${paciente.edad} años`}
             </p>
           </div>
-          <Boton variante="secundario" onClick={() => setEditando(true)}>
+          <Boton variant="secondary" onClick={() => setEditing(true)}>
             Editar
           </Boton>
         </div>
@@ -108,12 +108,12 @@ export default function FichaPacientePage() {
               Identificación
             </h3>
             <dl className="space-y-2 text-sm">
-              <Dato etiqueta="Cédula" valor={paciente.cedula} />
+              <Dato label="Cédula" value={paciente.cedula} />
               <Dato
-                etiqueta="Fecha de nacimiento"
-                valor={paciente.fecha_nacimiento && formatFechaCorta(paciente.fecha_nacimiento)}
+                label="Fecha de nacimiento"
+                value={paciente.fecha_nacimiento && formatShortDate(paciente.fecha_nacimiento)}
               />
-              <Dato etiqueta="Edad" valor={paciente.edad != null ? `${paciente.edad} años` : null} />
+              <Dato label="Edad" value={paciente.edad != null ? `${paciente.edad} años` : null} />
             </dl>
           </Tarjeta>
           <Tarjeta className="p-5">
@@ -121,7 +121,7 @@ export default function FichaPacientePage() {
               Contacto
             </h3>
             <dl className="space-y-2 text-sm">
-              <Dato etiqueta="Teléfono" valor={paciente.telefono} />
+              <Dato label="Teléfono" value={paciente.telefono} />
             </dl>
           </Tarjeta>
         </div>
@@ -145,7 +145,7 @@ export default function FichaPacientePage() {
                 {citas.map((c) => (
                   <tr key={c.id} className="hover:bg-surface-plane">
                     <td className="tnum px-5 py-3">
-                      {formatFechaCorta(c.starts_at)} · {formatHora(c.starts_at)}
+                      {formatShortDate(c.starts_at)} · {formatTime(c.starts_at)}
                     </td>
                     <td className="px-5 py-3">{medicos[c.medico_id] ?? 'Médico'}</td>
                     <td className="px-5 py-3 text-ink-2">{servicios[c.servicio_id] ?? 'Servicio'}</td>
@@ -160,13 +160,13 @@ export default function FichaPacientePage() {
         </Tarjeta>
       )}
 
-      {editando && (
+      {editing && (
         <FormularioPaciente
           paciente={paciente}
-          onCerrar={() => setEditando(false)}
-          onGuardado={() => {
-            setEditando(false)
-            cargar()
+          onClose={() => setEditing(false)}
+          onSaved={() => {
+            setEditing(false)
+            load()
           }}
         />
       )}

@@ -27,16 +27,16 @@ const iconos = {
 }
 
 const NAV = [
-  { to: '/', icono: 'panel', texto: 'Panel', roles: ['ADMIN', 'RECEPCION', 'MEDICO'], end: true },
-  { to: '/agenda', icono: 'agenda', texto: 'Agenda', roles: ['ADMIN', 'RECEPCION', 'MEDICO'] },
-  { to: '/pacientes', icono: 'pacientes', texto: 'Pacientes', roles: ['ADMIN', 'RECEPCION'] },
-  { to: '/medicos', icono: 'medicos', texto: 'Médicos', roles: ['ADMIN', 'RECEPCION'] },
+  { to: '/', icon: 'panel', text: 'Panel', roles: ['ADMIN', 'RECEPCION', 'MEDICO'], end: true },
+  { to: '/agenda', icon: 'agenda', text: 'Agenda', roles: ['ADMIN', 'RECEPCION', 'MEDICO'] },
+  { to: '/pacientes', icon: 'pacientes', text: 'Pacientes', roles: ['ADMIN', 'RECEPCION'] },
+  { to: '/medicos', icon: 'medicos', text: 'Médicos', roles: ['ADMIN', 'RECEPCION'] },
   { divisor: true, roles: ['ADMIN'] },
-  { to: '/usuarios', icono: 'usuarios', texto: 'Usuarios', roles: ['ADMIN'] },
-  { to: '/config', icono: 'config', texto: 'Configuración', roles: ['ADMIN'] },
+  { to: '/usuarios', icon: 'usuarios', text: 'Usuarios', roles: ['ADMIN'] },
+  { to: '/config', icon: 'config', text: 'Configuración', roles: ['ADMIN'] },
 ]
 
-function claseEnlace({ isActive }) {
+function linkClass({ isActive }) {
   const base = 'flex items-center gap-3 rounded-lg px-3 py-2 cursor-pointer'
   return isActive
     ? `${base} bg-[#e8f2f0] font-semibold text-brand-dark`
@@ -67,7 +67,7 @@ export default function Sidebar() {
           item.divisor ? (
             <div key={`div-${i}`} className="my-2 border-t border-line" />
           ) : (
-            <NavLink key={item.to} to={item.to} end={item.end} className={claseEnlace}>
+            <NavLink key={item.to} to={item.to} end={item.end} className={linkClass}>
               <svg
                 className="h-5 w-5"
                 fill="none"
@@ -75,9 +75,9 @@ export default function Sidebar() {
                 strokeWidth="1.8"
                 viewBox="0 0 24 24"
               >
-                {iconos[item.icono]}
+                {iconos[item.icon]}
               </svg>
-              {item.texto}
+              {item.text}
             </NavLink>
           ),
         )}
@@ -85,10 +85,10 @@ export default function Sidebar() {
 
       <div className="border-t border-line px-3 py-3">
         <div className="flex items-center gap-3 rounded-lg px-2 py-2">
-          <Avatar nombre={user.nombre_completo} tamano="sm" />
+          <Avatar name={user.nombre_completo} size="sm" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium">{user.nombre_completo}</p>
-            <p className="text-[11px] text-ink-muted">{ROLES[user.rol]?.etiqueta ?? user.rol}</p>
+            <p className="text-[11px] text-ink-muted">{ROLES[user.rol]?.label ?? user.rol}</p>
           </div>
           <button onClick={salir} title="Salir" className="text-ink-muted hover:text-crit">
             <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">

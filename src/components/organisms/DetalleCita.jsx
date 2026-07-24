@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { api, ApiError } from '../../config/api'
-import { formatFechaCorta, formatHora } from '../../utils/fecha'
-import { indexarPor } from '../../utils/datos'
+import { formatShortDate, formatTime } from '../../utils/date'
+import { indexBy } from '../../utils/data'
 import EstadoBadge from '../molecules/EstadoBadge'
 import Modal from '../molecules/Modal'
 import Boton from '../atoms/Boton'
@@ -19,16 +19,16 @@ export default function DetalleCita({
   nombrePaciente,
   medicos,
   servicios,
-  puedeGestionar,
-  onCerrar,
-  onActualizada,
+  canManage,
+  onClose,
+  onUpdated,
 }) {
-  const medicosMap = indexarPor(medicos, 'nombre_completo')
-  const serviciosMap = indexarPor(servicios, 'nombre')
+  const medicosMap = indexBy(medicos, 'nombre_completo')
+  const serviciosMap = indexBy(servicios, 'nombre')
 
-  const [editando, setEditando] = useState(false)
+  const [editing, setEditing] = useState(false)
   const [error, setError] = useState(null)
-  const [ocupado, setOcupado] = useState(false)
+  const [busy, setBusy] = useState(false)
 
   const activa = ESTADOS_ACTIVOS.includes(cita.estado)
 
@@ -41,36 +41,36 @@ export default function DetalleCita({
     motivo: cita.motivo ?? '',
     permitir_sobrecupo: false,
   })
-  function set(campo, valor) {
-    setForm((f) => ({ ...f, [campo]: valor }))
+  function set(field, value) {
+    setForm((f) => ({ ...f, [field]: value }))
   }
 
-  async function ejecutar(accion) {
+  async function run(action) {
     setError(null)
-    setOcupado(true)
+    setBusy(true)
     try {
-      await accion()
-      onActualizada()
+      await action()
+      onUpdated()
     } catch (err) {
       if (err instanceof ApiError) setError({ mensaje: err.message, candidatos: err.detail?.candidatos })
       else setError({ mensaje: 'No se pudo completar la acción.' })
-      setOcupado(false)
+      setBusy(false)
     }
   }
 
-  function cancelar() {
-    ejecutar(() => api.post(`/citas/${cita.id}/cancelar`))
+  function cancel() {
+    run(() => api.post(`/citas/${cita.id}/cancel`))
   }
-  function marcarAsistencia(estado) {
-    ejecutar(() => api.post(`/citas/${cita.id}/asistencia`, { estado }))
+  function markAttendance(estado) {
+    run(() => api.post(`/citas/${cita.id}/asistencia`, { estado }))
   }
-  function guardarEdicion(e) {
+  function saveEdit(e) {
     e.preventDefault()
     if (Number(form.hora.slice(3, 5)) % 15 !== 0) {
       setError({ mensaje: 'La hora debe empezar en :00, :15, :30 o :45.' })
       return
     }
-    ejecutar(() =>
+    run(() =>
       api.put(`/citas/${cita.id}`, {
         medico_id: form.medico_id,
         servicio_id: form.servicio_id,
@@ -97,20 +97,20 @@ export default function DetalleCita({
     </div>
   )
 
-  if (editando) {
+  if (editing) {
     const footer = (
       <>
-        <Boton variante="secundario" type="button" onClick={() => setEditando(false)}>
+        <Boton variant="secondary" type="button" onClick={() => setEditing(false)}>
           Volver
         </Boton>
-        <Boton type="submit" form="form-editar-cita" disabled={ocupado}>
-          {ocupado ? 'Guardando…' : 'Guardar cambios'}
+        <Boton type="submit" form="form-editar-cita" disabled={busy}>
+          {busy ? 'Guardando…' : 'Guardar cambios'}
         </Boton>
       </>
     )
     return (
-      <Modal titulo="Editar cita" subtitulo="Se revalidan disponibilidad y solapamientos." onClose={onCerrar} footer={footer}>
-        <form id="form-editar-cita" onSubmit={guardarEdicion} className="space-y-4">
+      <Modal title="Editar cita" subtitle="Se revalidan disponibilidad y solapamientos." onClose={onClose} footer={footer}>
+        <form id="form-editar-cita" onSubmit={saveEdit} className="space-y-4">
           {cajaError}
           <CamposCita form={form} set={set} medicos={medicos} servicios={servicios} />
         </form>
@@ -118,24 +118,24 @@ export default function DetalleCita({
     )
   }
 
-  const footer = puedeGestionar && activa && (
+  const footer = canManage && activa && (
     <>
-      <Boton variante="secundario" tamano="sm" onClick={() => marcarAsistencia('NO_SHOW')} disabled={ocupado}>
+      <Boton variant="secondary" size="sm" onClick={() => markAttendance('NO_SHOW')} disabled={busy}>
         No asistió
       </Boton>
-      <Boton variante="exito" tamano="sm" onClick={() => marcarAsistencia('COMPLETED')} disabled={ocupado}>
+      <Boton variant="success" size="sm" onClick={() => markAttendance('COMPLETED')} disabled={busy}>
         Atendida
       </Boton>
-      <Boton variante="peligro" tamano="sm" onClick={cancelar} disabled={ocupado}>
+      <Boton variant="danger" size="sm" onClick={cancel} disabled={busy}>
         Cancelar cita
       </Boton>
       <Boton
-        tamano="sm"
+        size="sm"
         onClick={() => {
           setError(null)
-          setEditando(true)
+          setEditing(true)
         }}
-        disabled={ocupado}
+        disabled={busy}
       >
         Editar
       </Boton>
@@ -143,22 +143,22 @@ export default function DetalleCita({
   )
 
   return (
-    <Modal titulo="Detalle de la cita" onClose={onCerrar} footer={footer || undefined}>
+    <Modal title="Detalle de la cita" onClose={onClose} footer={footer || undefined}>
       {cajaError}
       <div className="flex items-center justify-between">
         <p className="text-lg font-semibold">{nombrePaciente ?? 'Paciente'}</p>
         <EstadoBadge estado={cita.estado} />
       </div>
       <dl className="space-y-2 text-sm">
-        <Dato etiqueta="Médico" valor={medicosMap[cita.medico_id]} />
-        <Dato etiqueta="Servicio" valor={serviciosMap[cita.servicio_id]} />
-        <Dato etiqueta="Fecha" valor={formatFechaCorta(cita.starts_at)} />
+        <Dato label="Médico" value={medicosMap[cita.medico_id]} />
+        <Dato label="Servicio" value={serviciosMap[cita.servicio_id]} />
+        <Dato label="Fecha" value={formatShortDate(cita.starts_at)} />
         <Dato
-          etiqueta="Horario"
-          valor={`${formatHora(cita.starts_at)}–${formatHora(cita.ends_at)}`}
+          label="Horario"
+          value={`${formatTime(cita.starts_at)}–${formatTime(cita.ends_at)}`}
           tnum
         />
-        {cita.motivo && <Dato etiqueta="Motivo" valor={cita.motivo} />}
+        {cita.motivo && <Dato label="Motivo" value={cita.motivo} />}
       </dl>
       {!activa && (
         <p className="rounded-lg bg-surface-plane px-3 py-2 text-xs text-ink-muted">

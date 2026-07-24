@@ -8,9 +8,9 @@ import Alerta from '../components/atoms/Alerta'
 import Tarjeta from '../components/atoms/Tarjeta'
 import TarjetaKPI from '../components/molecules/TarjetaKPI'
 import MensajeLista from '../components/atoms/MensajeLista'
-import { formatHora, hoyISO } from '../utils/fecha'
-import { indexarPor } from '../utils/datos'
-import { ESTADOS_CITA } from '../utils/citas'
+import { formatTime, todayISO } from '../utils/date'
+import { indexBy } from '../utils/data'
+import { APPOINTMENT_STATES } from '../utils/citas'
 
 export default function PanelPage() {
   const { user } = useAuth()
@@ -18,52 +18,52 @@ export default function PanelPage() {
   const [medicos, setMedicos] = useState([])
   const [servicios, setServicios] = useState([])
   const [pacientes, setPacientes] = useState({})
-  const [cargando, setCargando] = useState(true)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [citaSel, setCitaSel] = useState(null)
 
-  const puedeGestionar = user.rol === 'ADMIN' || user.rol === 'RECEPCION'
+  const canManage = user.rol === 'ADMIN' || user.rol === 'RECEPCION'
 
-  const cargar = useCallback(async () => {
-    setCargando(true)
+  const load = useCallback(async () => {
+    setLoading(true)
     setError('')
     try {
       const [citasHoy, listaMedicos, listaServicios, listaPacientes] = await Promise.all([
-        api.get(`/citas?fecha=${hoyISO()}`),
+        api.get(`/citas?fecha=${todayISO()}`),
         api.get('/medicos'),
         api.get('/servicios'),
-        puedeGestionar ? api.get('/pacientes') : Promise.resolve([]),
+        canManage ? api.get('/pacientes') : Promise.resolve([]),
       ])
       setCitas(citasHoy)
       setMedicos(listaMedicos)
       setServicios(listaServicios)
-      setPacientes(indexarPor(listaPacientes, 'nombre_completo'))
+      setPacientes(indexBy(listaPacientes, 'nombre_completo'))
     } catch {
-      setError('No se pudieron cargar los datos del panel.')
+      setError('No se pudieron load los datos del panel.')
     } finally {
-      setCargando(false)
+      setLoading(false)
     }
-  }, [puedeGestionar])
+  }, [canManage])
 
   useEffect(() => {
-    cargar()
-  }, [cargar])
+    load()
+  }, [load])
 
-  const medicosMap = indexarPor(medicos, 'nombre_completo')
-  const serviciosMap = indexarPor(servicios, 'nombre')
+  const medicosMap = indexBy(medicos, 'nombre_completo')
+  const serviciosMap = indexBy(servicios, 'nombre')
   const confirmadas = citas.filter((c) => c.estado === 'CONFIRMED').length
   const pendientes = citas.filter((c) => c.estado === 'SCHEDULED').length
   const ordenadas = [...citas].sort((a, b) => a.starts_at.localeCompare(b.starts_at))
 
-  if (cargando) return <Spinner />
+  if (loading) return <Spinner />
   if (error) return <Alerta>{error}</Alerta>
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <TarjetaKPI titulo="Citas hoy" valor={citas.length} />
-        <TarjetaKPI titulo="Confirmadas" valor={confirmadas} nota={`${pendientes} pendientes de confirmar`} />
-        <TarjetaKPI titulo="Pendientes" valor={pendientes} />
+        <TarjetaKPI title="Citas hoy" value={citas.length} />
+        <TarjetaKPI title="Confirmadas" value={confirmadas} nota={`${pendientes} pendientes de confirmar`} />
+        <TarjetaKPI title="Pendientes" value={pendientes} />
       </div>
 
       <Tarjeta>
@@ -85,9 +85,9 @@ export default function PanelPage() {
                 className="flex w-full items-center gap-4 px-5 py-3.5 text-left hover:bg-surface-plane"
               >
                 <span className="tnum w-14 text-sm font-medium text-ink-2">
-                  {formatHora(c.starts_at)}
+                  {formatTime(c.starts_at)}
                 </span>
-                <span className={`h-9 w-1 rounded-full ${ESTADOS_CITA[c.estado]?.barra ?? 'bg-ink-muted'}`} />
+                <span className={`h-9 w-1 rounded-full ${APPOINTMENT_STATES[c.estado]?.bar ?? 'bg-ink-muted'}`} />
                 <div className="flex-1">
                   <p className="text-sm font-medium">
                     {pacientes[c.paciente_id] ?? c.motivo ?? 'Paciente'}
@@ -109,11 +109,11 @@ export default function PanelPage() {
           nombrePaciente={pacientes[citaSel.paciente_id]}
           medicos={medicos}
           servicios={servicios}
-          puedeGestionar={puedeGestionar}
-          onCerrar={() => setCitaSel(null)}
-          onActualizada={() => {
+          canManage={canManage}
+          onClose={() => setCitaSel(null)}
+          onUpdated={() => {
             setCitaSel(null)
-            cargar()
+            load()
           }}
         />
       )}

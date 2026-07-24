@@ -18,7 +18,7 @@ export function AuthProvider({ children }) {
   }, [navigate])
 
   useEffect(() => {
-    async function restaurarSesion() {
+    async function restoreSession() {
       if (!getToken()) {
         setLoading(false)
         return
@@ -32,7 +32,7 @@ export function AuthProvider({ children }) {
         setLoading(false)
       }
     }
-    restaurarSesion()
+    restoreSession()
   }, [])
 
   async function login(email, password) {

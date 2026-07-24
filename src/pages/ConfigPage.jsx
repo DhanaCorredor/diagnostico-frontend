@@ -7,14 +7,14 @@ import Alerta from '../components/atoms/Alerta'
 import Tarjeta from '../components/atoms/Tarjeta'
 
 const CATEGORIAS = [
-  { valor: 'CONSULTA', etiqueta: 'Consulta' },
-  { valor: 'ECOGRAFIA', etiqueta: 'Ecografía' },
-  { valor: 'DOPPLER', etiqueta: 'Doppler' },
-  { valor: 'ESTUDIO_CARDIACO', etiqueta: 'Estudio cardíaco' },
-  { valor: 'PROMOCION', etiqueta: 'Promoción' },
-  { valor: 'OTRO', etiqueta: 'Otro' },
+  { value: 'CONSULTA', label: 'Consulta' },
+  { value: 'ECOGRAFIA', label: 'Ecografía' },
+  { value: 'DOPPLER', label: 'Doppler' },
+  { value: 'ESTUDIO_CARDIACO', label: 'Estudio cardíaco' },
+  { value: 'PROMOCION', label: 'Promoción' },
+  { value: 'OTRO', label: 'Otro' },
 ]
-const CAT_LABEL = Object.fromEntries(CATEGORIAS.map((c) => [c.valor, c.etiqueta]))
+const CAT_LABEL = Object.fromEntries(CATEGORIAS.map((c) => [c.value, c.label]))
 
 export default function ConfigPage() {
   const [especialidades, setEspecialidades] = useState([])
@@ -24,19 +24,19 @@ export default function ConfigPage() {
   const [nuevaEsp, setNuevaEsp] = useState('')
   const [nuevoServ, setNuevoServ] = useState({ nombre: '', categoria: 'CONSULTA' })
 
-  async function cargar() {
+  async function load() {
     setError('')
     try {
       const [es, ss] = await Promise.all([api.get('/especialidades'), api.get('/servicios')])
       setEspecialidades(es)
       setServicios(ss)
     } catch {
-      setError('No se pudieron cargar los catálogos.')
+      setError('No se pudieron load los catálogos.')
     }
   }
 
   useEffect(() => {
-    cargar()
+    load()
   }, [])
 
   async function crearEspecialidad(e) {
@@ -45,7 +45,7 @@ export default function ConfigPage() {
     try {
       await api.post('/especialidades', { nombre: nuevaEsp.trim() })
       setNuevaEsp('')
-      cargar()
+      load()
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'No se pudo crear la especialidad.')
     }
@@ -60,7 +60,7 @@ export default function ConfigPage() {
         categoria: nuevoServ.categoria,
       })
       setNuevoServ({ nombre: '', categoria: 'CONSULTA' })
-      cargar()
+      load()
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'No se pudo crear el servicio.')
     }
@@ -77,7 +77,7 @@ export default function ConfigPage() {
 
           <div className="mb-4 flex flex-wrap gap-1.5">
             {especialidades.map((e) => (
-              <Badge key={e.id} color="brand" tamano="sm">
+              <Badge key={e.id} color="brand" size="sm">
                 {e.nombre}
               </Badge>
             ))}
@@ -129,8 +129,8 @@ export default function ConfigPage() {
               className="shrink-0 rounded-lg border border-line px-2 py-2 text-sm outline-none focus:border-brand"
             >
               {CATEGORIAS.map((c) => (
-                <option key={c.valor} value={c.valor}>
-                  {c.etiqueta}
+                <option key={c.value} value={c.value}>
+                  {c.label}
                 </option>
               ))}
             </select>
@@ -149,7 +149,7 @@ export default function ConfigPage() {
           ].map((t) => (
             <div key={t} className="flex items-center justify-between">
               <span className="text-ink-2">{t}</span>
-              <Badge color="good" tamano="sm">
+              <Badge color="good" size="sm">
                 Activo
               </Badge>
             </div>

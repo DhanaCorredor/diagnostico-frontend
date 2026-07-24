@@ -16,14 +16,14 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [cargando, setCargando] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const destino = location.state?.from?.pathname ?? '/'
 
   async function onSubmit(e) {
     e.preventDefault()
     setError('')
-    setCargando(true)
+    setLoading(true)
     try {
       await login(email, password)
       navigate(destino, { replace: true })
@@ -34,7 +34,7 @@ export default function LoginPage() {
         setError('No se pudo conectar con el servidor. Inténtalo de nuevo.')
       }
     } finally {
-      setCargando(false)
+      setLoading(false)
     }
   }
 
@@ -71,8 +71,8 @@ export default function LoginPage() {
 
         {error && <Alerta className="mb-4">{error}</Alerta>}
 
-        <Boton type="submit" disabled={cargando} className="w-full">
-          {cargando ? 'Entrando…' : 'Entrar'}
+        <Boton type="submit" disabled={loading} className="w-full">
+          {loading ? 'Entrando…' : 'Entrar'}
         </Boton>
 
         <p className="mt-4 text-center text-xs text-ink-muted">

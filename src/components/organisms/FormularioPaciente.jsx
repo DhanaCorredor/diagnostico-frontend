@@ -6,8 +6,8 @@ import Input from '../atoms/Input'
 import Boton from '../atoms/Boton'
 import Alerta from '../atoms/Alerta'
 
-export default function FormularioPaciente({ paciente, onCerrar, onGuardado }) {
-  const editando = Boolean(paciente)
+export default function FormularioPaciente({ paciente, onClose, onSaved }) {
+  const editing = Boolean(paciente)
 
   const [form, setForm] = useState({
     nombre_completo: paciente?.nombre_completo ?? '',
@@ -17,18 +17,18 @@ export default function FormularioPaciente({ paciente, onCerrar, onGuardado }) {
     fecha_nacimiento: paciente?.fecha_nacimiento ?? '',
   })
   const [error, setError] = useState('')
-  const [guardando, setGuardando] = useState(false)
+  const [saving, setSaving] = useState(false)
 
-  function set(campo, valor) {
-    setForm((f) => ({ ...f, [campo]: valor }))
+  function set(field, value) {
+    setForm((f) => ({ ...f, [field]: value }))
   }
 
   async function onSubmit(e) {
     e.preventDefault()
     setError('')
-    setGuardando(true)
+    setSaving(true)
 
-    const cuerpo = {
+    const body = {
       nombre_completo: form.nombre_completo.trim(),
       edad: Number(form.edad),
       cedula: form.cedula.trim() || null,
@@ -37,33 +37,33 @@ export default function FormularioPaciente({ paciente, onCerrar, onGuardado }) {
     }
 
     try {
-      const guardado = editando
-        ? await api.put(`/pacientes/${paciente.id}`, cuerpo)
-        : await api.post('/pacientes', cuerpo)
-      onGuardado(guardado)
+      const guardado = editing
+        ? await api.put(`/pacientes/${paciente.id}`, body)
+        : await api.post('/pacientes', body)
+      onSaved(guardado)
     } catch (err) {
       if (err instanceof ApiError) setError(err.message)
       else setError('No se pudo guardar el paciente.')
-      setGuardando(false)
+      setSaving(false)
     }
   }
 
   const footer = (
     <>
-      <Boton variante="secundario" type="button" onClick={onCerrar}>
+      <Boton variant="secondary" type="button" onClick={onClose}>
         Cancelar
       </Boton>
-      <Boton type="submit" form="form-paciente" disabled={guardando}>
-        {guardando ? 'Guardando…' : 'Guardar'}
+      <Boton type="submit" form="form-paciente" disabled={saving}>
+        {saving ? 'Guardando…' : 'Guardar'}
       </Boton>
     </>
   )
 
   return (
     <Modal
-      titulo={editando ? 'Editar paciente' : 'Nuevo paciente'}
-      subtitulo="Nombre y edad son obligatorios. La cédula es opcional."
-      onClose={onCerrar}
+      title={editing ? 'Editar paciente' : 'Nuevo paciente'}
+      subtitle="Nombre y edad son obligatorios. La cédula es opcional."
+      onClose={onClose}
       footer={footer}
     >
       <form id="form-paciente" onSubmit={onSubmit} className="space-y-4">

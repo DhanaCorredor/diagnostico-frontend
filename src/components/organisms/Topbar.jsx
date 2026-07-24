@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/useAuth'
-import { formatFechaLarga } from '../../utils/fecha'
+import { formatLongDate } from '../../utils/date'
 
 const TITULOS = {
   '': 'Panel',
@@ -18,14 +18,14 @@ export default function Topbar() {
   const navigate = useNavigate()
 
   const segmento = location.pathname.split('/')[1]
-  const titulo = TITULOS[segmento] ?? 'Panel'
+  const title = TITULOS[segmento] ?? 'Panel'
   const puedeAgendar = user.rol === 'ADMIN' || user.rol === 'RECEPCION'
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-white/90 px-8 py-4 backdrop-blur">
       <div>
-        <h1 className="text-lg font-semibold">{titulo}</h1>
-        <p className="text-xs capitalize text-ink-muted">{formatFechaLarga()}</p>
+        <h1 className="text-lg font-semibold">{title}</h1>
+        <p className="text-xs capitalize text-ink-muted">{formatLongDate()}</p>
       </div>
 
       {puedeAgendar && (
