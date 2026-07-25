@@ -32,36 +32,17 @@ export default function CitaPage() {
   }
 
   useEffect(() => {
-    async function loadMedicos() {
+    async function load() {
       try {
-        setMedicos(await api.get('/medicos'))
+        const [ms, ss] = await Promise.all([api.get('/medicos'), api.get('/servicios')])
+        setMedicos(ms)
+        setServicios(ss)
       } catch {
-        setError({ mensaje: 'No se pudieron cargar los médicos.' })
+        setError({ mensaje: 'No se pudieron cargar los médicos y servicios.' })
       }
     }
-    loadMedicos()
+    load()
   }, [])
-
-  useEffect(() => {
-    setForm((f) => ({ ...f, servicio_id: '' }))
-    if (!form.medico_id) {
-      setServicios([])
-      return
-    }
-    let cancelled = false
-    async function loadServicios() {
-      try {
-        const ss = await api.get(`/servicios?medico_id=${form.medico_id}`)
-        if (!cancelled) setServicios(ss)
-      } catch {
-        if (!cancelled) setError({ mensaje: 'No se pudieron cargar los servicios del médico.' })
-      }
-    }
-    loadServicios()
-    return () => {
-      cancelled = true
-    }
-  }, [form.medico_id])
 
   async function onSubmit(e) {
     e.preventDefault()
