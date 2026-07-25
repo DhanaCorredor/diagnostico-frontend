@@ -45,7 +45,7 @@ export default function DoctorsPage() {
         setMedicos(list)
         setDispPorMedico(mapa)
       } catch {
-        setError('No se pudieron load los médicos.')
+        setError('No se pudieron cargar los médicos.')
       } finally {
         setLoading(false)
       }

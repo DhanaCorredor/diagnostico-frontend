@@ -39,7 +39,7 @@ export default function PanelPage() {
       setServicios(listaServicios)
       setPacientes(indexBy(listaPacientes, 'nombre_completo'))
     } catch {
-      setError('No se pudieron load los datos del panel.')
+      setError('No se pudieron cargar los datos del panel.')
     } finally {
       setLoading(false)
     }

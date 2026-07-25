@@ -21,7 +21,7 @@ export default function UsersPage() {
       setUsuarios(us)
       setEspecialidades(es)
     } catch {
-      setError('No se pudieron load los usuarios.')
+      setError('No se pudieron cargar los usuarios.')
     } finally {
       setLoading(false)
     }

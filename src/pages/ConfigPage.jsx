@@ -31,7 +31,7 @@ export default function ConfigPage() {
       setEspecialidades(es)
       setServicios(ss)
     } catch {
-      setError('No se pudieron load los catálogos.')
+      setError('No se pudieron cargar los catálogos.')
     }
   }
 

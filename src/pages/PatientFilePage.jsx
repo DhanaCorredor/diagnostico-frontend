@@ -39,7 +39,7 @@ export default function PatientFilePage() {
       setMedicos(indexBy(listaMedicos, 'nombre_completo'))
       setServicios(indexBy(listaServicios, 'nombre'))
     } catch {
-      setError('No se pudo load la ficha del paciente.')
+      setError('No se pudo cargar la ficha del paciente.')
     } finally {
       setLoading(false)
     }

@@ -19,7 +19,7 @@ export default function PatientsPage() {
     try {
       setPacientes(await api.get('/pacientes'))
     } catch {
-      setError('No se pudieron load los pacientes.')
+      setError('No se pudieron cargar los pacientes.')
     } finally {
       setLoading(false)
     }

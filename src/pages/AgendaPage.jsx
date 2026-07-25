@@ -65,7 +65,7 @@ export default function AgendaPage() {
       setPacientes(indexBy(listaPacientes, 'nombre_completo'))
       setDispPorMedico(dispMapa)
     } catch {
-      setError('No se pudo load la agenda.')
+      setError('No se pudo cargar la agenda.')
     } finally {
       setLoading(false)
     }
