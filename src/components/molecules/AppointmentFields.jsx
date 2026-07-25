@@ -4,12 +4,29 @@ import Select from '../atoms/Select'
 
 const DURACIONES = [15, 30, 45, 60, 90]
 
+function serviciosDelMedico(servicios, medico) {
+  const especialidadesMedico = medico?.especialidades?.map((e) => e.id) ?? []
+  const hayDatosEspecialidad = servicios.some((s) => s.especialidades?.length)
+  if (!hayDatosEspecialidad || especialidadesMedico.length === 0) return servicios
+  return servicios.filter((s) =>
+    (s.especialidades ?? []).some((e) => especialidadesMedico.includes(e.id)),
+  )
+}
+
 export default function AppointmentFields({ form, set, medicos, servicios }) {
+  const medico = medicos.find((m) => m.id === form.medico_id)
+  const serviciosFiltrados = serviciosDelMedico(servicios, medico)
+
+  function elegirMedico(medicoId) {
+    set('medico_id', medicoId)
+    set('servicio_id', '')
+  }
+
   return (
     <>
       <div className="grid grid-cols-2 gap-3">
         <Field label="Médico">
-          <Select value={form.medico_id} onChange={(e) => set('medico_id', e.target.value)} required>
+          <Select value={form.medico_id} onChange={(e) => elegirMedico(e.target.value)} required>
             <option value="">Selecciona…</option>
             {medicos.map((m) => (
               <option key={m.id} value={m.id}>
@@ -28,7 +45,7 @@ export default function AppointmentFields({ form, set, medicos, servicios }) {
             <option value="">
               {form.medico_id ? 'Selecciona…' : 'Elige un médico primero'}
             </option>
-            {servicios.map((s) => (
+            {serviciosFiltrados.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.nombre}
               </option>

@@ -120,7 +120,7 @@ Puntos del contrato que el frontend respeta:
 - **Fechas en hora local *naive*** (sin sufijo `Z`): las citas se envían como `YYYY-MM-DDTHH:MM:00`.
 - **IDs UUID** (strings en JSON).
 - **Reglas de negocio en el backend** (el front solo las consume): *upsert* de paciente por nombre+edad, cero solapamientos por médico, disponibilidad con sobrecupo, horas en `:00/:15/:30/:45`.
-- **Servicios por especialidad:** `GET /servicios?medico_id=<uuid>` filtra los servicios a las especialidades del médico (relación N:M).
+- **Servicios por especialidad:** al elegir médico en el formulario de cita, el selector de servicios se **filtra a las especialidades de ese médico** (cruzando `especialidades` de médico y servicio, relación N:M) — evita agendar servicios que no corresponden. El backend también ofrece `GET /servicios?medico_id=` para el mismo filtro en servidor.
 - **Bajas lógicas:** `DELETE /pacientes/{id}` y `DELETE /usuarios/{id}` desactivan sin borrado físico.
 
 ---
@@ -141,7 +141,6 @@ Puntos del contrato que el frontend respeta:
 
 ## 8. Mejoras y próximos pasos
 
-- **Filtro de servicios por especialidad** en el selector de cita (consumir `?medico_id=`) — *listo para implementar cuando el backend despliegue*.
 - **Delete** de pacientes/usuarios desde la tabla (baja lógica) — *listo para implementar*.
 - **Historia clínica / notas** (fase 2): la API ya contempla notas clínicas; falta la UI.
 - **Tests automatizados** (ver §7).
