@@ -19,8 +19,15 @@ export default function AppointmentFields({ form, set, medicos, servicios }) {
           </Select>
         </Field>
         <Field label="Servicio">
-          <Select value={form.servicio_id} onChange={(e) => set('servicio_id', e.target.value)} required>
-            <option value="">Selecciona…</option>
+          <Select
+            value={form.servicio_id}
+            onChange={(e) => set('servicio_id', e.target.value)}
+            required
+            disabled={!form.medico_id}
+          >
+            <option value="">
+              {form.medico_id ? 'Selecciona…' : 'Elige un médico primero'}
+            </option>
             {servicios.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.nombre}
