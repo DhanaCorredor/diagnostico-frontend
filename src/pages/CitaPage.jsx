@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useForm } from '../hooks/useForm'
 import { useNavigate } from 'react-router-dom'
 import { api, ApiError } from '../config/api'
 import { todayISO } from '../utils/date'
@@ -13,7 +14,7 @@ export default function CitaPage() {
   const [medicos, setMedicos] = useState([])
   const [servicios, setServicios] = useState([])
 
-  const [form, setForm] = useState({
+  const [form, set] = useForm({
     nombre_completo: '',
     edad: '',
     medico_id: '',
@@ -26,10 +27,6 @@ export default function CitaPage() {
   })
   const [error, setError] = useState(null)
   const [saving, setSaving] = useState(false)
-
-  function set(field, value) {
-    setForm((f) => ({ ...f, [field]: value }))
-  }
 
   useEffect(() => {
     async function load() {

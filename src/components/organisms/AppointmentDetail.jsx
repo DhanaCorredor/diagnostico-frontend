@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useForm } from '../../hooks/useForm'
 import { api, ApiError } from '../../config/api'
 import { formatShortDate, formatTime } from '../../utils/date'
 import { indexBy } from '../../utils/data'
@@ -32,7 +33,7 @@ export default function AppointmentDetail({
 
   const activa = ESTADOS_ACTIVOS.includes(cita.estado)
 
-  const [form, setForm] = useState({
+  const [form, set] = useForm({
     medico_id: cita.medico_id,
     servicio_id: cita.servicio_id,
     fecha: cita.starts_at.slice(0, 10),
@@ -41,10 +42,6 @@ export default function AppointmentDetail({
     motivo: cita.motivo ?? '',
     permitir_sobrecupo: false,
   })
-  function set(field, value) {
-    setForm((f) => ({ ...f, [field]: value }))
-  }
-
   async function run(action) {
     setError(null)
     setBusy(true)

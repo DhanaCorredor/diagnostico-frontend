@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useForm } from '../../hooks/useForm'
 import { api, ApiError } from '../../config/api'
 import Modal from '../molecules/Modal'
 import Field from '../molecules/Field'
@@ -9,7 +10,7 @@ import Alert from '../atoms/Alert'
 export default function PatientForm({ paciente, onClose, onSaved }) {
   const editing = Boolean(paciente)
 
-  const [form, setForm] = useState({
+  const [form, set] = useForm({
     nombre_completo: paciente?.nombre_completo ?? '',
     edad: paciente?.edad ?? '',
     cedula: paciente?.cedula ?? '',
@@ -18,10 +19,6 @@ export default function PatientForm({ paciente, onClose, onSaved }) {
   })
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
-
-  function set(field, value) {
-    setForm((f) => ({ ...f, [field]: value }))
-  }
 
   async function onSubmit(e) {
     e.preventDefault()
