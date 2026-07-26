@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { api } from '../config/api'
 import PatientForm from '../components/organisms/PatientForm'
 import Button from '../components/atoms/Button'
+import Alert from '../components/atoms/Alert'
 import Modal from '../components/molecules/Modal'
 import SearchBar from '../components/molecules/SearchBar'
 import Table from '../components/molecules/Table'
@@ -15,6 +16,7 @@ export default function PatientsPage() {
   const [creating, setCreating] = useState(false)
   const [deleting, setDeleting] = useState(null)
   const [busy, setBusy] = useState(false)
+  const [errorDelete, setErrorDelete] = useState('')
 
   async function load() {
     setLoading(true)
@@ -32,15 +34,20 @@ export default function PatientsPage() {
     load()
   }, [])
 
+  function cerrarBorrado() {
+    setDeleting(null)
+    setErrorDelete('')
+  }
+
   async function eliminar() {
     setBusy(true)
+    setErrorDelete('')
     try {
       await api.del(`/pacientes/${deleting.id}`)
-      setDeleting(null)
+      cerrarBorrado()
       load()
     } catch {
-      setError('No se pudo eliminar el paciente.')
-      setDeleting(null)
+      setErrorDelete('No se pudo eliminar el paciente.')
     } finally {
       setBusy(false)
     }
@@ -118,10 +125,10 @@ export default function PatientsPage() {
         <Modal
           title="Eliminar paciente"
           subtitle="El paciente se dará de baja (baja lógica, recuperable)."
-          onClose={() => setDeleting(null)}
+          onClose={cerrarBorrado}
           footer={
             <>
-              <Button variant="secondary" onClick={() => setDeleting(null)} disabled={busy}>
+              <Button variant="secondary" onClick={cerrarBorrado} disabled={busy}>
                 Cancelar
               </Button>
               <Button variant="danger" onClick={eliminar} disabled={busy}>
@@ -130,6 +137,7 @@ export default function PatientsPage() {
             </>
           }
         >
+          {errorDelete && <Alert>{errorDelete}</Alert>}
           <p className="text-sm text-ink-2">
             ¿Seguro que quieres eliminar a{' '}
             <span className="font-medium text-ink">{deleting.nombre_completo}</span>?
