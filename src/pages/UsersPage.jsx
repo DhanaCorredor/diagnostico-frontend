@@ -3,6 +3,7 @@ import { api } from '../config/api'
 import UserForm from '../components/organisms/UserForm'
 import Badge from '../components/atoms/Badge'
 import Button from '../components/atoms/Button'
+import Alert from '../components/atoms/Alert'
 import Table from '../components/molecules/Table'
 import { ROLES } from '../utils/roles'
 
@@ -12,6 +13,7 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [editing, setEditing] = useState(null)
+  const [errorAccion, setErrorAccion] = useState('')
 
   async function load() {
     setLoading(true)
@@ -32,12 +34,13 @@ export default function UsersPage() {
   }, [])
 
   async function toggleActive(u) {
+    setErrorAccion('')
     try {
       if (u.activo) await api.del(`/usuarios/${u.id}`)
       else await api.put(`/usuarios/${u.id}`, { activo: true })
       load()
     } catch {
-      setError('No se pudo cambiar el estado del usuario.')
+      setErrorAccion('No se pudo cambiar el estado del usuario.')
     }
   }
 
@@ -84,7 +87,8 @@ export default function UsersPage() {
   ]
 
   return (
-    <>
+    <div className="space-y-4">
+      {errorAccion && <Alert>{errorAccion}</Alert>}
       <Table
         title="Usuarios del sistema"
         action={
@@ -110,6 +114,6 @@ export default function UsersPage() {
           }}
         />
       )}
-    </>
+    </div>
   )
 }
