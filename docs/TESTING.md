@@ -42,12 +42,13 @@ pnpm test:watch    # modo watch mientras desarrollas
 - **Por qué:** `Table` es la pieza compartida por Pacientes, Usuarios y Médicos; un fallo se propaga a las tres.
 - **Para qué:** garantizar sus **cuatro estados** — filas, **vacío**, **error** (con prioridad sobre el vacío) y **cargando** (sin mostrar filas ni vacío).
 
-### `components/AppointmentFields` — 3 tests · *funcionalidad crítica*
+### `components/AppointmentFields` — 4 tests · *funcionalidad crítica*
 - **Por qué:** es la regla que **evita agendar servicios que no corresponden al médico** (p. ej. un servicio de cardiología con una ginecóloga) — justo el error que se quería prevenir.
 - **Para qué:**
   - Con un médico elegido, **solo** aparecen los servicios de **su especialidad**.
   - **Degradación segura:** si el backend aún no envía `especialidades`, se muestran todos (no rompe).
   - Al **cambiar de médico**, se **resetea** el servicio elegido.
+  - **Accesibilidad:** cada etiqueta queda asociada a su campo (`label` ↔ input).
 
 ---
 
@@ -61,4 +62,4 @@ pnpm test:watch    # modo watch mientras desarrollas
 
 ## Resumen
 
-**24 tests** en 5 archivos, todos en verde. Cubren la **lógica de fechas** (lo más frágil) y la **regla de negocio clave** del filtrado por especialidad, más el componente reutilizable `Table`. Se ejecutan con `pnpm test`.
+**25 tests** en 5 archivos, todos en verde. Cubren la **lógica de fechas** (lo más frágil) y la **regla de negocio clave** del filtrado por especialidad, más el componente reutilizable `Table` y la **accesibilidad** de los formularios. Se ejecutan con `pnpm test`.

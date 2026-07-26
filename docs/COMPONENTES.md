@@ -15,6 +15,7 @@
 src/
   config/         # cliente HTTP + token JWT (configClient · api)
   auth/           # AuthContext · AuthProvider · useAuth · ProtectedRoute (guarda por rol)
+  hooks/          # useForm (estado de formularios)
   components/
     atoms/        # piezas básicas sin lógica de negocio
     molecules/    # combinaciones simples de átomos
@@ -22,7 +23,8 @@ src/
   layouts/        # AuthLayout · AppLayout
   pages/          # una por ruta
   utils/          # helpers puros (date, text, data) + metadata (citas, roles)
-  App.jsx         # rutas (React Router) + guardas por rol
+  router.jsx      # rutas (React Router) + guardas por rol
+  App.jsx         # monta el router
   main.jsx        # providers (Router + Auth)
 ```
 
@@ -109,6 +111,7 @@ src/
 - **Acciones sobre la cita** (`AppointmentDetail`) → cancelar (libera cupo), marcar asistencia (atendida/no-show), editar/mover (revalida reglas).
 - **`StatusBadge` + `APPOINTMENT_STATES`** → mapea `EstadoCita` (SCHEDULED · CONFIRMED · CANCELLED · COMPLETED · NO_SHOW) a color y etiqueta.
 - **Sesión** → `AuthProvider` guarda el JWT en `localStorage`, `useAuth` lo consume, `ProtectedRoute` protege por sesión y rol; un **handler global de 401** cierra sesión y redirige a login.
+- **Formularios** → `useForm(initial)` (en `hooks/`) centraliza `form` + `set(field, value)`; lo usan los 4 formularios (nueva/editar cita, paciente, usuario).
 - La **cédula** no se pide al agendar (opcional, se añade después).
 
 > Este mapa refleja lo **implementado**. La jerarquía es una **guía**, no un contrato: las piezas de un solo uso se quedaron **inline** a propósito (código más sencillo).

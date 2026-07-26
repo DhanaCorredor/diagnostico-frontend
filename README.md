@@ -73,7 +73,7 @@ as a bearer token on every request. The session user (and role) is read from
 | `/login` | Login | public |
 | `/` | Dashboard (today's KPIs + agenda) | all |
 | `/agenda` | Day calendar (doctor × hour, availability blocking) | all |
-| `/pacientes` | Patients list + create | ADMIN · RECEPCION |
+| `/pacientes` | Patients list, create and delete | ADMIN · RECEPCION |
 | `/pacientes/:id` | Patient file (data + appointment history) | ADMIN · RECEPCION |
 | `/medicos` | Doctors list (specialties + availability) | ADMIN · RECEPCION |
 | `/citas/nueva` | New appointment form | ADMIN · RECEPCION |
@@ -98,6 +98,7 @@ as a bearer token on every request. The session user (and role) is read from
 │   │   ├── configClient.js # HTTP client config + JWT handling
 │   │   └── api.js          # api.get/post/put/del
 │   ├── auth/               # AuthContext, AuthProvider, useAuth, ProtectedRoute
+│   ├── hooks/              # useForm (form state)
 │   ├── components/
 │   │   ├── atoms/          # Button, Input, Select, Label, Badge, Avatar,
 │   │   │                   # Spinner, Card, Alert, ListMessage

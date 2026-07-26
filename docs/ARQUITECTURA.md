@@ -29,6 +29,7 @@ SPA para el personal del centro (administración, recepción, médicos) que cons
 src/
   config/       # capa de acceso a datos (configClient + api) — configuración por entorno
   auth/         # sesión: AuthContext · AuthProvider · useAuth · ProtectedRoute
+  hooks/        # useForm (estado de formularios)
   components/
     atoms/      # piezas básicas sin lógica de negocio (Button, Input, Card…)
     molecules/  # combinaciones reutilizables (Field, Table, AppointmentFields…)
@@ -54,7 +55,7 @@ Detalle de cada carpeta y componente en [`COMPONENTES.md`](COMPONENTES.md).
 | **Composición y reutilización** | `Table`, `AppointmentFields`, `DataRow` | una pieza configurable sirve a varias vistas (Pacientes/Usuarios/Médicos comparten `Table`) |
 | **Single source of truth** | `utils/citas.js` (`APPOINTMENT_STATES`), `utils/roles.js` (`ROLES`) | la metadata de estados/roles se define **una vez** y se consume en todas partes |
 | **Provider (Context API)** | `auth/AuthContext` + `AuthProvider` | expone la sesión (usuario, rol, login/logout) a todo el árbol sin *prop drilling* |
-| **Custom Hook** | `auth/useAuth` | encapsula el consumo del contexto → `const { user } = useAuth()` |
+| **Custom Hook** | `auth/useAuth` · `hooks/useForm` | encapsular lógica reutilizable: consumo de sesión y estado de formularios (`form` + `set`) |
 | **Route Guard** | `auth/ProtectedRoute` | protege rutas por sesión y por rol (redirige a login si no procede) |
 | **Fachada / adaptador sobre `fetch`** | `config/configClient` (`request`) + `config/api` (`get/post/put/del`) | un único punto para cabeceras, token, errores y base URL |
 | **Manejo global de errores** | `request` + handler de 401 | un 401 (token caducado) cierra sesión y redirige **desde un solo sitio** |
@@ -127,7 +128,7 @@ Puntos del contrato que el frontend respeta:
 
 ## 7. Testing
 
-**Tests automatizados** con **Vitest + React Testing Library** (jsdom): **24 tests** que cubren la lógica de fechas (lo más frágil: zonas horarias, *off-by-one*), los helpers (`indexBy`, `initials`), el componente reutilizable `Table` (4 estados) y la **regla de negocio del filtrado de servicios por especialidad**. Se ejecutan con `pnpm test`.
+**Tests automatizados** con **Vitest + React Testing Library** (jsdom): **25 tests** que cubren la lógica de fechas (lo más frágil: zonas horarias, *off-by-one*), los helpers (`indexBy`, `initials`), el componente reutilizable `Table` (4 estados), la **regla de negocio del filtrado de servicios por especialidad** y la **asociación de etiquetas** (accesibilidad). Se ejecutan con `pnpm test`.
 
 El **qué, por qué y para qué** de cada suite está en [`TESTING.md`](TESTING.md). Los flujos contra la API real los cubre el **backend** con sus tests de integración; el E2E queda para **fase 2**.
 
@@ -135,9 +136,8 @@ El **qué, por qué y para qué** de cada suite está en [`TESTING.md`](TESTING.
 
 ## 8. Mejoras y próximos pasos
 
-- **Delete** de pacientes/usuarios desde la tabla (baja lógica) — *listo para implementar*.
 - **Historia clínica / notas** (fase 2): la API ya contempla notas clínicas; falta la UI.
-- **Tests automatizados** (ver §7).
 - **Vista semanal** de agenda (hoy solo vista Día).
 - **Paginación / búsqueda en servidor** si crecen los listados.
 - **Refresh token** para renovar sesión sin re-login.
+- **End-to-end** (Playwright/Cypress) sobre la suite actual de tests.
