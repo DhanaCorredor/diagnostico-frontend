@@ -108,8 +108,12 @@ export default function UserForm({ usuario, especialidades, onClose, onSaved }) 
               required
             />
           </Field>
-          <Field label="Rol">
-            <Select value={form.rol} onChange={(e) => set('rol', e.target.value)}>
+          <Field label="Rol" hint={editing ? 'El rol no se cambia tras crear el usuario.' : undefined}>
+            <Select
+              value={form.rol}
+              onChange={(e) => set('rol', e.target.value)}
+              disabled={editing}
+            >
               {ROLES.map((r) => (
                 <option key={r.value} value={r.value}>
                   {r.label}
