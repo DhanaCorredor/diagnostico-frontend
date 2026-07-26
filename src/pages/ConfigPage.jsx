@@ -5,6 +5,7 @@ import Button from '../components/atoms/Button'
 import Badge from '../components/atoms/Badge'
 import Alert from '../components/atoms/Alert'
 import Card from '../components/atoms/Card'
+import Modal from '../components/molecules/Modal'
 
 const CATEGORIAS = [
   { value: 'CONSULTA', label: 'Consulta' },
@@ -23,6 +24,8 @@ export default function ConfigPage() {
 
   const [nuevaEsp, setNuevaEsp] = useState('')
   const [nuevoServ, setNuevoServ] = useState({ nombre: '', categoria: 'CONSULTA' })
+  const [eliminando, setEliminando] = useState(null)
+  const [busy, setBusy] = useState(false)
 
   async function load() {
     setError('')
@@ -66,6 +69,20 @@ export default function ConfigPage() {
     }
   }
 
+  async function eliminarServicio() {
+    setBusy(true)
+    try {
+      await api.put(`/servicios/${eliminando.id}`, { activo: false })
+      setEliminando(null)
+      load()
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'No se pudo eliminar el servicio.')
+      setEliminando(null)
+    } finally {
+      setBusy(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {error && <Alert>{error}</Alert>}
@@ -106,10 +123,20 @@ export default function ConfigPage() {
             {servicios.map((s) => (
               <div
                 key={s.id}
-                className="flex items-center justify-between rounded-lg bg-surface-plane px-3 py-2"
+                className="flex items-center justify-between gap-2 rounded-lg bg-surface-plane px-3 py-2"
               >
-                <span>{s.nombre}</span>
-                <span className="text-xs text-ink-muted">{CAT_LABEL[s.categoria] ?? s.categoria}</span>
+                <span className="min-w-0 flex-1 truncate">{s.nombre}</span>
+                <span className="shrink-0 text-xs text-ink-muted">
+                  {CAT_LABEL[s.categoria] ?? s.categoria}
+                </span>
+                <button
+                  onClick={() => setEliminando(s)}
+                  className="shrink-0 text-ink-muted hover:text-crit"
+                  title="Eliminar servicio"
+                  aria-label={`Eliminar ${s.nombre}`}
+                >
+                  ✕
+                </button>
               </div>
             ))}
             {servicios.length === 0 && (
@@ -156,6 +183,29 @@ export default function ConfigPage() {
           ))}
         </div>
       </Card>
+
+      {eliminando && (
+        <Modal
+          title="Eliminar servicio"
+          subtitle="Se dará de baja (dejará de aparecer al agendar)."
+          onClose={() => setEliminando(null)}
+          footer={
+            <>
+              <Button variant="secondary" onClick={() => setEliminando(null)} disabled={busy}>
+                Cancelar
+              </Button>
+              <Button variant="danger" onClick={eliminarServicio} disabled={busy}>
+                {busy ? 'Eliminando…' : 'Eliminar'}
+              </Button>
+            </>
+          }
+        >
+          <p className="text-sm text-ink-2">
+            ¿Seguro que quieres eliminar{' '}
+            <span className="font-medium text-ink">{eliminando.nombre}</span>?
+          </p>
+        </Modal>
+      )}
     </div>
   )
 }
