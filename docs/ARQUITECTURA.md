@@ -127,15 +127,9 @@ Puntos del contrato que el frontend respeta:
 
 ## 7. Testing
 
-**Estado actual:** el MVP se ha validado **manualmente** contra el backend real (login, CRUD de pacientes, alta/edición/cancelación de citas, catálogos) en cada vista.
+**Tests automatizados** con **Vitest + React Testing Library** (jsdom): **24 tests** que cubren la lógica de fechas (lo más frágil: zonas horarias, *off-by-one*), los helpers (`indexBy`, `initials`), el componente reutilizable `Table` (4 estados) y la **regla de negocio del filtrado de servicios por especialidad**. Se ejecutan con `pnpm test`.
 
-**Plan de testing propuesto** (siguiente iteración, con **Vitest + React Testing Library**):
-
-| Nivel | Qué probar |
-|-------|-----------|
-| **Unitario (utils)** | `date.js` (formateos, *off-by-one*), `data.js` (`indexBy`), `text.js` (`initials`) — funciones puras, fáciles de cubrir |
-| **Componente** | `Table` (estados carga/error/vacío/filas), `AppointmentFields` (validación de hora `:00/:15/:30/:45`), `ProtectedRoute` (acceso por rol) |
-| **Integración** | flujo de login (token → sesión), manejo de 401 global, envío de nueva cita con *mock* de la API |
+El **qué, por qué y para qué** de cada suite está en [`TESTING.md`](TESTING.md). Los flujos contra la API real los cubre el **backend** con sus tests de integración; el E2E queda para **fase 2**.
 
 ---
 

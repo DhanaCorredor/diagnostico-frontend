@@ -8,7 +8,7 @@ over HTTP/JSON, authenticated with a JWT bearer token.
 > Bootcamp final project — MVP. The frontend is used only by the center's staff
 > (administration, reception and doctors). Most project documentation lives in the
 > backend repo under `docs/` (in Spanish). Frontend docs (in Spanish):
-> [component map](docs/COMPONENTES.md) · [architecture & design patterns](docs/ARQUITECTURA.md) · [use cases](docs/CASOS-DE-USO.md).
+> [component map](docs/COMPONENTES.md) · [architecture & design patterns](docs/ARQUITECTURA.md) · [use cases](docs/CASOS-DE-USO.md) · [testing](docs/TESTING.md).
 
 ## 🧱 Tech stack
 
@@ -52,6 +52,7 @@ VITE_API_URL=http://localhost:8000            # local backend
 | `pnpm build` | Build for production into `dist/` |
 | `pnpm preview` | Preview the production build locally |
 | `pnpm lint` | Run Oxlint over the source |
+| `pnpm test` | Run the test suite (Vitest + Testing Library) |
 
 ## 🔐 Authentication & roles
 
