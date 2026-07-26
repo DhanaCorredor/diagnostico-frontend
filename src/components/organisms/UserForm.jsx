@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useForm } from '../../hooks/useForm'
 import { api, ApiError } from '../../config/api'
 import Modal from '../molecules/Modal'
 import Field from '../molecules/Field'
@@ -16,7 +17,7 @@ const ROLES = [
 export default function UserForm({ usuario, especialidades, onClose, onSaved }) {
   const editing = Boolean(usuario)
 
-  const [form, setForm] = useState({
+  const [form, set, setForm] = useForm({
     nombre_completo: usuario?.nombre_completo ?? '',
     email: usuario?.email ?? '',
     rol: usuario?.rol ?? 'RECEPCION',
@@ -28,10 +29,6 @@ export default function UserForm({ usuario, especialidades, onClose, onSaved }) 
   const [saving, setSaving] = useState(false)
 
   const esMedico = form.rol === 'MEDICO'
-
-  function set(field, value) {
-    setForm((f) => ({ ...f, [field]: value }))
-  }
 
   function toggleEspecialidad(id) {
     setForm((f) => ({
@@ -50,8 +47,8 @@ export default function UserForm({ usuario, especialidades, onClose, onSaved }) 
     const body = {
       nombre_completo: form.nombre_completo.trim(),
       email: form.email.trim(),
-      rol: form.rol,
     }
+    if (!editing) body.rol = form.rol
     if (esMedico) {
       body.matricula = form.matricula.trim() || null
       body.especialidades = form.especialidades
