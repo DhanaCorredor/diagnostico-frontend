@@ -1,6 +1,8 @@
-const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+const BASE_URL = import.meta.env.VITE_API_URL
 
 const TOKEN_KEY = 'diagnostico_token'
+
+const DEFAULT_HEADERS = { 'Content-Type': 'application/json' }
 
 let unauthorizedHandler = null
 
@@ -26,8 +28,8 @@ export class ApiError extends Error {
   }
 }
 
-async function apiFetch(path, { method = 'GET', body, auth = true } = {}) {
-  const headers = { 'Content-Type': 'application/json' }
+export async function request(path, { method, body, auth = true }) {
+  const headers = { ...DEFAULT_HEADERS }
   if (auth) {
     const token = getToken()
     if (token) headers.Authorization = `Bearer ${token}`
@@ -55,18 +57,9 @@ async function apiFetch(path, { method = 'GET', body, auth = true } = {}) {
     if (res.status === 401 && auth) unauthorizedHandler?.()
     const detail = data?.detail ?? data
     const message =
-      typeof detail === 'string'
-        ? detail
-        : detail?.mensaje ?? 'Ha ocurrido un error en la petición'
+      typeof detail === 'string' ? detail : detail?.mensaje ?? 'Ha ocurrido un error en la petición'
     throw new ApiError(res.status, message, detail)
   }
 
   return data
-}
-
-export const api = {
-  get: (path) => apiFetch(path),
-  post: (path, body, opts) => apiFetch(path, { method: 'POST', body, ...opts }),
-  put: (path, body) => apiFetch(path, { method: 'PUT', body }),
-  del: (path) => apiFetch(path, { method: 'DELETE' }),
 }

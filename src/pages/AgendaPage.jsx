@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
-import { api } from '../api/client'
+import { api } from '../config/api'
 import { useAuth } from '../auth/useAuth'
-import { diaSemana, fechaLargaDesdeISO, formatHora, hoyISO, sumarDias } from '../utils/fecha'
-import { indexarPor } from '../utils/datos'
-import DetalleCita from '../components/organisms/DetalleCita'
+import { weekday, longDateFromISO, formatTime, todayISO, addDays } from '../utils/date'
+import { indexBy } from '../utils/data'
+import AppointmentDetail from '../components/organisms/AppointmentDetail'
 import Spinner from '../components/atoms/Spinner'
-import Tarjeta from '../components/atoms/Tarjeta'
-import MensajeLista from '../components/atoms/MensajeLista'
-import { ESTADOS_CITA } from '../utils/citas'
+import Card from '../components/atoms/Card'
+import ListMessage from '../components/atoms/ListMessage'
+import { APPOINTMENT_STATES } from '../utils/citas'
 
 const HORAS = Array.from({ length: 11 }, (_, i) => 7 + i)
 
@@ -28,28 +28,28 @@ function nombreCorto(nombre = '') {
 
 export default function AgendaPage() {
   const { user } = useAuth()
-  const [fecha, setFecha] = useState(hoyISO())
+  const [fecha, setFecha] = useState(todayISO())
   const [filtroMedico, setFiltroMedico] = useState('todos')
   const [citas, setCitas] = useState([])
   const [medicos, setMedicos] = useState([])
   const [servicios, setServicios] = useState([])
   const [pacientes, setPacientes] = useState({})
   const [dispPorMedico, setDispPorMedico] = useState({})
-  const [cargando, setCargando] = useState(true)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [citaSel, setCitaSel] = useState(null)
 
-  const puedeGestionar = user.rol === 'ADMIN' || user.rol === 'RECEPCION'
+  const canManage = user.rol === 'ADMIN' || user.rol === 'RECEPCION'
 
-  const cargar = useCallback(async () => {
-    setCargando(true)
+  const load = useCallback(async () => {
+    setLoading(true)
     setError('')
     try {
       const [citasDia, listaMedicos, listaServicios, listaPacientes] = await Promise.all([
         api.get(`/citas?fecha=${fecha}`),
         api.get('/medicos'),
         api.get('/servicios'),
-        puedeGestionar ? api.get('/pacientes') : Promise.resolve([]),
+        canManage ? api.get('/pacientes') : Promise.resolve([]),
       ])
       const franjas = await Promise.all(
         listaMedicos.map((m) => api.get(`/disponibilidad?medico_id=${m.id}`)),
@@ -62,21 +62,21 @@ export default function AgendaPage() {
       setCitas(citasDia)
       setMedicos(listaMedicos)
       setServicios(listaServicios)
-      setPacientes(indexarPor(listaPacientes, 'nombre_completo'))
+      setPacientes(indexBy(listaPacientes, 'nombre_completo'))
       setDispPorMedico(dispMapa)
     } catch {
       setError('No se pudo cargar la agenda.')
     } finally {
-      setCargando(false)
+      setLoading(false)
     }
-  }, [fecha, puedeGestionar])
+  }, [fecha, canManage])
 
   useEffect(() => {
-    cargar()
-  }, [cargar])
+    load()
+  }, [load])
 
-  const dia = diaSemana(fecha)
-  const serviciosMap = indexarPor(servicios, 'nombre')
+  const dia = weekday(fecha)
+  const serviciosMap = indexBy(servicios, 'nombre')
   const medicosVisibles =
     user.rol === 'MEDICO'
       ? medicos.filter((m) => m.id === user.id)
@@ -91,9 +91,9 @@ export default function AgendaPage() {
   }
 
   return (
-    <Tarjeta className="p-5">
+    <Card className="p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-semibold capitalize">{fechaLargaDesdeISO(fecha)}</h2>
+        <h2 className="font-semibold capitalize">{longDateFromISO(fecha)}</h2>
         <div className="flex items-center gap-2 text-sm">
           {user.rol !== 'MEDICO' && (
             <select
@@ -111,19 +111,19 @@ export default function AgendaPage() {
           )}
           <div className="flex gap-1">
             <button
-              onClick={() => setFecha(sumarDias(fecha, -1))}
+              onClick={() => setFecha(addDays(fecha, -1))}
               className="rounded-lg border border-line px-3 py-1.5 hover:bg-surface-plane"
             >
               ‹
             </button>
             <button
-              onClick={() => setFecha(hoyISO())}
+              onClick={() => setFecha(todayISO())}
               className="rounded-lg border border-line px-3 py-1.5 hover:bg-surface-plane"
             >
               Hoy
             </button>
             <button
-              onClick={() => setFecha(sumarDias(fecha, 1))}
+              onClick={() => setFecha(addDays(fecha, 1))}
               className="rounded-lg border border-line px-3 py-1.5 hover:bg-surface-plane"
             >
               ›
@@ -132,12 +132,12 @@ export default function AgendaPage() {
         </div>
       </div>
 
-      {cargando ? (
+      {loading ? (
         <Spinner className="py-10 text-center" />
       ) : error ? (
-        <MensajeLista tipo="error">{error}</MensajeLista>
+        <ListMessage type="error">{error}</ListMessage>
       ) : medicosVisibles.length === 0 ? (
-        <MensajeLista>No hay médicos que mostrar.</MensajeLista>
+        <ListMessage>No hay médicos que mostrar.</ListMessage>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-line">
           <div
@@ -154,7 +154,7 @@ export default function AgendaPage() {
             ))}
 
             {medicosVisibles.map((m) => (
-              <FilaMedico
+              <DoctorRow
                 key={m.id}
                 medico={m}
                 dia={dia}
@@ -162,7 +162,7 @@ export default function AgendaPage() {
                 citasDe={citasDe}
                 serviciosMap={serviciosMap}
                 pacientes={pacientes}
-                onSeleccionar={setCitaSel}
+                onSelect={setCitaSel}
               />
             ))}
           </div>
@@ -174,24 +174,24 @@ export default function AgendaPage() {
       </p>
 
       {citaSel && (
-        <DetalleCita
+        <AppointmentDetail
           cita={citaSel}
           nombrePaciente={pacientes[citaSel.paciente_id]}
           medicos={medicos}
           servicios={servicios}
-          puedeGestionar={puedeGestionar}
-          onCerrar={() => setCitaSel(null)}
-          onActualizada={() => {
+          canManage={canManage}
+          onClose={() => setCitaSel(null)}
+          onUpdated={() => {
             setCitaSel(null)
-            cargar()
+            load()
           }}
         />
       )}
-    </Tarjeta>
+    </Card>
   )
 }
 
-function FilaMedico({ medico, dia, franjas, citasDe, serviciosMap, pacientes, onSeleccionar }) {
+function DoctorRow({ medico, dia, franjas, citasDe, serviciosMap, pacientes, onSelect }) {
   return (
     <>
       <div className="sticky left-0 z-10 bg-white px-3 py-2 shadow-[1px_0_0_var(--color-line)]">
@@ -211,13 +211,13 @@ function FilaMedico({ medico, dia, franjas, citasDe, serviciosMap, pacientes, on
             {enHora.map((c) => (
               <button
                 key={c.id}
-                onClick={() => onSeleccionar(c)}
-                title={`${formatHora(c.starts_at)} · ${serviciosMap[c.servicio_id] ?? ''}`}
+                onClick={() => onSelect(c)}
+                title={`${formatTime(c.starts_at)} · ${serviciosMap[c.servicio_id] ?? ''}`}
                 className={`block w-full rounded px-1.5 py-1 text-left text-[11px] leading-tight hover:brightness-95 ${
-                  ESTADOS_CITA[c.estado]?.chip ?? 'bg-brand-light text-brand-dark'
+                  APPOINTMENT_STATES[c.estado]?.chip ?? 'bg-brand-light text-brand-dark'
                 }`}
               >
-                <span className="tnum font-medium">{formatHora(c.starts_at)}</span>{' '}
+                <span className="tnum font-medium">{formatTime(c.starts_at)}</span>{' '}
                 {pacientes[c.paciente_id] ? nombreCorto(pacientes[c.paciente_id]) : ''}
                 <span className="block text-[10px] opacity-80">
                   {serviciosMap[c.servicio_id] ?? ''}

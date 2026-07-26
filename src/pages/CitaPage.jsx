@@ -1,47 +1,45 @@
 import { useEffect, useState } from 'react'
+import { useForm } from '../hooks/useForm'
+import ErrorCita from '../components/molecules/ErrorCita'
 import { useNavigate } from 'react-router-dom'
-import { api, ApiError } from '../api/client'
-import { hoyISO } from '../utils/fecha'
-import Campo from '../components/molecules/Campo'
+import { api, ApiError } from '../config/api'
+import { todayISO } from '../utils/date'
+import Field from '../components/molecules/Field'
 import Input from '../components/atoms/Input'
-import Boton from '../components/atoms/Boton'
-import Tarjeta from '../components/atoms/Tarjeta'
-import CamposCita from '../components/molecules/CamposCita'
+import Button from '../components/atoms/Button'
+import Card from '../components/atoms/Card'
+import AppointmentFields from '../components/molecules/AppointmentFields'
 
-export default function NuevaCitaPage() {
+export default function CitaPage() {
   const navigate = useNavigate()
   const [medicos, setMedicos] = useState([])
   const [servicios, setServicios] = useState([])
 
-  const [form, setForm] = useState({
+  const [form, set] = useForm({
     nombre_completo: '',
     edad: '',
     medico_id: '',
     servicio_id: '',
-    fecha: hoyISO(),
+    fecha: todayISO(),
     hora: '09:00',
     duracion_min: 30,
     motivo: '',
     permitir_sobrecupo: false,
   })
   const [error, setError] = useState(null)
-  const [guardando, setGuardando] = useState(false)
-
-  function set(campo, valor) {
-    setForm((f) => ({ ...f, [campo]: valor }))
-  }
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    async function cargar() {
+    async function load() {
       try {
         const [ms, ss] = await Promise.all([api.get('/medicos'), api.get('/servicios')])
         setMedicos(ms)
         setServicios(ss)
       } catch {
-        setError({ mensaje: 'No se pudieron cargar médicos y servicios.' })
+        setError({ mensaje: 'No se pudieron cargar los médicos y servicios.' })
       }
     }
-    cargar()
+    load()
   }, [])
 
   async function onSubmit(e) {
@@ -54,8 +52,8 @@ export default function NuevaCitaPage() {
       return
     }
 
-    setGuardando(true)
-    const cuerpo = {
+    setSaving(true)
+    const body = {
       nombre_completo: form.nombre_completo.trim(),
       edad: Number(form.edad),
       medico_id: form.medico_id,
@@ -67,7 +65,7 @@ export default function NuevaCitaPage() {
     }
 
     try {
-      await api.post('/citas', cuerpo)
+      await api.post('/citas', body)
       navigate('/agenda')
     } catch (err) {
       if (err instanceof ApiError) {
@@ -76,13 +74,13 @@ export default function NuevaCitaPage() {
       } else {
         setError({ mensaje: 'No se pudo agendar la cita.' })
       }
-      setGuardando(false)
+      setSaving(false)
     }
   }
 
   return (
     <div className="mx-auto max-w-xl">
-      <Tarjeta>
+      <Card>
         <div className="border-b border-line px-6 py-4">
           <h2 className="text-lg font-semibold">Nueva cita</h2>
           <p className="text-xs text-ink-muted">
@@ -91,33 +89,20 @@ export default function NuevaCitaPage() {
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4 p-6">
-          {error && (
-            <div className="rounded-lg border border-crit/30 bg-crit/5 p-3 text-sm">
-              <p className="font-medium text-crit">{error.mensaje}</p>
-              {error.candidatos && (
-                <ul className="mt-1 list-inside list-disc text-ink-2">
-                  {error.candidatos.map((c) => (
-                    <li key={c.id}>
-                      {c.nombre_completo} · {c.edad} años
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
+          <ErrorCita error={error} />
 
           <div className="grid grid-cols-3 gap-3">
             <div className="col-span-2">
-              <Campo label="Paciente (nombre completo)">
+              <Field label="Paciente (nombre completo)">
                 <Input
                   value={form.nombre_completo}
                   onChange={(e) => set('nombre_completo', e.target.value)}
                   required
                   autoFocus
                 />
-              </Campo>
+              </Field>
             </div>
-            <Campo label="Edad">
+            <Field label="Edad">
               <Input
                 type="number"
                 min="0"
@@ -126,21 +111,21 @@ export default function NuevaCitaPage() {
                 onChange={(e) => set('edad', e.target.value)}
                 required
               />
-            </Campo>
+            </Field>
           </div>
 
-          <CamposCita form={form} set={set} medicos={medicos} servicios={servicios} />
+          <AppointmentFields form={form} set={set} medicos={medicos} servicios={servicios} />
 
           <div className="flex justify-end gap-3 border-t border-line pt-4">
-            <Boton variante="secundario" type="button" onClick={() => navigate(-1)}>
+            <Button variant="secondary" type="button" onClick={() => navigate(-1)}>
               Cancelar
-            </Boton>
-            <Boton type="submit" disabled={guardando}>
-              {guardando ? 'Guardando…' : 'Guardar cita'}
-            </Boton>
+            </Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? 'Guardando…' : 'Guardar cita'}
+            </Button>
           </div>
         </form>
-      </Tarjeta>
+      </Card>
     </div>
   )
 }

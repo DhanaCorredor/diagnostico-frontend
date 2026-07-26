@@ -1,31 +1,31 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { api } from '../api/client'
-import EstadoBadge from '../components/molecules/EstadoBadge'
-import FormularioPaciente from '../components/organisms/FormularioPaciente'
-import { formatFechaCorta, formatHora } from '../utils/fecha'
-import { indexarPor } from '../utils/datos'
+import { api } from '../config/api'
+import StatusBadge from '../components/molecules/StatusBadge'
+import PatientForm from '../components/organisms/PatientForm'
+import { formatShortDate, formatTime } from '../utils/date'
+import { indexBy } from '../utils/data'
 import Avatar from '../components/atoms/Avatar'
 import Spinner from '../components/atoms/Spinner'
-import Alerta from '../components/atoms/Alerta'
-import Tarjeta from '../components/atoms/Tarjeta'
-import Boton from '../components/atoms/Boton'
-import MensajeLista from '../components/atoms/MensajeLista'
-import Dato from '../components/molecules/Dato'
+import Alert from '../components/atoms/Alert'
+import Card from '../components/atoms/Card'
+import Button from '../components/atoms/Button'
+import ListMessage from '../components/atoms/ListMessage'
+import DataRow from '../components/molecules/DataRow'
 
-export default function FichaPacientePage() {
+export default function PatientFilePage() {
   const { id } = useParams()
   const [paciente, setPaciente] = useState(null)
   const [citas, setCitas] = useState([])
   const [medicos, setMedicos] = useState({})
   const [servicios, setServicios] = useState({})
   const [tab, setTab] = useState('datos')
-  const [editando, setEditando] = useState(false)
-  const [cargando, setCargando] = useState(true)
+  const [editing, setEditing] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  const cargar = useCallback(async () => {
-    setCargando(true)
+  const load = useCallback(async () => {
+    setLoading(true)
     setError('')
     try {
       const [pac, hist, listaMedicos, listaServicios] = await Promise.all([
@@ -36,21 +36,21 @@ export default function FichaPacientePage() {
       ])
       setPaciente(pac)
       setCitas(hist)
-      setMedicos(indexarPor(listaMedicos, 'nombre_completo'))
-      setServicios(indexarPor(listaServicios, 'nombre'))
+      setMedicos(indexBy(listaMedicos, 'nombre_completo'))
+      setServicios(indexBy(listaServicios, 'nombre'))
     } catch {
       setError('No se pudo cargar la ficha del paciente.')
     } finally {
-      setCargando(false)
+      setLoading(false)
     }
   }, [id])
 
   useEffect(() => {
-    cargar()
-  }, [cargar])
+    load()
+  }, [load])
 
-  if (cargando) return <Spinner />
-  if (error) return <Alerta>{error}</Alerta>
+  if (loading) return <Spinner />
+  if (error) return <Alert>{error}</Alert>
   if (!paciente) return null
 
   return (
@@ -62,9 +62,9 @@ export default function FichaPacientePage() {
         Volver a Pacientes
       </Link>
 
-      <Tarjeta className="mb-6 p-5">
+      <Card className="mb-6 p-5">
         <div className="flex flex-wrap items-center gap-4">
-          <Avatar nombre={paciente.nombre_completo} tamano="lg" />
+          <Avatar name={paciente.nombre_completo} size="lg" />
           <div className="flex-1">
             <h2 className="text-xl font-semibold">{paciente.nombre_completo}</h2>
             <p className="text-sm text-ink-2">
@@ -72,11 +72,11 @@ export default function FichaPacientePage() {
               {paciente.edad != null && ` · ${paciente.edad} años`}
             </p>
           </div>
-          <Boton variante="secundario" onClick={() => setEditando(true)}>
+          <Button variant="secondary" onClick={() => setEditing(true)}>
             Editar
-          </Boton>
+          </Button>
         </div>
-      </Tarjeta>
+      </Card>
 
       <div className="mb-4 flex gap-1 border-b border-line text-sm">
         <button
@@ -103,34 +103,34 @@ export default function FichaPacientePage() {
 
       {tab === 'datos' && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <Tarjeta className="p-5">
+          <Card className="p-5">
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-muted">
               Identificación
             </h3>
             <dl className="space-y-2 text-sm">
-              <Dato etiqueta="Cédula" valor={paciente.cedula} />
-              <Dato
-                etiqueta="Fecha de nacimiento"
-                valor={paciente.fecha_nacimiento && formatFechaCorta(paciente.fecha_nacimiento)}
+              <DataRow label="Cédula" value={paciente.cedula} />
+              <DataRow
+                label="Fecha de nacimiento"
+                value={paciente.fecha_nacimiento && formatShortDate(paciente.fecha_nacimiento)}
               />
-              <Dato etiqueta="Edad" valor={paciente.edad != null ? `${paciente.edad} años` : null} />
+              <DataRow label="Edad" value={paciente.edad != null ? `${paciente.edad} años` : null} />
             </dl>
-          </Tarjeta>
-          <Tarjeta className="p-5">
+          </Card>
+          <Card className="p-5">
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-ink-muted">
               Contacto
             </h3>
             <dl className="space-y-2 text-sm">
-              <Dato etiqueta="Teléfono" valor={paciente.telefono} />
+              <DataRow label="Teléfono" value={paciente.telefono} />
             </dl>
-          </Tarjeta>
+          </Card>
         </div>
       )}
 
       {tab === 'citas' && (
-        <Tarjeta>
+        <Card>
           {citas.length === 0 ? (
-            <MensajeLista>Este paciente no tiene citas registradas.</MensajeLista>
+            <ListMessage>Este paciente no tiene citas registradas.</ListMessage>
           ) : (
             <table className="w-full text-sm">
               <thead className="text-left text-xs uppercase tracking-wide text-ink-muted">
@@ -145,28 +145,28 @@ export default function FichaPacientePage() {
                 {citas.map((c) => (
                   <tr key={c.id} className="hover:bg-surface-plane">
                     <td className="tnum px-5 py-3">
-                      {formatFechaCorta(c.starts_at)} · {formatHora(c.starts_at)}
+                      {formatShortDate(c.starts_at)} · {formatTime(c.starts_at)}
                     </td>
                     <td className="px-5 py-3">{medicos[c.medico_id] ?? 'Médico'}</td>
                     <td className="px-5 py-3 text-ink-2">{servicios[c.servicio_id] ?? 'Servicio'}</td>
                     <td className="px-5 py-3">
-                      <EstadoBadge estado={c.estado} />
+                      <StatusBadge estado={c.estado} />
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           )}
-        </Tarjeta>
+        </Card>
       )}
 
-      {editando && (
-        <FormularioPaciente
+      {editing && (
+        <PatientForm
           paciente={paciente}
-          onCerrar={() => setEditando(false)}
-          onGuardado={() => {
-            setEditando(false)
-            cargar()
+          onClose={() => setEditing(false)}
+          onSaved={() => {
+            setEditing(false)
+            load()
           }}
         />
       )}

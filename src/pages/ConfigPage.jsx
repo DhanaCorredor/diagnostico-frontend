@@ -1,20 +1,20 @@
 import { useEffect, useState } from 'react'
-import { api, ApiError } from '../api/client'
+import { api, ApiError } from '../config/api'
 import Input from '../components/atoms/Input'
-import Boton from '../components/atoms/Boton'
+import Button from '../components/atoms/Button'
 import Badge from '../components/atoms/Badge'
-import Alerta from '../components/atoms/Alerta'
-import Tarjeta from '../components/atoms/Tarjeta'
+import Alert from '../components/atoms/Alert'
+import Card from '../components/atoms/Card'
 
 const CATEGORIAS = [
-  { valor: 'CONSULTA', etiqueta: 'Consulta' },
-  { valor: 'ECOGRAFIA', etiqueta: 'Ecografía' },
-  { valor: 'DOPPLER', etiqueta: 'Doppler' },
-  { valor: 'ESTUDIO_CARDIACO', etiqueta: 'Estudio cardíaco' },
-  { valor: 'PROMOCION', etiqueta: 'Promoción' },
-  { valor: 'OTRO', etiqueta: 'Otro' },
+  { value: 'CONSULTA', label: 'Consulta' },
+  { value: 'ECOGRAFIA', label: 'Ecografía' },
+  { value: 'DOPPLER', label: 'Doppler' },
+  { value: 'ESTUDIO_CARDIACO', label: 'Estudio cardíaco' },
+  { value: 'PROMOCION', label: 'Promoción' },
+  { value: 'OTRO', label: 'Otro' },
 ]
-const CAT_LABEL = Object.fromEntries(CATEGORIAS.map((c) => [c.valor, c.etiqueta]))
+const CAT_LABEL = Object.fromEntries(CATEGORIAS.map((c) => [c.value, c.label]))
 
 export default function ConfigPage() {
   const [especialidades, setEspecialidades] = useState([])
@@ -24,7 +24,7 @@ export default function ConfigPage() {
   const [nuevaEsp, setNuevaEsp] = useState('')
   const [nuevoServ, setNuevoServ] = useState({ nombre: '', categoria: 'CONSULTA' })
 
-  async function cargar() {
+  async function load() {
     setError('')
     try {
       const [es, ss] = await Promise.all([api.get('/especialidades'), api.get('/servicios')])
@@ -36,7 +36,7 @@ export default function ConfigPage() {
   }
 
   useEffect(() => {
-    cargar()
+    load()
   }, [])
 
   async function crearEspecialidad(e) {
@@ -45,7 +45,7 @@ export default function ConfigPage() {
     try {
       await api.post('/especialidades', { nombre: nuevaEsp.trim() })
       setNuevaEsp('')
-      cargar()
+      load()
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'No se pudo crear la especialidad.')
     }
@@ -60,7 +60,7 @@ export default function ConfigPage() {
         categoria: nuevoServ.categoria,
       })
       setNuevoServ({ nombre: '', categoria: 'CONSULTA' })
-      cargar()
+      load()
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'No se pudo crear el servicio.')
     }
@@ -68,16 +68,16 @@ export default function ConfigPage() {
 
   return (
     <div className="space-y-6">
-      {error && <Alerta>{error}</Alerta>}
+      {error && <Alert>{error}</Alert>}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Tarjeta className="p-5">
+        <Card className="p-5">
           <h3 className="mb-1 font-semibold">Especialidades</h3>
           <p className="mb-3 text-xs text-ink-muted">Áreas médicas del centro.</p>
 
           <div className="mb-4 flex flex-wrap gap-1.5">
             {especialidades.map((e) => (
-              <Badge key={e.id} color="brand" tamano="sm">
+              <Badge key={e.id} color="brand" size="sm">
                 {e.nombre}
               </Badge>
             ))}
@@ -92,11 +92,11 @@ export default function ConfigPage() {
               onChange={(e) => setNuevaEsp(e.target.value)}
               placeholder="Nueva especialidad…"
             />
-            <Boton className="shrink-0">Añadir</Boton>
+            <Button className="shrink-0">Añadir</Button>
           </form>
-        </Tarjeta>
+        </Card>
 
-        <Tarjeta className="p-5">
+        <Card className="p-5">
           <h3 className="mb-1 font-semibold">Servicios y estudios</h3>
           <p className="mb-3 text-xs text-ink-muted">
             La duración de cada cita la elige recepción al agendar.
@@ -129,17 +129,17 @@ export default function ConfigPage() {
               className="shrink-0 rounded-lg border border-line px-2 py-2 text-sm outline-none focus:border-brand"
             >
               {CATEGORIAS.map((c) => (
-                <option key={c.valor} value={c.valor}>
-                  {c.etiqueta}
+                <option key={c.value} value={c.value}>
+                  {c.label}
                 </option>
               ))}
             </select>
-            <Boton className="shrink-0">Añadir</Boton>
+            <Button className="shrink-0">Añadir</Button>
           </form>
-        </Tarjeta>
+        </Card>
       </div>
 
-      <Tarjeta className="p-5">
+      <Card className="p-5">
         <h3 className="mb-3 font-semibold">Seguridad</h3>
         <div className="space-y-2 text-sm">
           {[
@@ -149,13 +149,13 @@ export default function ConfigPage() {
           ].map((t) => (
             <div key={t} className="flex items-center justify-between">
               <span className="text-ink-2">{t}</span>
-              <Badge color="good" tamano="sm">
+              <Badge color="good" size="sm">
                 Activo
               </Badge>
             </div>
           ))}
         </div>
-      </Tarjeta>
+      </Card>
     </div>
   )
 }

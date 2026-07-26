@@ -7,8 +7,8 @@ over HTTP/JSON, authenticated with a JWT bearer token.
 
 > Bootcamp final project — MVP. The frontend is used only by the center's staff
 > (administration, reception and doctors). Most project documentation lives in the
-> backend repo under `docs/` (in Spanish); the frontend **component map** is here in
-> [`docs/COMPONENTES.md`](docs/COMPONENTES.md).
+> backend repo under `docs/` (in Spanish). Frontend docs (in Spanish):
+> [component map](docs/COMPONENTES.md) · [architecture & design patterns](docs/ARQUITECTURA.md) · [use cases](docs/CASOS-DE-USO.md) · [testing](docs/TESTING.md).
 
 ## 🧱 Tech stack
 
@@ -52,6 +52,7 @@ VITE_API_URL=http://localhost:8000            # local backend
 | `pnpm build` | Build for production into `dist/` |
 | `pnpm preview` | Preview the production build locally |
 | `pnpm lint` | Run Oxlint over the source |
+| `pnpm test` | Run the test suite (Vitest + Testing Library) |
 
 ## 🔐 Authentication & roles
 
@@ -72,9 +73,9 @@ as a bearer token on every request. The session user (and role) is read from
 | `/login` | Login | public |
 | `/` | Dashboard (today's KPIs + agenda) | all |
 | `/agenda` | Day calendar (doctor × hour, availability blocking) | all |
-| `/pacientes` | Patients list + create | ADMIN · RECEPCION |
+| `/pacientes` | Patients list, create and delete | ADMIN · RECEPCION |
 | `/pacientes/:id` | Patient file (data + appointment history) | ADMIN · RECEPCION |
-| `/medicos` | Doctors grid (specialties + availability) | ADMIN · RECEPCION |
+| `/medicos` | Doctors list (specialties + availability) | ADMIN · RECEPCION |
 | `/citas/nueva` | New appointment form | ADMIN · RECEPCION |
 | `/usuarios` | Staff management (CRUD) | ADMIN |
 | `/config` | Catalog management (specialties, services) | ADMIN |
@@ -90,20 +91,23 @@ as a bearer token on every request. The session user (and role) is read from
 ├── public/                 # static assets (logo, favicon)
 ├── src/
 │   ├── main.jsx            # React entry (Router + Auth providers)
-│   ├── App.jsx             # routes + role guards
+│   ├── App.jsx             # mounts the router
+│   ├── router.jsx          # route definitions + role guards
 │   ├── index.css           # Tailwind v4 + brand theme (@theme)
-│   ├── api/
-│   │   └── client.js       # HTTP client + JWT handling
+│   ├── config/
+│   │   ├── configClient.js # HTTP client config + JWT handling
+│   │   └── api.js          # api.get/post/put/del
 │   ├── auth/               # AuthContext, AuthProvider, useAuth, ProtectedRoute
+│   ├── hooks/              # useForm (form state)
 │   ├── components/
-│   │   ├── atoms/          # Boton, Input, Select, Label, Badge, Avatar,
-│   │   │                   # Spinner, Tarjeta, Alerta, MensajeLista
-│   │   ├── molecules/      # Campo, Modal, EstadoBadge, TarjetaKPI,
-│   │   │                   # BarraBusqueda, CamposCita
-│   │   └── organisms/      # Sidebar, Topbar, forms, TarjetaMedico, DetalleCita
+│   │   ├── atoms/          # Button, Input, Select, Label, Badge, Avatar,
+│   │   │                   # Spinner, Card, Alert, ListMessage
+│   │   ├── molecules/      # Field, Modal, StatusBadge, KpiCard, SearchBar,
+│   │   │                   # AppointmentFields, Table, DataRow
+│   │   └── organisms/      # Sidebar, Topbar, PatientForm, UserForm, AppointmentDetail
 │   ├── layouts/            # AuthLayout, AppLayout
 │   ├── pages/              # one component per route
-│   └── utils/              # fecha, texto, datos, citas (state meta), roles (role meta)
+│   └── utils/              # date, text, data, citas (state meta), roles (role meta)
 └── vite.config.js          # Vite + React + Tailwind config
 ```
 

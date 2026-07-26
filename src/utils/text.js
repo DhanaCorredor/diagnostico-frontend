@@ -1,4 +1,4 @@
-export function iniciales(nombre = '') {
+export function initials(nombre = '') {
   return nombre
     .split(' ')
     .filter(Boolean)
