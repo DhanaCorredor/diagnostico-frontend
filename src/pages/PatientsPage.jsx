@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { api } from '../config/api'
 import PatientForm from '../components/organisms/PatientForm'
 import Button from '../components/atoms/Button'
+import Modal from '../components/molecules/Modal'
 import SearchBar from '../components/molecules/SearchBar'
 import Table from '../components/molecules/Table'
 
@@ -12,6 +13,8 @@ export default function PatientsPage() {
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [creating, setCreating] = useState(false)
+  const [deleting, setDeleting] = useState(null)
+  const [busy, setBusy] = useState(false)
 
   async function load() {
     setLoading(true)
@@ -28,6 +31,20 @@ export default function PatientsPage() {
   useEffect(() => {
     load()
   }, [])
+
+  async function eliminar() {
+    setBusy(true)
+    try {
+      await api.del(`/pacientes/${deleting.id}`)
+      setDeleting(null)
+      load()
+    } catch {
+      setError('No se pudo eliminar el paciente.')
+      setDeleting(null)
+    } finally {
+      setBusy(false)
+    }
+  }
 
   const term = search.trim().toLowerCase()
   const filtered = term
@@ -51,9 +68,14 @@ export default function PatientsPage() {
       header: '',
       className: 'text-right',
       render: (p) => (
-        <Link to={`/pacientes/${p.id}`} className="text-brand hover:underline">
-          Ver ficha
-        </Link>
+        <div className="flex justify-end gap-3">
+          <Link to={`/pacientes/${p.id}`} className="text-brand hover:underline">
+            Ver ficha
+          </Link>
+          <button onClick={() => setDeleting(p)} className="text-crit hover:underline">
+            Eliminar
+          </button>
+        </div>
       ),
     },
   ]
@@ -90,6 +112,29 @@ export default function PatientsPage() {
             load()
           }}
         />
+      )}
+
+      {deleting && (
+        <Modal
+          title="Eliminar paciente"
+          subtitle="El paciente se dará de baja (baja lógica, recuperable)."
+          onClose={() => setDeleting(null)}
+          footer={
+            <>
+              <Button variant="secondary" onClick={() => setDeleting(null)} disabled={busy}>
+                Cancelar
+              </Button>
+              <Button variant="danger" onClick={eliminar} disabled={busy}>
+                {busy ? 'Eliminando…' : 'Eliminar'}
+              </Button>
+            </>
+          }
+        >
+          <p className="text-sm text-ink-2">
+            ¿Seguro que quieres eliminar a{' '}
+            <span className="font-medium text-ink">{deleting.nombre_completo}</span>?
+          </p>
+        </Modal>
       )}
     </div>
   )
