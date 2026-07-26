@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useForm } from '../../hooks/useForm'
+import ErrorCita from '../molecules/ErrorCita'
 import { api, ApiError } from '../../config/api'
 import { formatShortDate, formatTime } from '../../utils/date'
 import { indexBy } from '../../utils/data'
@@ -79,20 +80,7 @@ export default function AppointmentDetail({
     )
   }
 
-  const cajaError = error && (
-    <div className="rounded-lg border border-crit/30 bg-crit/5 p-3 text-sm">
-      <p className="font-medium text-crit">{error.mensaje}</p>
-      {error.candidatos && (
-        <ul className="mt-1 list-inside list-disc text-ink-2">
-          {error.candidatos.map((c) => (
-            <li key={c.id}>
-              {c.nombre_completo} · {c.edad} años
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  )
+  const cajaError = <ErrorCita error={error} />
 
   if (editing) {
     const footer = (

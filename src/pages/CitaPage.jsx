@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useForm } from '../hooks/useForm'
+import ErrorCita from '../components/molecules/ErrorCita'
 import { useNavigate } from 'react-router-dom'
 import { api, ApiError } from '../config/api'
 import { todayISO } from '../utils/date'
@@ -88,20 +89,7 @@ export default function CitaPage() {
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4 p-6">
-          {error && (
-            <div className="rounded-lg border border-crit/30 bg-crit/5 p-3 text-sm">
-              <p className="font-medium text-crit">{error.mensaje}</p>
-              {error.candidatos && (
-                <ul className="mt-1 list-inside list-disc text-ink-2">
-                  {error.candidatos.map((c) => (
-                    <li key={c.id}>
-                      {c.nombre_completo} · {c.edad} años
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          )}
+          <ErrorCita error={error} />
 
           <div className="grid grid-cols-3 gap-3">
             <div className="col-span-2">

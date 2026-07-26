@@ -53,6 +53,7 @@ src/
 | `AppointmentFields` | `Field` + `Input` + `Select` | campos compartidos de **nueva/editar cita** |
 | `Table` | `Card` + `thead`/`tbody` + estados | tabla reutilizable (config de columnas): Pacientes · Usuarios · Médicos |
 | `DataRow` | `dt` + `dd` | fila "etiqueta: valor" (ficha de paciente, detalle de cita) |
+| `ErrorCita` | caja crit + lista | error de agenda: mensaje + candidatos de solapamiento (nueva/editar cita) |
 
 > `EnlaceNav`, `SelectorVista` (Día/Semana), `FranjaHoraria`, `ItemNota` (del plan) → no se hicieron: la nav va inline en `Sidebar`; solo hay vista Día; la disponibilidad se pinta directa; las notas clínicas son **fase 2**.
 
