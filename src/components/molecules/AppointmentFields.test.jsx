@@ -65,3 +65,18 @@ describe('AppointmentFields — filtro de servicios por especialidad', () => {
     expect(set).toHaveBeenCalledWith('servicio_id', '')
   })
 })
+
+describe('AppointmentFields — accesibilidad', () => {
+  it('asocia cada etiqueta con su campo (label ↔ input)', () => {
+    render(
+      <AppointmentFields
+        form={baseForm({ medico_id: 'm1' })}
+        set={vi.fn()}
+        medicos={medicos}
+        servicios={serviciosConEsp}
+      />,
+    )
+    expect(screen.getByLabelText('Médico')).toBeInTheDocument()
+    expect(screen.getByLabelText('Servicio')).toBeInTheDocument()
+  })
+})

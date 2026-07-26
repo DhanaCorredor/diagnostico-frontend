@@ -49,8 +49,9 @@ export default function LoginPage() {
         <h1 className="mb-1 text-xl font-semibold">Iniciar sesión</h1>
         <p className="mb-6 text-sm text-ink-2">Acceso solo para personal autorizado.</p>
 
-        <Label>Correo</Label>
+        <Label htmlFor="email">Correo</Label>
         <Input
+          id="email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -60,8 +61,9 @@ export default function LoginPage() {
           className="mb-4"
         />
 
-        <Label>Contraseña</Label>
+        <Label htmlFor="password">Contraseña</Label>
         <Input
+          id="password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
