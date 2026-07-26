@@ -1,31 +1,31 @@
-import Tarjeta from '../atoms/Tarjeta'
+import Card from '../atoms/Card'
 import Spinner from '../atoms/Spinner'
-import MensajeLista from '../atoms/MensajeLista'
+import ListMessage from '../atoms/ListMessage'
 
-export default function Tabla({ titulo, contador, accion, columnas, filas, cargando, error, vacio }) {
+export default function Table({ title, count, action, columns, rows, loading, error, empty }) {
   return (
-    <Tarjeta>
+    <Card>
       <div className="flex items-center justify-between border-b border-line px-5 py-4">
         <h2 className="font-semibold">
-          {titulo}
-          {contador != null && (
-            <span className="ml-1 text-sm font-normal text-ink-muted">({contador})</span>
+          {title}
+          {count != null && (
+            <span className="ml-1 text-sm font-normal text-ink-muted">({count})</span>
           )}
         </h2>
-        {accion}
+        {action}
       </div>
 
-      {cargando ? (
+      {loading ? (
         <Spinner className="px-5 py-10 text-center" />
       ) : error ? (
-        <MensajeLista tipo="error">{error}</MensajeLista>
-      ) : filas.length === 0 ? (
-        <MensajeLista>{vacio}</MensajeLista>
+        <ListMessage type="error">{error}</ListMessage>
+      ) : rows.length === 0 ? (
+        <ListMessage>{empty}</ListMessage>
       ) : (
         <table className="w-full text-sm">
           <thead className="text-left text-xs uppercase tracking-wide text-ink-muted">
             <tr className="border-b border-line">
-              {columnas.map((c, i) => (
+              {columns.map((c, i) => (
                 <th key={i} className={`px-5 py-3 font-medium ${c.thClassName ?? ''}`}>
                   {c.header}
                 </th>
@@ -33,9 +33,9 @@ export default function Tabla({ titulo, contador, accion, columnas, filas, carga
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
-            {filas.map((fila) => (
+            {rows.map((fila) => (
               <tr key={fila.id} className="hover:bg-surface-plane">
-                {columnas.map((c, i) => (
+                {columns.map((c, i) => (
                   <td key={i} className={`px-5 py-3 ${c.className ?? ''}`}>{c.render(fila)}</td>
                 ))}
               </tr>
@@ -43,6 +43,6 @@ export default function Tabla({ titulo, contador, accion, columnas, filas, carga
           </tbody>
         </table>
       )}
-    </Tarjeta>
+    </Card>
   )
 }

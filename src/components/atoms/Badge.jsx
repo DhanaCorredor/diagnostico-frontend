@@ -1,4 +1,4 @@
-const COLORES = {
+const COLORS = {
   brand: 'bg-brand-light text-brand-dark',
   good: 'bg-good/10 text-good',
   warn: 'bg-warn/10 text-[#8a6100]',
@@ -8,14 +8,14 @@ const COLORES = {
   neutral: 'bg-surface-plane text-ink-2',
 }
 
-const TAMANOS = {
+const SIZES = {
   sm: 'px-2 py-0.5',
   md: 'px-2.5 py-1',
 }
 
-export default function Badge({ color = 'neutral', tamano = 'md', className = '', children }) {
+export default function Badge({ color = 'neutral', size = 'md', className = '', children }) {
   return (
-    <span className={`rounded-full text-xs font-medium ${COLORES[color]} ${TAMANOS[tamano]} ${className}`}>
+    <span className={`rounded-full text-xs font-medium ${COLORS[color]} ${SIZES[size]} ${className}`}>
       {children}
     </span>
   )

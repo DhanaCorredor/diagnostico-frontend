@@ -1,7 +1,7 @@
-export const ESTADOS_CITA = {
-  SCHEDULED: { texto: 'Agendada', color: 'warn', barra: 'bg-warn', chip: 'bg-warn/10 text-[#8a6100]' },
-  CONFIRMED: { texto: 'Confirmada', color: 'good', barra: 'bg-good', chip: 'bg-good/10 text-good' },
-  CANCELLED: { texto: 'Cancelada', color: 'crit', barra: 'bg-crit', chip: 'bg-crit/10 text-crit' },
-  COMPLETED: { texto: 'Completada', color: 'muted', barra: 'bg-ink-muted', chip: 'bg-ink-muted/10 text-ink-2' },
-  NO_SHOW: { texto: 'No asistió', color: 'crit', barra: 'bg-crit', chip: 'bg-crit/10 text-crit' },
+export const APPOINTMENT_STATES = {
+  SCHEDULED: { text: 'Agendada', color: 'warn', bar: 'bg-warn', chip: 'bg-warn/10 text-[#8a6100]' },
+  CONFIRMED: { text: 'Confirmada', color: 'good', bar: 'bg-good', chip: 'bg-good/10 text-good' },
+  CANCELLED: { text: 'Cancelada', color: 'crit', bar: 'bg-crit', chip: 'bg-crit/10 text-crit' },
+  COMPLETED: { text: 'Completada', color: 'muted', bar: 'bg-ink-muted', chip: 'bg-ink-muted/10 text-ink-2' },
+  NO_SHOW: { text: 'No asistió', color: 'crit', bar: 'bg-crit', chip: 'bg-crit/10 text-crit' },
 }

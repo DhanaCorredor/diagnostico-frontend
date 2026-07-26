@@ -1,22 +1,23 @@
 import { useState } from 'react'
-import { api, ApiError } from '../../api/client'
+import { useForm } from '../../hooks/useForm'
+import { api, ApiError } from '../../config/api'
 import Modal from '../molecules/Modal'
-import Campo from '../molecules/Campo'
+import Field from '../molecules/Field'
 import Input from '../atoms/Input'
 import Select from '../atoms/Select'
-import Boton from '../atoms/Boton'
-import Alerta from '../atoms/Alerta'
+import Button from '../atoms/Button'
+import Alert from '../atoms/Alert'
 
 const ROLES = [
-  { valor: 'ADMIN', etiqueta: 'Administrador' },
-  { valor: 'RECEPCION', etiqueta: 'Recepción' },
-  { valor: 'MEDICO', etiqueta: 'Médico' },
+  { value: 'ADMIN', label: 'Administrador' },
+  { value: 'RECEPCION', label: 'Recepción' },
+  { value: 'MEDICO', label: 'Médico' },
 ]
 
-export default function FormularioUsuario({ usuario, especialidades, onCerrar, onGuardado }) {
-  const editando = Boolean(usuario)
+export default function UserForm({ usuario, especialidades, onClose, onSaved }) {
+  const editing = Boolean(usuario)
 
-  const [form, setForm] = useState({
+  const [form, set, setForm] = useForm({
     nombre_completo: usuario?.nombre_completo ?? '',
     email: usuario?.email ?? '',
     rol: usuario?.rol ?? 'RECEPCION',
@@ -25,13 +26,9 @@ export default function FormularioUsuario({ usuario, especialidades, onCerrar, o
     especialidades: usuario?.especialidades?.map((e) => e.id) ?? [],
   })
   const [error, setError] = useState('')
-  const [guardando, setGuardando] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   const esMedico = form.rol === 'MEDICO'
-
-  function set(campo, valor) {
-    setForm((f) => ({ ...f, [campo]: valor }))
-  }
 
   function toggleEspecialidad(id) {
     setForm((f) => ({
@@ -45,102 +42,106 @@ export default function FormularioUsuario({ usuario, especialidades, onCerrar, o
   async function onSubmit(e) {
     e.preventDefault()
     setError('')
-    setGuardando(true)
+    setSaving(true)
 
-    const cuerpo = {
+    const body = {
       nombre_completo: form.nombre_completo.trim(),
       email: form.email.trim(),
-      rol: form.rol,
     }
+    if (!editing) body.rol = form.rol
     if (esMedico) {
-      cuerpo.matricula = form.matricula.trim() || null
-      cuerpo.especialidades = form.especialidades
+      body.matricula = form.matricula.trim() || null
+      body.especialidades = form.especialidades
     }
-    if (!editando || form.password) cuerpo.password = form.password
+    if (!editing || form.password) body.password = form.password
 
     try {
-      if (editando) await api.put(`/usuarios/${usuario.id}`, cuerpo)
-      else await api.post('/usuarios', cuerpo)
-      onGuardado()
+      if (editing) await api.put(`/usuarios/${usuario.id}`, body)
+      else await api.post('/usuarios', body)
+      onSaved()
     } catch (err) {
       if (err instanceof ApiError) setError(err.message)
       else setError('No se pudo guardar el usuario.')
-      setGuardando(false)
+      setSaving(false)
     }
   }
 
   const footer = (
     <>
-      <Boton variante="secundario" type="button" onClick={onCerrar}>
+      <Button variant="secondary" type="button" onClick={onClose}>
         Cancelar
-      </Boton>
-      <Boton type="submit" form="form-usuario" disabled={guardando}>
-        {guardando ? 'Guardando…' : 'Guardar'}
-      </Boton>
+      </Button>
+      <Button type="submit" form="form-usuario" disabled={saving}>
+        {saving ? 'Guardando…' : 'Guardar'}
+      </Button>
     </>
   )
 
   return (
     <Modal
-      titulo={editando ? 'Editar usuario' : 'Nuevo acceso'}
-      subtitulo="Personal interno que inicia sesión en el sistema."
-      onClose={onCerrar}
+      title={editing ? 'Editar usuario' : 'Nuevo acceso'}
+      subtitle="Personal interno que inicia sesión en el sistema."
+      onClose={onClose}
       footer={footer}
     >
       <form id="form-usuario" onSubmit={onSubmit} className="space-y-4">
-        {error && <Alerta>{error}</Alerta>}
+        {error && <Alert>{error}</Alert>}
 
-        <Campo label="Nombre completo">
+        <Field label="Nombre completo">
           <Input
             value={form.nombre_completo}
             onChange={(e) => set('nombre_completo', e.target.value)}
             required
             autoFocus
           />
-        </Campo>
+        </Field>
 
         <div className="grid grid-cols-2 gap-3">
-          <Campo label="Correo">
+          <Field label="Correo">
             <Input
               type="email"
               value={form.email}
               onChange={(e) => set('email', e.target.value)}
               required
             />
-          </Campo>
-          <Campo label="Rol">
-            <Select value={form.rol} onChange={(e) => set('rol', e.target.value)}>
+          </Field>
+          <Field label="Rol" hint={editing ? 'El rol no se cambia tras crear el usuario.' : undefined}>
+            <Select
+              value={form.rol}
+              onChange={(e) => set('rol', e.target.value)}
+              disabled={editing}
+            >
               {ROLES.map((r) => (
-                <option key={r.valor} value={r.valor}>
-                  {r.etiqueta}
+                <option key={r.value} value={r.value}>
+                  {r.label}
                 </option>
               ))}
             </Select>
-          </Campo>
+          </Field>
         </div>
 
-        <Campo
-          label={editando ? 'Contraseña (dejar en blanco para no cambiar)' : 'Contraseña'}
+        <Field
+          label={editing ? 'Contraseña (dejar en blanco para no cambiar)' : 'Contraseña'}
           hint="Mínimo 8 caracteres."
         >
           <Input
             type="password"
             value={form.password}
             onChange={(e) => set('password', e.target.value)}
-            required={!editando}
+            required={!editing}
             minLength={8}
           />
-        </Campo>
+        </Field>
 
         {esMedico && (
           <>
-            <Campo label="Matrícula (opcional)">
+            <Field label="Matrícula (opcional)">
               <Input
                 value={form.matricula}
                 onChange={(e) => set('matricula', e.target.value)}
                 placeholder="MPPS 45.221"
               />
-            </Campo>
+            </Field>
             <div>
               <label className="mb-1 block text-sm font-medium">Especialidades</label>
               <div className="flex max-h-40 flex-wrap gap-2 overflow-y-auto rounded-lg border border-line p-2">

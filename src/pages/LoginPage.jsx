@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth'
-import { ApiError } from '../api/client'
+import { ApiError } from '../config/api'
 import AuthLayout from '../layouts/AuthLayout'
 import Input from '../components/atoms/Input'
 import Label from '../components/atoms/Label'
-import Boton from '../components/atoms/Boton'
-import Alerta from '../components/atoms/Alerta'
+import Button from '../components/atoms/Button'
+import Alert from '../components/atoms/Alert'
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -16,14 +16,14 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [cargando, setCargando] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const destino = location.state?.from?.pathname ?? '/'
 
   async function onSubmit(e) {
     e.preventDefault()
     setError('')
-    setCargando(true)
+    setLoading(true)
     try {
       await login(email, password)
       navigate(destino, { replace: true })
@@ -34,7 +34,7 @@ export default function LoginPage() {
         setError('No se pudo conectar con el servidor. Inténtalo de nuevo.')
       }
     } finally {
-      setCargando(false)
+      setLoading(false)
     }
   }
 
@@ -49,8 +49,9 @@ export default function LoginPage() {
         <h1 className="mb-1 text-xl font-semibold">Iniciar sesión</h1>
         <p className="mb-6 text-sm text-ink-2">Acceso solo para personal autorizado.</p>
 
-        <Label>Correo</Label>
+        <Label htmlFor="email">Correo</Label>
         <Input
+          id="email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -60,8 +61,9 @@ export default function LoginPage() {
           className="mb-4"
         />
 
-        <Label>Contraseña</Label>
+        <Label htmlFor="password">Contraseña</Label>
         <Input
+          id="password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -69,11 +71,11 @@ export default function LoginPage() {
           className="mb-4"
         />
 
-        {error && <Alerta className="mb-4">{error}</Alerta>}
+        {error && <Alert className="mb-4">{error}</Alert>}
 
-        <Boton type="submit" disabled={cargando} className="w-full">
-          {cargando ? 'Entrando…' : 'Entrar'}
-        </Boton>
+        <Button type="submit" disabled={loading} className="w-full">
+          {loading ? 'Entrando…' : 'Entrar'}
+        </Button>
 
         <p className="mt-4 text-center text-xs text-ink-muted">
           🔒 Conexión segura · Datos cifrados

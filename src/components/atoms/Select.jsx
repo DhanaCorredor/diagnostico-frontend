@@ -1,4 +1,4 @@
-import { controlBase } from './estilos'
+import { controlBase } from './styles'
 
 export default function Select({ className = '', children, ...props }) {
   return (

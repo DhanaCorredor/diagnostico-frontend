@@ -1,4 +1,4 @@
-export default function BarraBusqueda({ value, onChange, placeholder = 'Buscar…', className = '' }) {
+export default function SearchBar({ value, onChange, placeholder = 'Buscar…', className = '' }) {
   return (
     <div className={`relative ${className}`}>
       <svg

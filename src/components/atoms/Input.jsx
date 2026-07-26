@@ -1,4 +1,4 @@
-import { controlBase } from './estilos'
+import { controlBase } from './styles'
 
 export default function Input({ className = '', ...props }) {
   return <input className={`${controlBase} ${className}`} {...props} />

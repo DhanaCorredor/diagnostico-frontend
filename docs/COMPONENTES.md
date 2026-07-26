@@ -13,16 +13,18 @@
 
 ```
 src/
-  api/            # cliente HTTP + token JWT (client.js)
+  config/         # cliente HTTP + token JWT (configClient · api)
   auth/           # AuthContext · AuthProvider · useAuth · ProtectedRoute (guarda por rol)
+  hooks/          # useForm (estado de formularios)
   components/
     atoms/        # piezas básicas sin lógica de negocio
     molecules/    # combinaciones simples de átomos
     organisms/    # secciones completas con lógica/estado
   layouts/        # AuthLayout · AppLayout
   pages/          # una por ruta
-  utils/          # helpers puros (fecha, texto, datos) + metadata (citas, roles)
-  App.jsx         # rutas (React Router) + guardas por rol
+  utils/          # helpers puros (date, text, data) + metadata (citas, roles)
+  router.jsx      # rutas (React Router) + guardas por rol
+  App.jsx         # monta el router
   main.jsx        # providers (Router + Auth)
 ```
 
@@ -30,14 +32,14 @@ src/
 
 | Componente | Uso |
 |-----------|-----|
-| `Boton` | variantes: primario · secundario · peligro · éxito (tamaños sm/md) |
-| `Input` · `Select` · `Label` | controles de formulario (comparten `estilos.js` → `controlBase`) |
+| `Button` | variantes: primary · secondary · danger · success (tamaños sm/md) |
+| `Input` · `Select` · `Label` | controles de formulario (comparten `styles.js` → `controlBase`) |
 | `Badge` | pastilla de color (estado de cita, rol) — 7 colores |
 | `Avatar` | iniciales del usuario/paciente (sm/md/lg) |
 | `Spinner` | estado de carga ("Cargando…") |
-| `Tarjeta` | contenedor blanco con borde (contenedor base de todo) |
-| `Alerta` | mensaje de error/éxito/info |
-| `MensajeLista` | mensaje centrado en tabla/lista (vacío/error) |
+| `Card` | contenedor blanco con borde (contenedor base de todo) |
+| `Alert` | mensaje de error/éxito/info |
+| `ListMessage` | mensaje centrado en tabla/lista (vacío/error) |
 
 > `Icono` (del plan original) → no se creó: los SVG van **inline** (sidebar, buscador, flechas de agenda…).
 
@@ -45,14 +47,15 @@ src/
 
 | Componente | Compuesto por | Uso |
 |-----------|---------------|-----|
-| `Campo` | `Label` + control (children) + hint | todos los formularios |
+| `Field` | `Label` + control (children) + hint | todos los formularios |
 | `Modal` | cabecera + contenido + pie | ventanas modales (formularios, detalle de cita) |
-| `EstadoBadge` | `Badge` + `ESTADOS_CITA` | estado de una cita |
-| `TarjetaKPI` | `Tarjeta` + título/número/nota | KPIs del panel |
-| `BarraBusqueda` | input + icono | buscar paciente/cédula |
-| `CamposCita` | `Campo` + `Input` + `Select` | campos compartidos de **nueva/editar cita** |
-| `Tabla` | `Tarjeta` + `thead`/`tbody` + estados | tabla reutilizable (config de columnas): Pacientes · Usuarios · Médicos |
-| `Dato` | `dt` + `dd` | fila "etiqueta: valor" (ficha de paciente, detalle de cita) |
+| `StatusBadge` | `Badge` + `APPOINTMENT_STATES` | estado de una cita |
+| `KpiCard` | `Card` + título/número/nota | KPIs del panel |
+| `SearchBar` | input + icono | buscar paciente/cédula |
+| `AppointmentFields` | `Field` + `Input` + `Select` | campos compartidos de **nueva/editar cita** |
+| `Table` | `Card` + `thead`/`tbody` + estados | tabla reutilizable (config de columnas): Pacientes · Usuarios · Médicos |
+| `DataRow` | `dt` + `dd` | fila "etiqueta: valor" (ficha de paciente, detalle de cita) |
+| `ErrorCita` | caja crit + lista | error de agenda: mensaje + candidatos de solapamiento (nueva/editar cita) |
 
 > `EnlaceNav`, `SelectorVista` (Día/Semana), `FranjaHoraria`, `ItemNota` (del plan) → no se hicieron: la nav va inline en `Sidebar`; solo hay vista Día; la disponibilidad se pinta directa; las notas clínicas son **fase 2**.
 
@@ -62,11 +65,11 @@ src/
 |-----------|----------|
 | `Sidebar` | navegación por rol + usuario + salir |
 | `Topbar` | título de la página + botón "Nueva cita" |
-| `FormularioPaciente` | alta/edición: **nombre + edad** (cédula opcional) |
-| `FormularioUsuario` | alta/edición de personal: nombre + email + rol (+ matrícula/especialidades si médico) |
-| `DetalleCita` | detalle de una cita + **acciones** (cancelar · asistencia · editar/mover) |
+| `PatientForm` | alta/edición: **nombre + edad** (cédula opcional) |
+| `UserForm` | alta/edición de personal: nombre + email + rol (+ matrícula/especialidades si médico) |
+| `AppointmentDetail` | detalle de una cita + **acciones** (cancelar · asistencia · editar/mover) |
 
-> `TablaPacientes` / `TablaUsuarios` / cuadro médico usan la molécula reutilizable **`Tabla`** (config de columnas). Otras secciones de una sola vista se dejaron **inline**: `Calendario` (la rejilla vive en `AgendaPage`), `PanelResumen` (en `PanelPage`), `FichaCabecera`/`FichaTabs` (en `FichaPacientePage`). `FormularioCita` = `NuevaCitaPage` + `CamposCita`. `ListaNotasClinicas` → **fase 2**.
+> `TablaPacientes` / `TablaUsuarios` / cuadro médico usan la molécula reutilizable **`Table`** (config de columnas). Otras secciones de una sola vista se dejaron **inline**: `Calendario` (la rejilla vive en `AgendaPage`), `PanelResumen` (en `PanelPage`), `FichaCabecera`/`FichaTabs` (en `PatientFilePage`). `FormularioCita` = `CitaPage` + `AppointmentFields`. `ListaNotasClinicas` → **fase 2**.
 
 ## 🖼️ Plantillas (layouts)
 
@@ -80,13 +83,13 @@ src/
 | Página | Ruta | Quién accede | Compone |
 |--------|------|--------------|---------|
 | `LoginPage` | `/login` | todos | `AuthLayout` |
-| `PanelPage` | `/` | todos | `TarjetaKPI` + agenda del día (→ `DetalleCita`) |
-| `AgendaPage` | `/agenda` | todos | rejilla médico×hora (→ `DetalleCita`) |
-| `PacientesPage` | `/pacientes` | ADMIN · RECEPCION | `Tabla` + `BarraBusqueda` + `FormularioPaciente` |
-| `FichaPacientePage` | `/pacientes/:id` | ADMIN · RECEPCION | cabecera + pestañas (Datos · Historial) |
-| `MedicosPage` | `/medicos` | ADMIN · RECEPCION | `Tabla` (lista: médico · especialidades · disponibilidad) |
-| `NuevaCitaPage` | `/citas/nueva` | ADMIN · RECEPCION | Paciente + `CamposCita` |
-| `UsuariosPage` | `/usuarios` | **solo ADMIN** | `Tabla` + `FormularioUsuario` |
+| `PanelPage` | `/` | todos | `KpiCard` + agenda del día (→ `AppointmentDetail`) |
+| `AgendaPage` | `/agenda` | todos | rejilla médico×hora (→ `AppointmentDetail`) |
+| `PatientsPage` | `/pacientes` | ADMIN · RECEPCION | `Table` + `SearchBar` + `PatientForm` |
+| `PatientFilePage` | `/pacientes/:id` | ADMIN · RECEPCION | cabecera + pestañas (Datos · Historial) |
+| `DoctorsPage` | `/medicos` | ADMIN · RECEPCION | `Table` (lista: médico · especialidades · disponibilidad) |
+| `CitaPage` | `/citas/nueva` | ADMIN · RECEPCION | Paciente + `AppointmentFields` |
+| `UsersPage` | `/usuarios` | **solo ADMIN** | `Table` + `UserForm` |
 | `ConfigPage` | `/config` | **solo ADMIN** | especialidades + servicios |
 
 > **Guardas por rol** (`App.jsx`): RECEPCIÓN **no** ve `/usuarios` ni `/config`; MEDICO ve `Panel` y su `Agenda` (**solo lectura**, sin botón "Nueva cita"). Historia clínica → **fase 2**.
@@ -95,19 +98,20 @@ src/
 
 | Archivo | Contenido |
 |---------|-----------|
-| `fecha.js` | `hoyISO`, `formatHora`, `formatFechaCorta`/`Larga`, `sumarDias`, `diaSemana`… |
-| `texto.js` | `iniciales` (para `Avatar`) |
-| `datos.js` | `indexarPor` (lista → mapa por id) |
-| `citas.js` | `ESTADOS_CITA` (estado → texto · color · barra · chip) |
-| `roles.js` | `ROLES` (rol → etiqueta · color) |
+| `date.js` | `todayISO`, `formatTime`, `formatShortDate`/`LongDate`, `addDays`, `weekday`… |
+| `text.js` | `initials` (para `Avatar`) |
+| `data.js` | `indexBy` (lista → mapa por id) |
+| `citas.js` | `APPOINTMENT_STATES` (estado → text · color · bar · chip) |
+| `roles.js` | `ROLES` (rol → label · color) |
 
 ## 🔑 Comportamientos clave (dónde vive la lógica)
 
-- **Nueva cita** (`NuevaCitaPage` + `CamposCita`) → `POST /citas`: **upsert de paciente** por nombre + edad; el backend valida **disponibilidad** (con **sobrecupo**) y **cero solapamientos por médico**.
+- **Nueva cita** (`CitaPage` + `AppointmentFields`) → `POST /citas`: **upsert de paciente** por nombre + edad; el backend valida **disponibilidad** (con **sobrecupo**) y **cero solapamientos por médico**.
 - **`AgendaPage`** → pide la disponibilidad de cada médico y **grisa** las horas fuera de ella; recepción puede **forzar sobrecupo**.
-- **Acciones sobre la cita** (`DetalleCita`) → cancelar (libera cupo), marcar asistencia (atendida/no-show), editar/mover (revalida reglas).
-- **`EstadoBadge` + `ESTADOS_CITA`** → mapea `EstadoCita` (SCHEDULED · CONFIRMED · CANCELLED · COMPLETED · NO_SHOW) a color y etiqueta.
+- **Acciones sobre la cita** (`AppointmentDetail`) → cancelar (libera cupo), marcar asistencia (atendida/no-show), editar/mover (revalida reglas).
+- **`StatusBadge` + `APPOINTMENT_STATES`** → mapea `EstadoCita` (SCHEDULED · CONFIRMED · CANCELLED · COMPLETED · NO_SHOW) a color y etiqueta.
 - **Sesión** → `AuthProvider` guarda el JWT en `localStorage`, `useAuth` lo consume, `ProtectedRoute` protege por sesión y rol; un **handler global de 401** cierra sesión y redirige a login.
+- **Formularios** → `useForm(initial)` (en `hooks/`) centraliza `form` + `set(field, value)`; lo usan los 4 formularios (nueva/editar cita, paciente, usuario).
 - La **cédula** no se pide al agendar (opcional, se añade después).
 
 > Este mapa refleja lo **implementado**. La jerarquía es una **guía**, no un contrato: las piezas de un solo uso se quedaron **inline** a propósito (código más sencillo).

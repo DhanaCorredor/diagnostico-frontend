@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { api } from '../api/client'
+import { api } from '../config/api'
 import Avatar from '../components/atoms/Avatar'
 import Badge from '../components/atoms/Badge'
-import Tabla from '../components/molecules/Tabla'
+import Table from '../components/molecules/Table'
 
 const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 
@@ -23,43 +23,43 @@ function resumirFranjas(franjas) {
   })
 }
 
-export default function MedicosPage() {
+export default function DoctorsPage() {
   const [medicos, setMedicos] = useState([])
   const [dispPorMedico, setDispPorMedico] = useState({})
-  const [cargando, setCargando] = useState(true)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    async function cargar() {
-      setCargando(true)
+    async function load() {
+      setLoading(true)
       setError('')
       try {
-        const lista = await api.get('/medicos')
+        const list = await api.get('/medicos')
         const franjas = await Promise.all(
-          lista.map((m) => api.get(`/disponibilidad?medico_id=${m.id}`)),
+          list.map((m) => api.get(`/disponibilidad?medico_id=${m.id}`)),
         )
         const mapa = {}
-        lista.forEach((m, i) => {
+        list.forEach((m, i) => {
           mapa[m.id] = franjas[i]
         })
-        setMedicos(lista)
+        setMedicos(list)
         setDispPorMedico(mapa)
       } catch {
         setError('No se pudieron cargar los médicos.')
       } finally {
-        setCargando(false)
+        setLoading(false)
       }
     }
-    cargar()
+    load()
   }, [])
 
-  const columnas = [
+  const columns = [
     {
       header: 'Médico',
       className: 'font-medium',
       render: (m) => (
         <div className="flex items-center gap-2">
-          <Avatar nombre={m.nombre_completo} tamano="sm" />
+          <Avatar name={m.nombre_completo} size="sm" />
           {m.nombre_completo}
         </div>
       ),
@@ -69,7 +69,7 @@ export default function MedicosPage() {
       render: (m) => (
         <div className="flex flex-wrap gap-1">
           {m.especialidades.map((e) => (
-            <Badge key={e.id} color="brand" tamano="sm">
+            <Badge key={e.id} color="brand" size="sm">
               {e.nombre}
             </Badge>
           ))}
@@ -97,14 +97,14 @@ export default function MedicosPage() {
   ]
 
   return (
-    <Tabla
-      titulo="Médicos"
-      contador={medicos.length}
-      columnas={columnas}
-      filas={medicos}
-      cargando={cargando}
+    <Table
+      title="Médicos"
+      count={medicos.length}
+      columns={columns}
+      rows={medicos}
+      loading={loading}
       error={error}
-      vacio="No hay médicos registrados."
+      empty="No hay médicos registrados."
     />
   )
 }
