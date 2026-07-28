@@ -1,10 +1,31 @@
 # Frontend — Mejoras y Fase 2
 
-> Guía de trabajo del frontend tras la entrega del MVP (`v0.1.0`, desplegado en Vercel).
+> Guía de trabajo del frontend tras la entrega del MVP (`v0.3.1`, desplegado en Vercel).
 > Cada tarea indica su **rama**; se trabaja en orden, una rama por unidad, `develop → main` con
 > merge `--no-ff` y tag en los hitos. Las casillas se marcan al mergear.
 >
-> El equivalente del backend es [`diagnostico-backend/docs/MEJORAS-Y-PROXIMOS-PASOS.md`](../../diagnostico-backend/docs/MEJORAS-Y-PROXIMOS-PASOS.md).
+> El equivalente del backend es [`diagnostico-backend/docs/MEJORAS-Y-PROXIMOS-PASOS.md`](../../diagnostico-backend/docs/MEJORAS-Y-PROXIMOS-PASOS.md);
+> este documento es su reflejo en el frontend y **no repite** lo que allí ya está resuelto.
+
+## 0. Alineación con el backend
+
+Lo que el backend ya tiene en `develop` (`v0.6.x`) y qué significa aquí:
+
+| Backend | Efecto en el frontend |
+|---------|-----------------------|
+| Franjas solapadas rechazadas con **409** | Habilita `feat/availability-ui`: hay un error real que mostrar |
+| **CORS multi-origen** | `localhost:5173` vuelve a poder atacar el backend de Render sin tocar `FRONTEND_ORIGIN` |
+| **CI con GitHub Actions** (tests + lint) | El frontend no tiene CI: hueco a cubrir (ver 2) |
+| `DELETE /pacientes/{id}` y `/usuarios/{id}` | Habilitan los botones de desactivar (ver 2) |
+| Filtro de servicios por especialidad (N:M) | **Ya consumido** en `AppointmentFields.jsx:8-13`, con *fallback* si el backend no envía especialidades |
+
+**Restricciones del contrato que el frontend debe respetar:**
+
+- **Fechas sin zona horaria.** La API trabaja en hora local *naive* y **rechaza con 422** cualquier
+  fecha que lleve zona. Nada de `toISOString()` (añade la `Z`); el "ahora" del centro es UTC-4.
+- **Un solo idioma por capa.** El código va en inglés, el contrato en español (ver 4.3).
+
+*Facturación:* fuera del sistema (SENIAT, pago directo). No es un pendiente del ERP ni del frontend.
 
 ## Convenciones
 
@@ -45,9 +66,12 @@ Funcionalidad de bajo esfuerzo cuyo endpoint **ya existe en el backend**.
 - [ ] **`feat/user-deactivate`** — mismo caso para el personal en `UsersPage.jsx`.
 - [ ] **`feat/availability-ui`** — pantalla para **crear y ver franjas horarias** de un médico.
       Hoy el frontend solo lee (`GET /disponibilidad?medico_id=` en `DoctorsPage.jsx:39` y
-      `AgendaPage.jsx:55`); nadie llama al `POST`. Debe mostrar el **409 de solapamiento** que
-      valida el backend. El cliente ya propaga el mensaje del servidor
+      `AgendaPage.jsx:55`); nadie llama al `POST`. Debe mostrar el **409 de solapamiento**, que el
+      backend ya devuelve. El cliente ya propaga el mensaje del servidor
       (`config/configClient.js:56-61`), así que no hace falta tocarlo.
+- [ ] **`chore/ci-github-actions`** — el backend ya corre tests y lint en cada push; el frontend
+      no tiene CI. Replicar el flujo con `pnpm vitest run` y `pnpm lint` (oxlint), que hoy solo se
+      ejecutan a mano.
 - [ ] **`test/pages-coverage`** — hoy hay 25 tests en 5 archivos y **ninguna página** está
       cubierta. Prioridad: `LoginPage` (flujo de error 401), `AgendaPage` (rejilla y
       disponibilidad), `PatientsPage` (búsqueda y filtrado).
@@ -105,6 +129,14 @@ Rama sugerida: **`fix/a11y-tabs`**.
 
 Los listados de pacientes y personal cargan todo de golpe. El backend tampoco pagina todavía
 (está en su propia deuda técnica), así que **va después que él**.
+
+### 4.6 Identificación del paciente
+
+Contrapartida de la deuda del backend (hoy identifica por `nombre_completo` + `edad`, con riesgo
+de duplicados). En `PatientForm.jsx` tanto `cedula` como `fecha_nacimiento` son **opcionales** y se
+envían como `null` si van vacías (líneas 31-33). Cuando el backend decida exigir uno de los dos,
+el formulario debe marcarlo como obligatorio y validarlo antes de enviar.
+**Va después del backend**, que es quien define la regla.
 
 ---
 
