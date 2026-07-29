@@ -1,142 +1,174 @@
 # Frontend — Mejoras y Fase 2
 
-> Guía de trabajo del frontend tras la entrega del MVP (`v0.3.1`, desplegado en Vercel).
-> Cada tarea indica su **rama**; se trabaja en orden, una rama por unidad, `develop → main` con
-> merge `--no-ff` y tag en los hitos. Las casillas se marcan al mergear.
->
-> El equivalente del backend es [`diagnostico-backend/docs/MEJORAS-Y-PROXIMOS-PASOS.md`](../../diagnostico-backend/docs/MEJORAS-Y-PROXIMOS-PASOS.md);
-> este documento es su reflejo en el frontend y **no repite** lo que allí ya está resuelto.
+> Guía de trabajo del frontend tras la entrega del MVP (release `v0.3.1`, desplegado en Vercel).
+> Es el **espejo** del catálogo del backend
+> ([`diagnostico-backend/docs/MEJORAS-Y-PROXIMOS-PASOS.md`](../../diagnostico-backend/docs/MEJORAS-Y-PROXIMOS-PASOS.md)):
+> reutiliza sus identificadores para el trabajo derivado y añade un **bloque `F`** para lo que
+> solo afecta a este repo. Revisado contra el código el **29 jul 2026**.
 
-## 0. Alineación con el backend
-
-Lo que el backend ya tiene en `develop` (`v0.6.x`) y qué significa aquí:
-
-| Backend | Efecto en el frontend |
-|---------|-----------------------|
-| Franjas solapadas rechazadas con **409** | Habilita `feat/availability-ui`: hay un error real que mostrar |
-| **CORS multi-origen** | `localhost:5173` vuelve a poder atacar el backend de Render sin tocar `FRONTEND_ORIGIN` |
-| **CI con GitHub Actions** (tests + lint) | El frontend no tiene CI: hueco a cubrir (ver 2) |
-| `DELETE /pacientes/{id}` y `/usuarios/{id}` | Habilitan los botones de desactivar (ver 2) |
-| Filtro de servicios por especialidad (N:M) | **Ya consumido** en `AppointmentFields.jsx:8-13`, con *fallback* si el backend no envía especialidades |
-
-**Restricciones del contrato que el frontend debe respetar:**
-
-- **Fechas sin zona horaria.** La API trabaja en hora local *naive* y **rechaza con 422** cualquier
-  fecha que lleve zona. Nada de `toISOString()` (añade la `Z`); el "ahora" del centro es UTC-4.
-- **Un solo idioma por capa.** El código va en inglés, el contrato en español (ver 4.3).
-
-*Facturación:* fuera del sistema (SENIAT, pago directo). No es un pendiente del ERP ni del frontend.
-
-## Convenciones
+## 1. Convenciones
 
 - **Código 100 % en inglés**: identificadores, funciones, componentes, archivos y tests.
-  El **contrato de la API sigue en español** (rutas, campos JSON, enums), porque es el idioma
-  del centro médico; esa decisión se revisa en el punto 4.3.
+- **Contrato de la API en español** (rutas, campos JSON, enums). No es un pendiente: es la
+  decisión `B2` del backend, tomada a propósito porque es el idioma del centro y de la interfaz.
 - **Documentación en español**, salvo `README.md`.
 - **Sin comentarios en el código**: las explicaciones van en la conversación y en estos documentos.
-- Commits *Conventional Commits* en inglés, atómicos.
+- Commits *Conventional Commits* en inglés, atómicos. Una rama por unidad, `develop → main` con
+  merge `--no-ff` y tag en los hitos. Las casillas se marcan **al mergear**.
+- **Identificadores**: `F` = trabajo propio del frontend · `A`/`B`/`C` = derivado del catálogo del
+  backend, con su mismo número.
 
----
+## 2. Regla de orden con el backend
 
-## 1. Base: terminar la migración a inglés
+> **Primero se despliega la mejora en el backend, después se hace la UI.** Si la pantalla sale
+> antes, pide a la API algo que todavía no existe.
 
-Bloquea al resto: cualquier funcionalidad nueva escrita sobre la base actual nace híbrida y
-habría que volver a tocar esas mismas líneas en el rename. El backend ya hizo este mismo paso.
+**Estado del backend a 29 jul 2026:** hay mejoras terminadas en su `develop` (`A1` franjas
+solapadas con `409`, `A2` CORS multi-origen, `A3` restricción de solapamiento en base de datos,
+`A6` CI, `A8` inglés) que **aún no están en producción**: se publicarán juntas en la release
+`v0.7.0`, a la vez que `A7` (migración de la base de datos a Neon, **con fecha límite ~14 ago 2026**).
 
-**Estado actual**: componentes, archivos y utilidades ya están en inglés (`indexBy`,
-`formatTime`, `APPOINTMENT_STATES`, `AppointmentDetail`), pero las variables locales no.
-En `AgendaPage.jsx` conviven `HORAS`, `horaDisponible`, `nombreCorto`, `filtroMedico`,
-`dispPorMedico`, `citaSel` con `loading`, `error`, `canManage`.
+Consecuencia práctica: el bloque `F` de abajo **no depende de esa release** y se puede hacer ya.
+Lo derivado del backend (`A5`, `B1`, `C1`–`C4`) espera a que su mejora esté publicada.
 
-- [ ] **`refactor/english-identifiers`** — renombrar variables, funciones y estados locales de
-      todas las páginas y organismos. Sin cambio de comportamiento: los tests existentes deben
-      seguir pasando sin tocarlos.
-- [ ] **`refactor/english-filenames`** — `utils/citas.js` → `utils/appointments.js`,
-      `molecules/ErrorCita.jsx` → `molecules/AppointmentError.jsx`, y sus importaciones.
-- [ ] **`refactor/english-tests`** — descripciones de `describe`/`it` en inglés
-      (hoy están en español, p. ej. `AppointmentFields.test.jsx:26`).
+## 3. Plan priorizado
 
-## 2. Próximos pasos inmediatos
+| Orden | ID | Tarea | Rama | Coste | Espera al backend | Estado |
+|:-----:|:--:|-------|------|:-----:|:-----------------:|:------:|
+| 1 | **F1** | Terminar la migración a inglés | `refactor/english-identifiers` | bajo | no | ⬜ |
+| 2 | **F2** | Pantalla de disponibilidad del médico | `feat/availability-ui` | medio | no | ⬜ |
+| 3 | **F3** | Integración continua | `chore/ci-github-actions` | bajo | no | ⬜ |
+| 4 | **F4** | Cobertura de tests de páginas | `test/pages-coverage` | medio | no | ⬜ |
+| 5 | **F5** | Mensajes de error reales del backend | `fix/api-error-messages` | bajo | no | ⬜ |
+| 6 | **F6** | Accesibilidad de pestañas y modales | `fix/a11y-tabs` | bajo | no | ⬜ |
+| — | **C1** | Historia clínica | `feat/clinical-notes` | medio | sí | ⬜ |
+| — | **A5** | Identificación del paciente | `feat/patient-birthdate` | medio | sí | ⬜ |
+| — | **B1** | Paginación de listados | `feat/pagination` | medio | sí | ⬜ |
+| — | **C2** | Reportes | `feat/reports` | alto | sí | ⬜ |
+| — | **C3** | Auditoría de citas | `feat/audit-log` | medio | sí | ⬜ |
+| — | **C4** | Recursos y salas | `feat/resources` | alto | sí | ⬜ |
+| — | **F7** | Peticiones de disponibilidad agrupadas | `perf/availability-batch` | bajo | sí | ⬜ |
 
-Funcionalidad de bajo esfuerzo cuyo endpoint **ya existe en el backend**.
+`F1` va primero porque **bloquea al resto**: cualquier funcionalidad escrita sobre la base actual
+nace mezclada y habría que volver a tocar esas mismas líneas en el rename.
 
-- [ ] **`feat/patient-deactivate`** — botón "Desactivar" en la ficha del paciente.
-      `DELETE /pacientes/{id}` existe desde `v0.6.0`; `PatientFilePage.jsx:75-77` solo ofrece
-      "Editar". Requiere confirmación en modal y recarga posterior.
-- [ ] **`feat/user-deactivate`** — mismo caso para el personal en `UsersPage.jsx`.
-- [ ] **`feat/availability-ui`** — pantalla para **crear y ver franjas horarias** de un médico.
-      Hoy el frontend solo lee (`GET /disponibilidad?medico_id=` en `DoctorsPage.jsx:39` y
-      `AgendaPage.jsx:55`); nadie llama al `POST`. Debe mostrar el **409 de solapamiento**, que el
-      backend ya devuelve. El cliente ya propaga el mensaje del servidor
-      (`config/configClient.js:56-61`), así que no hace falta tocarlo.
-- [ ] **`chore/ci-github-actions`** — el backend ya corre tests y lint en cada push; el frontend
-      no tiene CI. Replicar el flujo con `pnpm vitest run` y `pnpm lint` (oxlint), que hoy solo se
-      ejecutan a mano.
-- [ ] **`test/pages-coverage`** — hoy hay 25 tests en 5 archivos y **ninguna página** está
-      cubierta. Prioridad: `LoginPage` (flujo de error 401), `AgendaPage` (rejilla y
-      disponibilidad), `PatientsPage` (búsqueda y filtrado).
+## 4. Bloque F — Trabajo propio del frontend
 
-## 3. Fase 2 — Funcionalidades
+### F1 · Terminar la migración a inglés · coste bajo
 
-Lado frontend de las funcionalidades que el backend dejó conscientemente fuera del MVP.
-Cada una depende de que exista antes el endpoint correspondiente.
+- **Hoy:** los componentes, los archivos y las utilidades ya están en inglés (`indexBy`,
+  `formatTime`, `APPOINTMENT_STATES`, `AppointmentDetail`), pero **las variables locales no**. En
+  `AgendaPage.jsx` conviven `HORAS`, `horaDisponible`, `nombreCorto`, `filtroMedico`,
+  `dispPorMedico`, `citaSel` con `loading`, `error` y `canManage`.
+- **Consecuencia:** el proyecto se lee mezclado, igual que le pasaba al backend antes de `A8`.
+- **Qué haríamos:** renombrar variables, funciones y estados locales de páginas y organismos, sin
+  cambio de comportamiento — los tests existentes deben seguir pasando **sin tocarlos**. Después,
+  los nombres de archivo que quedan en español (`utils/citas.js` → `utils/appointments.js`,
+  `molecules/ErrorCita.jsx` → `molecules/AppointmentError.jsx`) y sus importaciones. Por último,
+  las descripciones de `describe`/`it`, hoy en español (p. ej. `AppointmentFields.test.jsx:26`).
+- **Aviso:** el contrato sigue en español, así que los campos que vienen de la API
+  (`nombre_completo`, `medico_id`, `fecha_nacimiento`…) **no se tocan**. La frontera está en el
+  `api.get`: fuera inglés, dentro del JSON español.
 
-| Mejora | Trabajo en el frontend | Depende del backend |
-|--------|------------------------|---------------------|
-| **Historia clínica** | Pestaña de notas en la ficha del paciente; editor por cita | Sí (`notas_clinicas` es andamiaje) |
-| **Reportes y estadísticas** | Vista con gráficos: citas por médico/servicio, no-shows, ocupación | Sí (endpoints de agregación) |
-| **Auditoría** | Vista de log filtrable por usuario y fecha | Sí |
-| **Recursos / salas** | Mostrar la sala en la agenda y en el detalle de cita | Sí |
-| **Duración por médico/servicio** | La duración deja de ser fija en el formulario de cita | Sí |
-| **Visitas (agrupar estudios)** | Alta de varios estudios en una misma visita | Sí |
-| **Holter: colocación y retiro** | Dos momentos en la agenda para un mismo estudio | Sí |
-| **Portal de pacientes** | App/rutas públicas con login propio de paciente | Sí |
-| **Recordatorios por WhatsApp** | Pantalla de configuración y estado de envíos | Sí |
-| **Google Calendar** | Botón de conexión y estado de sincronización | Sí |
-| **PWA offline** | *Service worker*, manifiesto y caché de lectura para recepción | No |
+### F2 · Pantalla de disponibilidad del médico · coste medio
 
-## 4. Deuda técnica
+- **Hoy:** la UI solo **lee** las franjas (`GET /disponibilidad?medico_id=` en `DoctorsPage.jsx:39`
+  y `AgendaPage.jsx:55`). Nadie llama al `POST`, que existe desde el MVP.
+- **Consecuencia:** las franjas solo se pueden crear llamando a la API a mano o por el *seed*, así
+  que **el administrador no puede cambiar el horario de un médico desde la aplicación**. Es el
+  hueco más visible que queda en la interfaz, y así lo recoge también el backend en su §4.1.
+- **Qué haríamos:** en la ficha del médico, alta y listado de franjas por día de la semana. Debe
+  distinguir los dos errores de la API: el `400` de "la hora de inicio debe ser anterior a la de
+  fin" y el `409` de franja cruzada que introduce `A1`. El cliente ya propaga el mensaje del
+  servidor (`config/configClient.js:56-61`), así que **no hay que tocarlo**.
+- **Nota:** el `409` no estará en producción hasta la release `v0.7.0` del backend; contra el
+  backend local sí funciona ya.
 
-Detectada en el código actual; no bloquea nada, pero conviene resolverla.
+### F3 · Integración continua · coste bajo
 
-### 4.1 Errores que se tragan el mensaje del backend
+- **Hoy:** los tests (`pnpm vitest run`) y el lint (oxlint) se ejecutan **a mano**.
+- **Qué haríamos:** el equivalente de `A6`: un *workflow* de GitHub Actions que en cada `push` y
+  cada *pull request* instale con pnpm, corra la suite y pase el lint; más el *badge* en el
+  `README`.
+- **Por qué importa:** el flujo de ramas ya es parte del proyecto; la CI es lo que lo convierte en
+  una garantía y no en una costumbre.
 
-Varias páginas capturan con `catch` vacío y muestran un texto genérico, perdiendo el `detail`
-que el servidor sí envía. Ejemplo: `PatientFilePage.jsx:41-42` muestra siempre
-"No se pudo cargar la ficha del paciente." Conviene usar `ApiError.message`, que el cliente ya
-rellena. Rama sugerida: **`fix/api-error-messages`**.
+### F4 · Cobertura de tests de páginas · coste medio
 
-### 4.2 N+1 de peticiones en el cliente
+- **Hoy:** 25 tests en 5 archivos, todos de utilidades y componentes
+  (`AppointmentFields`, `Table`, `data`, `date`, `text`). **Ninguna página está cubierta.**
+- **Qué haríamos:** empezar por donde más se rompería sin avisar — `LoginPage` (error `401`),
+  `AgendaPage` (rejilla horaria y franjas de disponibilidad) y `PatientsPage` (búsqueda y baja).
+- **Orden:** después de `F1`, para no escribir tests que haya que renombrar acto seguido.
 
-`DoctorsPage.jsx:39` y `AgendaPage.jsx:55` lanzan **una petición de disponibilidad por médico**
-(15 médicos = 15 llamadas). Con un endpoint que acepte varios `medico_id` sería una sola.
-Requiere coordinación con el backend. Rama sugerida: **`perf/availability-batch`**.
+### F5 · Mensajes de error reales del backend · coste bajo
 
-### 4.3 Contrato de la API en inglés *(decisión abierta)*
+- **Hoy:** varias páginas capturan con `catch` sin argumento y muestran un texto genérico,
+  perdiendo el `detail` que el servidor sí envía. Ejemplos: `PatientsPage.jsx:49-50` ("No se pudo
+  eliminar el paciente.") y `PatientFilePage.jsx:41-42` ("No se pudo cargar la ficha del
+  paciente.").
+- **Consecuencia:** la API explica *por qué* falló y la interfaz lo tira a la basura. Con `F2` esto
+  se vuelve crítico: el `409` de franja cruzada **es** el mensaje útil.
+- **Qué haríamos:** usar `ApiError.message`, que el cliente ya rellena, y dejar el texto genérico
+  solo como respaldo cuando no haya `detail`.
 
-El **código** de ambos repos queda en inglés; el **contrato** (rutas, campos JSON, valores de
-enum) sigue en español. Cambiarlo obliga a tocar backend y frontend a la vez, así que se decide
-y se ejecuta de forma coordinada, o se documenta como decisión de dominio y se deja como está.
+### F6 · Accesibilidad de pestañas y modales · coste bajo
 
-### 4.4 Accesibilidad
+- **Hoy:** las pestañas de la ficha del paciente (`PatientFilePage.jsx:81-102`) son `<button>`
+  sueltos, sin `role="tablist"` / `role="tab"` ni `aria-selected`.
+- **Consecuencia:** un lector de pantalla no las anuncia como pestañas ni dice cuál está activa.
+- **Qué haríamos:** los roles ARIA y la navegación con flechas; de paso, revisar el foco de los
+  modales (que al abrirse el foco entre y al cerrarse vuelva al botón que los abrió).
 
-Las pestañas de la ficha del paciente (`PatientFilePage.jsx:81-102`) son `<button>` sueltos sin
-`role="tablist"` / `role="tab"` ni `aria-selected`, por lo que un lector de pantalla no las
-anuncia como pestañas. Revisar también el foco en los modales.
-Rama sugerida: **`fix/a11y-tabs`**.
+### F7 · Peticiones de disponibilidad agrupadas · coste bajo · **espera al backend**
 
-### 4.5 Paginación
+- **Hoy:** `DoctorsPage.jsx:39` y `AgendaPage.jsx:55` lanzan **una petición por médico**. Con los
+  15 médicos reales del briefing, son 15 llamadas para pintar una pantalla.
+- **Qué haría falta:** que `GET /disponibilidad` acepte varios `medico_id` (o devuelva todas las
+  franjas). No tiene ficha en el catálogo del backend: **hay que proponérselo**.
 
-Los listados de pacientes y personal cargan todo de golpe. El backend tampoco pagina todavía
-(está en su propia deuda técnica), así que **va después que él**.
+## 5. Trabajo derivado del catálogo del backend
 
-### 4.6 Identificación del paciente
+Cada uno espera a que su mejora esté **publicada** en producción.
 
-Contrapartida de la deuda del backend (hoy identifica por `nombre_completo` + `edad`, con riesgo
-de duplicados). En `PatientForm.jsx` tanto `cedula` como `fecha_nacimiento` son **opcionales** y se
-envían como `null` si van vacías (líneas 31-33). Cuando el backend decida exigir uno de los dos,
-el formulario debe marcarlo como obligatorio y validarlo antes de enviar.
-**Va después del backend**, que es quien define la regla.
+| Mejora del backend | Qué hay que hacer aquí |
+|--------------------|------------------------|
+| **A5** · identificación del paciente | En `PatientForm.jsx`, pedir **fecha de nacimiento** en vez de edad y mostrar la edad calculada. Hoy `cedula` y `fecha_nacimiento` son opcionales y se envían como `null` (líneas 31-33); pasarán a ser obligatorias según decida el backend |
+| **B1** · paginación | Paginador en las tablas de **Pacientes** y **Usuarios**, leyendo el total que pasará a devolver la API |
+| **C1** · historia clínica | Sección de **notas clínicas** en la ficha del paciente: lista y formulario de nota nueva, visible solo para `MEDICO` y `ADMIN`. El médico **deja de ser solo lectura**, así que hay que revisar las guardas de rol (`ProtectedRoute`) y el menú del `Sidebar` |
+| **C2** · reportes | Sección nueva solo para `ADMIN`: citas por médico/servicio/periodo, ausencias y ocupación |
+| **C3** · auditoría | Historial de cambios en el detalle de la cita (`AppointmentDetail.jsx`). Solo `ADMIN` |
+| **C4** · recursos y salas | Selector de **recurso** en el formulario de cita y mantenimiento del catálogo en `ConfigPage.jsx` |
+
+## 6. Restricciones del contrato
+
+Cosas que el frontend debe respetar y que no se deducen leyendo solo este repo:
+
+- **Fechas sin zona horaria.** La API trabaja en hora local *naive* y **rechaza con `422`**
+  cualquier fecha que lleve zona. Nada de `toISOString()`, que añade la `Z`. El "ahora" del centro
+  es UTC−4.
+- **Los mensajes de error de la API vienen en español** a propósito: los lee el personal del
+  centro. Se muestran tal cual, no se traducen (ver `F5`).
+- **Baja lógica, no borrado.** `DELETE /pacientes/{id}` y `/usuarios/{id}` desactivan; el registro
+  es recuperable. La interfaz ya lo dice y debe seguir diciéndolo.
+
+## 7. Ya hecho — no rehacer
+
+- **Baja de pacientes y de usuarios:** implementada en `PatientsPage.jsx:125-145` (modal de
+  confirmación con el aviso de baja lógica) y en `UsersPage.jsx:82` (alternar activar/desactivar),
+  sobre `api.del` (`config/api.js:9`).
+- **Filtro de servicios por especialidad (N:M):** consumido en `AppointmentFields.jsx:8-13`, con
+  *fallback* que muestra todos los servicios si el backend no envía especialidades.
+- **Acciones sobre la cita:** cancelar, marcar asistencia y editar, en `AppointmentDetail.jsx`.
+- **Refactor a atomic design:** átomos, moléculas y organismos, con lint en 0 avisos.
+
+## 8. Fuera del sistema
+
+**Facturación y cobros:** fuera del ERP (SENIAT, pago directo). Decisión de alcance, no pendiente.
+
+**PWA offline, portal de pacientes, WhatsApp, Google Calendar, visitas, Holter y duración por
+médico:** son `C5` en el catálogo del backend, de coste alto y **sin fecha**. Salvo la PWA, todas
+necesitan endpoints que aún no existen.
 
 ---
 
