@@ -8,20 +8,23 @@ import Table from '../components/molecules/Table'
 import { ROLES } from '../utils/roles'
 
 export default function UsersPage() {
-  const [usuarios, setUsuarios] = useState([])
-  const [especialidades, setEspecialidades] = useState([])
+  const [users, setUsers] = useState([])
+  const [specialties, setSpecialties] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [editing, setEditing] = useState(null)
-  const [errorAccion, setErrorAccion] = useState('')
+  const [actionError, setActionError] = useState('')
 
   async function load() {
     setLoading(true)
     setError('')
     try {
-      const [us, es] = await Promise.all([api.get('/usuarios'), api.get('/especialidades')])
-      setUsuarios(us)
-      setEspecialidades(es)
+      const [userList, specialtyList] = await Promise.all([
+        api.get('/usuarios'),
+        api.get('/especialidades'),
+      ])
+      setUsers(userList)
+      setSpecialties(specialtyList)
     } catch {
       setError('No se pudieron cargar los usuarios.')
     } finally {
@@ -33,35 +36,35 @@ export default function UsersPage() {
     load()
   }, [])
 
-  async function toggleActive(u) {
-    setErrorAccion('')
+  async function toggleActive(user) {
+    setActionError('')
     try {
-      if (u.activo) await api.del(`/usuarios/${u.id}`)
-      else await api.put(`/usuarios/${u.id}`, { activo: true })
+      if (user.activo) await api.del(`/usuarios/${user.id}`)
+      else await api.put(`/usuarios/${user.id}`, { activo: true })
       load()
     } catch {
-      setErrorAccion('No se pudo cambiar el estado del usuario.')
+      setActionError('No se pudo cambiar el estado del usuario.')
     }
   }
 
   const columns = [
-    { header: 'Nombre', className: 'font-medium', render: (u) => u.nombre_completo },
-    { header: 'Correo', className: 'text-ink-2', render: (u) => u.email },
+    { header: 'Nombre', className: 'font-medium', render: (user) => user.nombre_completo },
+    { header: 'Correo', className: 'text-ink-2', render: (user) => user.email },
     {
       header: 'Rol',
-      render: (u) => {
-        const b = ROLES[u.rol] ?? { label: u.rol, color: 'neutral' }
+      render: (user) => {
+        const role = ROLES[user.rol] ?? { label: user.rol, color: 'neutral' }
         return (
-          <Badge color={b.color} size="sm">
-            {b.label}
+          <Badge color={role.color} size="sm">
+            {role.label}
           </Badge>
         )
       },
     },
     {
       header: 'Estado',
-      render: (u) =>
-        u.activo ? (
+      render: (user) =>
+        user.activo ? (
           <span className="text-good">● Activo</span>
         ) : (
           <span className="text-ink-muted">○ Inactivo</span>
@@ -70,16 +73,16 @@ export default function UsersPage() {
     {
       header: '',
       className: 'text-right',
-      render: (u) => (
+      render: (user) => (
         <div className="flex justify-end gap-3">
-          <button onClick={() => setEditing(u)} className="text-brand hover:underline">
+          <button onClick={() => setEditing(user)} className="text-brand hover:underline">
             Editar
           </button>
           <button
-            onClick={() => toggleActive(u)}
-            className={u.activo ? 'text-crit hover:underline' : 'text-good hover:underline'}
+            onClick={() => toggleActive(user)}
+            className={user.activo ? 'text-crit hover:underline' : 'text-good hover:underline'}
           >
-            {u.activo ? 'Desactivar' : 'Activar'}
+            {user.activo ? 'Desactivar' : 'Activar'}
           </button>
         </div>
       ),
@@ -88,7 +91,7 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-4">
-      {errorAccion && <Alert>{errorAccion}</Alert>}
+      {actionError && <Alert>{actionError}</Alert>}
       <Table
         title="Usuarios del sistema"
         action={
@@ -97,7 +100,7 @@ export default function UsersPage() {
           </Button>
         }
         columns={columns}
-        rows={usuarios}
+        rows={users}
         loading={loading}
         error={error}
         empty="No hay usuarios."
@@ -106,7 +109,7 @@ export default function UsersPage() {
       {editing && (
         <UserForm
           usuario={editing.id ? editing : null}
-          especialidades={especialidades}
+          especialidades={specialties}
           onClose={() => setEditing(null)}
           onSaved={() => {
             setEditing(null)

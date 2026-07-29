@@ -23,24 +23,24 @@ export default function UserForm({ usuario, especialidades, onClose, onSaved }) 
     rol: usuario?.rol ?? 'RECEPCION',
     password: '',
     matricula: usuario?.matricula ?? '',
-    especialidades: usuario?.especialidades?.map((e) => e.id) ?? [],
+    especialidades: usuario?.especialidades?.map((specialty) => specialty.id) ?? [],
   })
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
 
-  const esMedico = form.rol === 'MEDICO'
+  const isDoctor = form.rol === 'MEDICO'
 
-  function toggleEspecialidad(id) {
-    setForm((f) => ({
-      ...f,
-      especialidades: f.especialidades.includes(id)
-        ? f.especialidades.filter((x) => x !== id)
-        : [...f.especialidades, id],
+  function toggleSpecialty(id) {
+    setForm((current) => ({
+      ...current,
+      especialidades: current.especialidades.includes(id)
+        ? current.especialidades.filter((specialtyId) => specialtyId !== id)
+        : [...current.especialidades, id],
     }))
   }
 
-  async function onSubmit(e) {
-    e.preventDefault()
+  async function onSubmit(event) {
+    event.preventDefault()
     setError('')
     setSaving(true)
 
@@ -49,7 +49,7 @@ export default function UserForm({ usuario, especialidades, onClose, onSaved }) 
       email: form.email.trim(),
     }
     if (!editing) body.rol = form.rol
-    if (esMedico) {
+    if (isDoctor) {
       body.matricula = form.matricula.trim() || null
       body.especialidades = form.especialidades
     }
@@ -71,7 +71,7 @@ export default function UserForm({ usuario, especialidades, onClose, onSaved }) 
       <Button variant="secondary" type="button" onClick={onClose}>
         Cancelar
       </Button>
-      <Button type="submit" form="form-usuario" disabled={saving}>
+      <Button type="submit" form="user-form" disabled={saving}>
         {saving ? 'Guardando…' : 'Guardar'}
       </Button>
     </>
@@ -84,13 +84,13 @@ export default function UserForm({ usuario, especialidades, onClose, onSaved }) 
       onClose={onClose}
       footer={footer}
     >
-      <form id="form-usuario" onSubmit={onSubmit} className="space-y-4">
+      <form id="user-form" onSubmit={onSubmit} className="space-y-4">
         {error && <Alert>{error}</Alert>}
 
         <Field label="Nombre completo">
           <Input
             value={form.nombre_completo}
-            onChange={(e) => set('nombre_completo', e.target.value)}
+            onChange={(event) => set('nombre_completo', event.target.value)}
             required
             autoFocus
           />
@@ -101,19 +101,22 @@ export default function UserForm({ usuario, especialidades, onClose, onSaved }) 
             <Input
               type="email"
               value={form.email}
-              onChange={(e) => set('email', e.target.value)}
+              onChange={(event) => set('email', event.target.value)}
               required
             />
           </Field>
-          <Field label="Rol" hint={editing ? 'El rol no se cambia tras crear el usuario.' : undefined}>
+          <Field
+            label="Rol"
+            hint={editing ? 'El rol no se cambia tras crear el usuario.' : undefined}
+          >
             <Select
               value={form.rol}
-              onChange={(e) => set('rol', e.target.value)}
+              onChange={(event) => set('rol', event.target.value)}
               disabled={editing}
             >
-              {ROLES.map((r) => (
-                <option key={r.value} value={r.value}>
-                  {r.label}
+              {ROLES.map((role) => (
+                <option key={role.value} value={role.value}>
+                  {role.label}
                 </option>
               ))}
             </Select>
@@ -127,38 +130,38 @@ export default function UserForm({ usuario, especialidades, onClose, onSaved }) 
           <Input
             type="password"
             value={form.password}
-            onChange={(e) => set('password', e.target.value)}
+            onChange={(event) => set('password', event.target.value)}
             required={!editing}
             minLength={8}
           />
         </Field>
 
-        {esMedico && (
+        {isDoctor && (
           <>
             <Field label="Matrícula (opcional)">
               <Input
                 value={form.matricula}
-                onChange={(e) => set('matricula', e.target.value)}
+                onChange={(event) => set('matricula', event.target.value)}
                 placeholder="MPPS 45.221"
               />
             </Field>
             <div>
               <label className="mb-1 block text-sm font-medium">Especialidades</label>
               <div className="flex max-h-40 flex-wrap gap-2 overflow-y-auto rounded-lg border border-line p-2">
-                {especialidades.map((e) => {
-                  const activa = form.especialidades.includes(e.id)
+                {especialidades.map((specialty) => {
+                  const selected = form.especialidades.includes(specialty.id)
                   return (
                     <button
                       type="button"
-                      key={e.id}
-                      onClick={() => toggleEspecialidad(e.id)}
+                      key={specialty.id}
+                      onClick={() => toggleSpecialty(specialty.id)}
                       className={`rounded-full px-2.5 py-1 text-xs ${
-                        activa
+                        selected
                           ? 'bg-brand text-white'
                           : 'bg-surface-plane text-ink-2 hover:bg-brand-light'
                       }`}
                     >
-                      {e.nombre}
+                      {specialty.nombre}
                     </button>
                   )
                 })}

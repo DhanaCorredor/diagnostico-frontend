@@ -4,28 +4,28 @@ import Avatar from '../components/atoms/Avatar'
 import Badge from '../components/atoms/Badge'
 import Table from '../components/molecules/Table'
 
-const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
+const WEEKDAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 
-function resumirFranjas(franjas) {
-  const grupos = {}
-  for (const f of franjas) {
-    const horario = `${f.hora_inicio.slice(0, 5)}–${f.hora_fin.slice(0, 5)}`
-    ;(grupos[horario] ??= []).push(f.dia_semana)
+function summarizeSlots(slots) {
+  const groups = {}
+  for (const slot of slots) {
+    const schedule = `${slot.hora_inicio.slice(0, 5)}–${slot.hora_fin.slice(0, 5)}`
+    ;(groups[schedule] ??= []).push(slot.dia_semana)
   }
-  return Object.entries(grupos).map(([horario, dias]) => {
-    const ordenados = [...new Set(dias)].sort((a, b) => a - b)
-    const consecutivos = ordenados[ordenados.length - 1] - ordenados[0] === ordenados.length - 1
-    const etiquetaDias =
-      ordenados.length > 1 && consecutivos
-        ? `${DIAS[ordenados[0]]}–${DIAS[ordenados[ordenados.length - 1]]}`
-        : ordenados.map((d) => DIAS[d]).join(', ')
-    return `${etiquetaDias} · ${horario}`
+  return Object.entries(groups).map(([schedule, days]) => {
+    const sorted = [...new Set(days)].sort((a, b) => a - b)
+    const consecutive = sorted[sorted.length - 1] - sorted[0] === sorted.length - 1
+    const daysLabel =
+      sorted.length > 1 && consecutive
+        ? `${WEEKDAYS[sorted[0]]}–${WEEKDAYS[sorted[sorted.length - 1]]}`
+        : sorted.map((day) => WEEKDAYS[day]).join(', ')
+    return `${daysLabel} · ${schedule}`
   })
 }
 
 export default function DoctorsPage() {
-  const [medicos, setMedicos] = useState([])
-  const [dispPorMedico, setDispPorMedico] = useState({})
+  const [doctors, setDoctors] = useState([])
+  const [availabilityByDoctor, setAvailabilityByDoctor] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -34,16 +34,16 @@ export default function DoctorsPage() {
       setLoading(true)
       setError('')
       try {
-        const list = await api.get('/medicos')
-        const franjas = await Promise.all(
-          list.map((m) => api.get(`/disponibilidad?medico_id=${m.id}`)),
+        const doctorList = await api.get('/medicos')
+        const slots = await Promise.all(
+          doctorList.map((doctor) => api.get(`/disponibilidad?medico_id=${doctor.id}`)),
         )
-        const mapa = {}
-        list.forEach((m, i) => {
-          mapa[m.id] = franjas[i]
+        const availabilityMap = {}
+        doctorList.forEach((doctor, i) => {
+          availabilityMap[doctor.id] = slots[i]
         })
-        setMedicos(list)
-        setDispPorMedico(mapa)
+        setDoctors(doctorList)
+        setAvailabilityByDoctor(availabilityMap)
       } catch {
         setError('No se pudieron cargar los médicos.')
       } finally {
@@ -57,20 +57,20 @@ export default function DoctorsPage() {
     {
       header: 'Médico',
       className: 'font-medium',
-      render: (m) => (
+      render: (doctor) => (
         <div className="flex items-center gap-2">
-          <Avatar name={m.nombre_completo} size="sm" />
-          {m.nombre_completo}
+          <Avatar name={doctor.nombre_completo} size="sm" />
+          {doctor.nombre_completo}
         </div>
       ),
     },
     {
       header: 'Especialidades',
-      render: (m) => (
+      render: (doctor) => (
         <div className="flex flex-wrap gap-1">
-          {m.especialidades.map((e) => (
-            <Badge key={e.id} color="brand" size="sm">
-              {e.nombre}
+          {doctor.especialidades.map((specialty) => (
+            <Badge key={specialty.id} color="brand" size="sm">
+              {specialty.nombre}
             </Badge>
           ))}
         </div>
@@ -79,15 +79,15 @@ export default function DoctorsPage() {
     {
       header: 'Disponibilidad',
       className: 'text-ink-2',
-      render: (m) => {
-        const franjas = resumirFranjas(dispPorMedico[m.id] ?? [])
-        return franjas.length === 0 ? (
+      render: (doctor) => {
+        const schedules = summarizeSlots(availabilityByDoctor[doctor.id] ?? [])
+        return schedules.length === 0 ? (
           <span className="text-ink-muted">Sin definir</span>
         ) : (
           <div className="space-y-0.5">
-            {franjas.map((f) => (
-              <div key={f} className="tnum">
-                {f}
+            {schedules.map((schedule) => (
+              <div key={schedule} className="tnum">
+                {schedule}
               </div>
             ))}
           </div>
@@ -99,9 +99,9 @@ export default function DoctorsPage() {
   return (
     <Table
       title="Médicos"
-      count={medicos.length}
+      count={doctors.length}
       columns={columns}
-      rows={medicos}
+      rows={doctors}
       loading={loading}
       error={error}
       empty="No hay médicos registrados."

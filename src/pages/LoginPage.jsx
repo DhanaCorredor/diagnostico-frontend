@@ -18,15 +18,15 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const destino = location.state?.from?.pathname ?? '/'
+  const redirectTo = location.state?.from?.pathname ?? '/'
 
-  async function onSubmit(e) {
-    e.preventDefault()
+  async function onSubmit(event) {
+    event.preventDefault()
     setError('')
     setLoading(true)
     try {
       await login(email, password)
-      navigate(destino, { replace: true })
+      navigate(redirectTo, { replace: true })
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         setError('Correo o contraseña incorrectos.')
@@ -54,7 +54,7 @@ export default function LoginPage() {
           id="email"
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(event) => setEmail(event.target.value)}
           required
           autoFocus
           placeholder="tu@diagnostico.com"
@@ -66,7 +66,7 @@ export default function LoginPage() {
           id="password"
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(event) => setPassword(event.target.value)}
           required
           className="mb-4"
         />

@@ -9,20 +9,20 @@ import SearchBar from '../components/molecules/SearchBar'
 import Table from '../components/molecules/Table'
 
 export default function PatientsPage() {
-  const [pacientes, setPacientes] = useState([])
+  const [patients, setPatients] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [creating, setCreating] = useState(false)
   const [deleting, setDeleting] = useState(null)
   const [busy, setBusy] = useState(false)
-  const [errorDelete, setErrorDelete] = useState('')
+  const [deleteError, setDeleteError] = useState('')
 
   async function load() {
     setLoading(true)
     setError('')
     try {
-      setPacientes(await api.get('/pacientes'))
+      setPatients(await api.get('/pacientes'))
     } catch {
       setError('No se pudieron cargar los pacientes.')
     } finally {
@@ -34,20 +34,20 @@ export default function PatientsPage() {
     load()
   }, [])
 
-  function cerrarBorrado() {
+  function closeDeleteDialog() {
     setDeleting(null)
-    setErrorDelete('')
+    setDeleteError('')
   }
 
-  async function eliminar() {
+  async function deletePatient() {
     setBusy(true)
-    setErrorDelete('')
+    setDeleteError('')
     try {
       await api.del(`/pacientes/${deleting.id}`)
-      cerrarBorrado()
+      closeDeleteDialog()
       load()
     } catch {
-      setErrorDelete('No se pudo eliminar el paciente.')
+      setDeleteError('No se pudo eliminar el paciente.')
     } finally {
       setBusy(false)
     }
@@ -55,31 +55,32 @@ export default function PatientsPage() {
 
   const term = search.trim().toLowerCase()
   const filtered = term
-    ? pacientes.filter(
-        (p) =>
-          p.nombre_completo.toLowerCase().includes(term) ||
-          (p.cedula ?? '').toLowerCase().includes(term),
+    ? patients.filter(
+        (patient) =>
+          patient.nombre_completo.toLowerCase().includes(term) ||
+          (patient.cedula ?? '').toLowerCase().includes(term),
       )
-    : pacientes
+    : patients
 
   const columns = [
-    { header: 'Paciente', className: 'font-medium', render: (p) => p.nombre_completo },
+    { header: 'Paciente', className: 'font-medium', render: (patient) => patient.nombre_completo },
     {
       header: 'Cédula',
       className: 'tnum text-ink-2',
-      render: (p) => p.cedula ?? <span className="italic text-ink-muted">Sin cédula</span>,
+      render: (patient) =>
+        patient.cedula ?? <span className="italic text-ink-muted">Sin cédula</span>,
     },
-    { header: 'Teléfono', className: 'tnum text-ink-2', render: (p) => p.telefono ?? '—' },
-    { header: 'Edad', className: 'tnum text-ink-2', render: (p) => p.edad ?? '—' },
+    { header: 'Teléfono', className: 'tnum text-ink-2', render: (patient) => patient.telefono ?? '—' },
+    { header: 'Edad', className: 'tnum text-ink-2', render: (patient) => patient.edad ?? '—' },
     {
       header: '',
       className: 'text-right',
-      render: (p) => (
+      render: (patient) => (
         <div className="flex justify-end gap-3">
-          <Link to={`/pacientes/${p.id}`} className="text-brand hover:underline">
+          <Link to={`/pacientes/${patient.id}`} className="text-brand hover:underline">
             Ver ficha
           </Link>
-          <button onClick={() => setDeleting(p)} className="text-crit hover:underline">
+          <button onClick={() => setDeleting(patient)} className="text-crit hover:underline">
             Eliminar
           </button>
         </div>
@@ -125,19 +126,19 @@ export default function PatientsPage() {
         <Modal
           title="Eliminar paciente"
           subtitle="El paciente se dará de baja (baja lógica, recuperable)."
-          onClose={cerrarBorrado}
+          onClose={closeDeleteDialog}
           footer={
             <>
-              <Button variant="secondary" onClick={cerrarBorrado} disabled={busy}>
+              <Button variant="secondary" onClick={closeDeleteDialog} disabled={busy}>
                 Cancelar
               </Button>
-              <Button variant="danger" onClick={eliminar} disabled={busy}>
+              <Button variant="danger" onClick={deletePatient} disabled={busy}>
                 {busy ? 'Eliminando…' : 'Eliminar'}
               </Button>
             </>
           }
         >
-          {errorDelete && <Alert>{errorDelete}</Alert>}
+          {deleteError && <Alert>{deleteError}</Alert>}
           <p className="text-sm text-ink-2">
             ¿Seguro que quieres eliminar a{' '}
             <span className="font-medium text-ink">{deleting.nombre_completo}</span>?

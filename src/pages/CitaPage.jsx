@@ -12,8 +12,8 @@ import AppointmentFields from '../components/molecules/AppointmentFields'
 
 export default function CitaPage() {
   const navigate = useNavigate()
-  const [medicos, setMedicos] = useState([])
-  const [servicios, setServicios] = useState([])
+  const [doctors, setDoctors] = useState([])
+  const [services, setServices] = useState([])
 
   const [form, set] = useForm({
     nombre_completo: '',
@@ -32,9 +32,12 @@ export default function CitaPage() {
   useEffect(() => {
     async function load() {
       try {
-        const [ms, ss] = await Promise.all([api.get('/medicos'), api.get('/servicios')])
-        setMedicos(ms)
-        setServicios(ss)
+        const [doctorList, serviceList] = await Promise.all([
+          api.get('/medicos'),
+          api.get('/servicios'),
+        ])
+        setDoctors(doctorList)
+        setServices(serviceList)
       } catch {
         setError({ mensaje: 'No se pudieron cargar los médicos y servicios.' })
       }
@@ -42,12 +45,12 @@ export default function CitaPage() {
     load()
   }, [])
 
-  async function onSubmit(e) {
-    e.preventDefault()
+  async function onSubmit(event) {
+    event.preventDefault()
     setError(null)
 
-    const minutos = Number(form.hora.slice(3, 5))
-    if (minutos % 15 !== 0) {
+    const minutes = Number(form.hora.slice(3, 5))
+    if (minutes % 15 !== 0) {
       setError({ mensaje: 'La hora debe empezar en :00, :15, :30 o :45.' })
       return
     }
@@ -69,8 +72,7 @@ export default function CitaPage() {
       navigate('/agenda')
     } catch (err) {
       if (err instanceof ApiError) {
-        const candidatos = err.detail?.candidatos
-        setError({ mensaje: err.message, candidatos })
+        setError({ mensaje: err.message, candidatos: err.detail?.candidatos })
       } else {
         setError({ mensaje: 'No se pudo agendar la cita.' })
       }
@@ -96,7 +98,7 @@ export default function CitaPage() {
               <Field label="Paciente (nombre completo)">
                 <Input
                   value={form.nombre_completo}
-                  onChange={(e) => set('nombre_completo', e.target.value)}
+                  onChange={(event) => set('nombre_completo', event.target.value)}
                   required
                   autoFocus
                 />
@@ -108,13 +110,13 @@ export default function CitaPage() {
                 min="0"
                 max="120"
                 value={form.edad}
-                onChange={(e) => set('edad', e.target.value)}
+                onChange={(event) => set('edad', event.target.value)}
                 required
               />
             </Field>
           </div>
 
-          <AppointmentFields form={form} set={set} medicos={medicos} servicios={servicios} />
+          <AppointmentFields form={form} set={set} medicos={doctors} servicios={services} />
 
           <div className="flex justify-end gap-3 border-t border-line pt-4">
             <Button variant="secondary" type="button" onClick={() => navigate(-1)}>

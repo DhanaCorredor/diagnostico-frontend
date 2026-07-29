@@ -5,9 +5,9 @@ export default function ErrorCita({ error }) {
       <p className="font-medium text-crit">{error.mensaje}</p>
       {error.candidatos && (
         <ul className="mt-1 list-inside list-disc text-ink-2">
-          {error.candidatos.map((c) => (
-            <li key={c.id}>
-              {c.nombre_completo} · {c.edad} años
+          {error.candidatos.map((candidate) => (
+            <li key={candidate.id}>
+              {candidate.nombre_completo} · {candidate.edad} años
             </li>
           ))}
         </ul>

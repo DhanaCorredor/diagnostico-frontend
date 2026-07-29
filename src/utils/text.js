@@ -1,9 +1,9 @@
-export function initials(nombre = '') {
-  return nombre
+export function initials(name = '') {
+  return name
     .split(' ')
     .filter(Boolean)
     .slice(0, 2)
-    .map((p) => p[0])
+    .map((part) => part[0])
     .join('')
     .toUpperCase()
 }
