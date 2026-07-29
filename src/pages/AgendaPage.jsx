@@ -7,7 +7,7 @@ import AppointmentDetail from '../components/organisms/AppointmentDetail'
 import Spinner from '../components/atoms/Spinner'
 import Card from '../components/atoms/Card'
 import ListMessage from '../components/atoms/ListMessage'
-import { APPOINTMENT_STATES } from '../utils/citas'
+import { APPOINTMENT_STATES } from '../utils/appointments'
 
 const HOURS = Array.from({ length: 11 }, (_, i) => 7 + i)
 

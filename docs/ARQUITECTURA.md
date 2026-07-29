@@ -53,7 +53,7 @@ Detalle de cada carpeta y componente en [`COMPONENTES.md`](COMPONENTES.md).
 | **Atomic Design** | `components/atoms · molecules · organisms` | organización por complejidad; jerarquía de composición clara |
 | **Presentacional vs. contenedor** | átomos/moléculas (presentacionales) vs. páginas/organismos (con estado) | separar "cómo se ve" de "qué hace" |
 | **Composición y reutilización** | `Table`, `AppointmentFields`, `DataRow` | una pieza configurable sirve a varias vistas (Pacientes/Usuarios/Médicos comparten `Table`) |
-| **Single source of truth** | `utils/citas.js` (`APPOINTMENT_STATES`), `utils/roles.js` (`ROLES`) | la metadata de estados/roles se define **una vez** y se consume en todas partes |
+| **Single source of truth** | `utils/appointments.js` (`APPOINTMENT_STATES`), `utils/roles.js` (`ROLES`) | la metadata de estados/roles se define **una vez** y se consume en todas partes |
 | **Provider (Context API)** | `auth/AuthContext` + `AuthProvider` | expone la sesión (usuario, rol, login/logout) a todo el árbol sin *prop drilling* |
 | **Custom Hook** | `auth/useAuth` · `hooks/useForm` | encapsular lógica reutilizable: consumo de sesión y estado de formularios (`form` + `set`) |
 | **Route Guard** | `auth/ProtectedRoute` | protege rutas por sesión y por rol (redirige a login si no procede) |

@@ -10,7 +10,7 @@ import KpiCard from '../components/molecules/KpiCard'
 import ListMessage from '../components/atoms/ListMessage'
 import { formatTime, todayISO } from '../utils/date'
 import { indexBy } from '../utils/data'
-import { APPOINTMENT_STATES } from '../utils/citas'
+import { APPOINTMENT_STATES } from '../utils/appointments'
 
 export default function PanelPage() {
   const { user } = useAuth()

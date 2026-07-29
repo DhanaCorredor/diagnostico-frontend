@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useForm } from '../../hooks/useForm'
-import ErrorCita from '../molecules/ErrorCita'
+import AppointmentError from '../molecules/AppointmentError'
 import { api, ApiError } from '../../config/api'
 import { formatShortDate, formatTime } from '../../utils/date'
 import { indexBy } from '../../utils/data'
@@ -82,7 +82,7 @@ export default function AppointmentDetail({
     )
   }
 
-  const errorBox = <ErrorCita error={error} />
+  const errorBox = <AppointmentError error={error} />
 
   if (editing) {
     const footer = (

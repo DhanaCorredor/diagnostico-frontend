@@ -1,4 +1,4 @@
-export default function ErrorCita({ error }) {
+export default function AppointmentError({ error }) {
   if (!error) return null
   return (
     <div className="rounded-lg border border-crit/30 bg-crit/5 p-3 text-sm">

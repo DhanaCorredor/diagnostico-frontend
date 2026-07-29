@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useForm } from '../hooks/useForm'
-import ErrorCita from '../components/molecules/ErrorCita'
+import AppointmentError from '../components/molecules/AppointmentError'
 import { useNavigate } from 'react-router-dom'
 import { api, ApiError } from '../config/api'
 import { todayISO } from '../utils/date'
@@ -10,7 +10,7 @@ import Button from '../components/atoms/Button'
 import Card from '../components/atoms/Card'
 import AppointmentFields from '../components/molecules/AppointmentFields'
 
-export default function CitaPage() {
+export default function NewAppointmentPage() {
   const navigate = useNavigate()
   const [doctors, setDoctors] = useState([])
   const [services, setServices] = useState([])
@@ -91,7 +91,7 @@ export default function CitaPage() {
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4 p-6">
-          <ErrorCita error={error} />
+          <AppointmentError error={error} />
 
           <div className="grid grid-cols-3 gap-3">
             <div className="col-span-2">

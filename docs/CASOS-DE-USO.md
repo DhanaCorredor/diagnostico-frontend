@@ -96,7 +96,7 @@ graph LR
 |-------------|------|--------|
 | CU-01 | `/login` | `LoginPage` |
 | CU-02 | `/agenda` · `/` | `AgendaPage` · `PanelPage` |
-| CU-03 | `/citas/nueva` | `CitaPage` |
+| CU-03 | `/citas/nueva` | `NewAppointmentPage` |
 | CU-04 | (modal) | `AppointmentDetail` |
 | CU-05 | `/pacientes` | `PatientsPage` |
 | CU-06 | `/pacientes/:id` | `PatientFilePage` |
