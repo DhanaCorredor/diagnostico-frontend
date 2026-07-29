@@ -7,15 +7,15 @@ import Input from '../atoms/Input'
 import Button from '../atoms/Button'
 import Alert from '../atoms/Alert'
 
-export default function PatientForm({ paciente, onClose, onSaved }) {
-  const editing = Boolean(paciente)
+export default function PatientForm({ patient, onClose, onSaved }) {
+  const editing = Boolean(patient)
 
   const [form, set] = useForm({
-    nombre_completo: paciente?.nombre_completo ?? '',
-    edad: paciente?.edad ?? '',
-    cedula: paciente?.cedula ?? '',
-    telefono: paciente?.telefono ?? '',
-    fecha_nacimiento: paciente?.fecha_nacimiento ?? '',
+    nombre_completo: patient?.nombre_completo ?? '',
+    edad: patient?.edad ?? '',
+    cedula: patient?.cedula ?? '',
+    telefono: patient?.telefono ?? '',
+    fecha_nacimiento: patient?.fecha_nacimiento ?? '',
   })
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
@@ -35,7 +35,7 @@ export default function PatientForm({ paciente, onClose, onSaved }) {
 
     try {
       const saved = editing
-        ? await api.put(`/pacientes/${paciente.id}`, body)
+        ? await api.put(`/pacientes/${patient.id}`, body)
         : await api.post('/pacientes', body)
       onSaved(saved)
     } catch (err) {

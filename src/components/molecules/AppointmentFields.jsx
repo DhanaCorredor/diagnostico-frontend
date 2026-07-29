@@ -13,9 +13,9 @@ function servicesForDoctor(services, doctor) {
   )
 }
 
-export default function AppointmentFields({ form, set, medicos, servicios }) {
-  const doctor = medicos.find((candidate) => candidate.id === form.medico_id)
-  const availableServices = servicesForDoctor(servicios, doctor)
+export default function AppointmentFields({ form, set, doctors, services }) {
+  const doctor = doctors.find((candidate) => candidate.id === form.medico_id)
+  const availableServices = servicesForDoctor(services, doctor)
 
   function selectDoctor(doctorId) {
     set('medico_id', doctorId)
@@ -32,7 +32,7 @@ export default function AppointmentFields({ form, set, medicos, servicios }) {
             required
           >
             <option value="">Selecciona…</option>
-            {medicos.map((option) => (
+            {doctors.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.nombre_completo}
               </option>
@@ -60,8 +60,8 @@ export default function AppointmentFields({ form, set, medicos, servicios }) {
         <Field label="Fecha">
           <Input
             type="date"
-            value={form.fecha}
-            onChange={(event) => set('fecha', event.target.value)}
+            value={form.date}
+            onChange={(event) => set('date', event.target.value)}
             required
           />
         </Field>
@@ -69,8 +69,8 @@ export default function AppointmentFields({ form, set, medicos, servicios }) {
           <Input
             type="time"
             step="900"
-            value={form.hora}
-            onChange={(event) => set('hora', event.target.value)}
+            value={form.time}
+            onChange={(event) => set('time', event.target.value)}
             required
           />
         </Field>

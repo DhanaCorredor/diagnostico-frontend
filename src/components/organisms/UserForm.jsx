@@ -14,16 +14,16 @@ const ROLES = [
   { value: 'MEDICO', label: 'Médico' },
 ]
 
-export default function UserForm({ usuario, especialidades, onClose, onSaved }) {
-  const editing = Boolean(usuario)
+export default function UserForm({ user, specialties, onClose, onSaved }) {
+  const editing = Boolean(user)
 
   const [form, set, setForm] = useForm({
-    nombre_completo: usuario?.nombre_completo ?? '',
-    email: usuario?.email ?? '',
-    rol: usuario?.rol ?? 'RECEPCION',
+    nombre_completo: user?.nombre_completo ?? '',
+    email: user?.email ?? '',
+    rol: user?.rol ?? 'RECEPCION',
     password: '',
-    matricula: usuario?.matricula ?? '',
-    especialidades: usuario?.especialidades?.map((specialty) => specialty.id) ?? [],
+    matricula: user?.matricula ?? '',
+    especialidades: user?.especialidades?.map((specialty) => specialty.id) ?? [],
   })
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
@@ -56,7 +56,7 @@ export default function UserForm({ usuario, especialidades, onClose, onSaved }) 
     if (!editing || form.password) body.password = form.password
 
     try {
-      if (editing) await api.put(`/usuarios/${usuario.id}`, body)
+      if (editing) await api.put(`/usuarios/${user.id}`, body)
       else await api.post('/usuarios', body)
       onSaved()
     } catch (err) {
@@ -148,7 +148,7 @@ export default function UserForm({ usuario, especialidades, onClose, onSaved }) 
             <div>
               <label className="mb-1 block text-sm font-medium">Especialidades</label>
               <div className="flex max-h-40 flex-wrap gap-2 overflow-y-auto rounded-lg border border-line p-2">
-                {especialidades.map((specialty) => {
+                {specialties.map((specialty) => {
                   const selected = form.especialidades.includes(specialty.id)
                   return (
                     <button

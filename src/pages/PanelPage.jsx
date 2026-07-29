@@ -62,7 +62,7 @@ export default function PanelPage() {
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <KpiCard title="Citas hoy" value={appointments.length} />
-        <KpiCard title="Confirmadas" value={confirmed} nota={`${pending} pendientes de confirmar`} />
+        <KpiCard title="Confirmadas" value={confirmed} note={`${pending} pendientes de confirmar`} />
         <KpiCard title="Pendientes" value={pending} />
       </div>
 
@@ -99,7 +99,7 @@ export default function PanelPage() {
                     {serviceNames[appointment.servicio_id] ?? 'Servicio'}
                   </p>
                 </div>
-                <StatusBadge estado={appointment.estado} />
+                <StatusBadge status={appointment.estado} />
               </button>
             ))}
           </div>
@@ -108,10 +108,10 @@ export default function PanelPage() {
 
       {selectedAppointment && (
         <AppointmentDetail
-          cita={selectedAppointment}
-          nombrePaciente={patientNames[selectedAppointment.paciente_id]}
-          medicos={doctors}
-          servicios={services}
+          appointment={selectedAppointment}
+          patientName={patientNames[selectedAppointment.paciente_id]}
+          doctors={doctors}
+          services={services}
           canManage={canManage}
           onClose={() => setSelectedAppointment(null)}
           onUpdated={() => {

@@ -20,8 +20,8 @@ export default function CitaPage() {
     edad: '',
     medico_id: '',
     servicio_id: '',
-    fecha: todayISO(),
-    hora: '09:00',
+    date: todayISO(),
+    time: '09:00',
     duracion_min: 30,
     motivo: '',
     permitir_sobrecupo: false,
@@ -39,7 +39,7 @@ export default function CitaPage() {
         setDoctors(doctorList)
         setServices(serviceList)
       } catch {
-        setError({ mensaje: 'No se pudieron cargar los médicos y servicios.' })
+        setError({ message: 'No se pudieron cargar los médicos y servicios.' })
       }
     }
     load()
@@ -49,9 +49,9 @@ export default function CitaPage() {
     event.preventDefault()
     setError(null)
 
-    const minutes = Number(form.hora.slice(3, 5))
+    const minutes = Number(form.time.slice(3, 5))
     if (minutes % 15 !== 0) {
-      setError({ mensaje: 'La hora debe empezar en :00, :15, :30 o :45.' })
+      setError({ message: 'La hora debe empezar en :00, :15, :30 o :45.' })
       return
     }
 
@@ -61,7 +61,7 @@ export default function CitaPage() {
       edad: Number(form.edad),
       medico_id: form.medico_id,
       servicio_id: form.servicio_id,
-      starts_at: `${form.fecha}T${form.hora}:00`,
+      starts_at: `${form.date}T${form.time}:00`,
       duracion_min: Number(form.duracion_min),
       motivo: form.motivo.trim() || null,
       permitir_sobrecupo: form.permitir_sobrecupo,
@@ -72,9 +72,9 @@ export default function CitaPage() {
       navigate('/agenda')
     } catch (err) {
       if (err instanceof ApiError) {
-        setError({ mensaje: err.message, candidatos: err.detail?.candidatos })
+        setError({ message: err.message, candidates: err.detail?.candidatos })
       } else {
-        setError({ mensaje: 'No se pudo agendar la cita.' })
+        setError({ message: 'No se pudo agendar la cita.' })
       }
       setSaving(false)
     }
@@ -116,7 +116,7 @@ export default function CitaPage() {
             </Field>
           </div>
 
-          <AppointmentFields form={form} set={set} medicos={doctors} servicios={services} />
+          <AppointmentFields form={form} set={set} doctors={doctors} services={services} />
 
           <div className="flex justify-end gap-3 border-t border-line pt-4">
             <Button variant="secondary" type="button" onClick={() => navigate(-1)}>

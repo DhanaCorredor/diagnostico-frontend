@@ -178,10 +178,10 @@ export default function AgendaPage() {
 
       {selectedAppointment && (
         <AppointmentDetail
-          cita={selectedAppointment}
-          nombrePaciente={patientNames[selectedAppointment.paciente_id]}
-          medicos={doctors}
-          servicios={services}
+          appointment={selectedAppointment}
+          patientName={patientNames[selectedAppointment.paciente_id]}
+          doctors={doctors}
+          services={services}
           canManage={canManage}
           onClose={() => setSelectedAppointment(null)}
           onUpdated={() => {

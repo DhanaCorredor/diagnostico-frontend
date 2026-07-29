@@ -108,8 +108,8 @@ export default function UsersPage() {
 
       {editing && (
         <UserForm
-          usuario={editing.id ? editing : null}
-          especialidades={specialties}
+          user={editing.id ? editing : null}
+          specialties={specialties}
           onClose={() => setEditing(null)}
           onSaved={() => {
             setEditing(null)

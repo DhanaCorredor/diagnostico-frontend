@@ -155,7 +155,7 @@ export default function PatientFilePage() {
                       {serviceNames[appointment.servicio_id] ?? 'Servicio'}
                     </td>
                     <td className="px-5 py-3">
-                      <StatusBadge estado={appointment.estado} />
+                      <StatusBadge status={appointment.estado} />
                     </td>
                   </tr>
                 ))}
@@ -167,7 +167,7 @@ export default function PatientFilePage() {
 
       {editing && (
         <PatientForm
-          paciente={patient}
+          patient={patient}
           onClose={() => setEditing(false)}
           onSaved={() => {
             setEditing(false)

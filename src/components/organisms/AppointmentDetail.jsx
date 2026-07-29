@@ -17,30 +17,30 @@ function durationOf(appointment) {
 }
 
 export default function AppointmentDetail({
-  cita,
-  nombrePaciente,
-  medicos,
-  servicios,
+  appointment,
+  patientName,
+  doctors,
+  services,
   canManage,
   onClose,
   onUpdated,
 }) {
-  const doctorNames = indexBy(medicos, 'nombre_completo')
-  const serviceNames = indexBy(servicios, 'nombre')
+  const doctorNames = indexBy(doctors, 'nombre_completo')
+  const serviceNames = indexBy(services, 'nombre')
 
   const [editing, setEditing] = useState(false)
   const [error, setError] = useState(null)
   const [busy, setBusy] = useState(false)
 
-  const isActive = ACTIVE_STATES.includes(cita.estado)
+  const isActive = ACTIVE_STATES.includes(appointment.estado)
 
   const [form, set] = useForm({
-    medico_id: cita.medico_id,
-    servicio_id: cita.servicio_id,
-    fecha: cita.starts_at.slice(0, 10),
-    hora: cita.starts_at.slice(11, 16),
-    duracion_min: durationOf(cita),
-    motivo: cita.motivo ?? '',
+    medico_id: appointment.medico_id,
+    servicio_id: appointment.servicio_id,
+    date: appointment.starts_at.slice(0, 10),
+    time: appointment.starts_at.slice(11, 16),
+    duracion_min: durationOf(appointment),
+    motivo: appointment.motivo ?? '',
     permitir_sobrecupo: false,
   })
 
@@ -52,29 +52,29 @@ export default function AppointmentDetail({
       onUpdated()
     } catch (err) {
       if (err instanceof ApiError)
-        setError({ mensaje: err.message, candidatos: err.detail?.candidatos })
-      else setError({ mensaje: 'No se pudo completar la acción.' })
+        setError({ message: err.message, candidates: err.detail?.candidatos })
+      else setError({ message: 'No se pudo completar la acción.' })
       setBusy(false)
     }
   }
 
   function cancel() {
-    run(() => api.post(`/citas/${cita.id}/cancelar`))
+    run(() => api.post(`/citas/${appointment.id}/cancelar`))
   }
   function markAttendance(estado) {
-    run(() => api.post(`/citas/${cita.id}/asistencia`, { estado }))
+    run(() => api.post(`/citas/${appointment.id}/asistencia`, { estado }))
   }
   function saveEdit(event) {
     event.preventDefault()
-    if (Number(form.hora.slice(3, 5)) % 15 !== 0) {
-      setError({ mensaje: 'La hora debe empezar en :00, :15, :30 o :45.' })
+    if (Number(form.time.slice(3, 5)) % 15 !== 0) {
+      setError({ message: 'La hora debe empezar en :00, :15, :30 o :45.' })
       return
     }
     run(() =>
-      api.put(`/citas/${cita.id}`, {
+      api.put(`/citas/${appointment.id}`, {
         medico_id: form.medico_id,
         servicio_id: form.servicio_id,
-        starts_at: `${form.fecha}T${form.hora}:00`,
+        starts_at: `${form.date}T${form.time}:00`,
         duracion_min: Number(form.duracion_min),
         motivo: form.motivo.trim() || null,
         permitir_sobrecupo: form.permitir_sobrecupo,
@@ -104,7 +104,7 @@ export default function AppointmentDetail({
       >
         <form id="appointment-edit-form" onSubmit={saveEdit} className="space-y-4">
           {errorBox}
-          <AppointmentFields form={form} set={set} medicos={medicos} servicios={servicios} />
+          <AppointmentFields form={form} set={set} doctors={doctors} services={services} />
         </form>
       </Modal>
     )
@@ -143,19 +143,19 @@ export default function AppointmentDetail({
     <Modal title="Detalle de la cita" onClose={onClose} footer={footer || undefined}>
       {errorBox}
       <div className="flex items-center justify-between">
-        <p className="text-lg font-semibold">{nombrePaciente ?? 'Paciente'}</p>
-        <StatusBadge estado={cita.estado} />
+        <p className="text-lg font-semibold">{patientName ?? 'Paciente'}</p>
+        <StatusBadge status={appointment.estado} />
       </div>
       <dl className="space-y-2 text-sm">
-        <DataRow label="Médico" value={doctorNames[cita.medico_id]} />
-        <DataRow label="Servicio" value={serviceNames[cita.servicio_id]} />
-        <DataRow label="Fecha" value={formatShortDate(cita.starts_at)} />
+        <DataRow label="Médico" value={doctorNames[appointment.medico_id]} />
+        <DataRow label="Servicio" value={serviceNames[appointment.servicio_id]} />
+        <DataRow label="Fecha" value={formatShortDate(appointment.starts_at)} />
         <DataRow
           label="Horario"
-          value={`${formatTime(cita.starts_at)}–${formatTime(cita.ends_at)}`}
+          value={`${formatTime(appointment.starts_at)}–${formatTime(appointment.ends_at)}`}
           tnum
         />
-        {cita.motivo && <DataRow label="Motivo" value={cita.motivo} />}
+        {appointment.motivo && <DataRow label="Motivo" value={appointment.motivo} />}
       </dl>
       {!isActive && (
         <p className="rounded-lg bg-surface-plane px-3 py-2 text-xs text-ink-muted">
