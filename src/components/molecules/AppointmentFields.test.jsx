@@ -35,8 +35,8 @@ function baseForm(overrides = {}) {
   }
 }
 
-describe('AppointmentFields — filtro de servicios por especialidad', () => {
-  it('solo ofrece los servicios de la especialidad del médico elegido', () => {
+describe('AppointmentFields — service filtering by specialty', () => {
+  it('offers only the services matching the selected doctor specialty', () => {
     render(
       <AppointmentFields
         form={baseForm({ medico_id: 'm1' })}
@@ -49,7 +49,7 @@ describe('AppointmentFields — filtro de servicios por especialidad', () => {
     expect(screen.queryByRole('option', { name: 'Ecocardiograma' })).not.toBeInTheDocument()
   })
 
-  it('si los servicios no traen especialidades (backend antiguo), muestra todos', () => {
+  it('shows every service when they carry no specialty (older backend)', () => {
     const servicesWithoutSpecialty = [
       { id: 's1', nombre: 'Ecografía ginecológica' },
       { id: 's2', nombre: 'Ecocardiograma' },
@@ -66,7 +66,7 @@ describe('AppointmentFields — filtro de servicios por especialidad', () => {
     expect(screen.getByRole('option', { name: 'Ecocardiograma' })).toBeInTheDocument()
   })
 
-  it('al cambiar de médico resetea el servicio elegido (evita agendar uno que no corresponde)', () => {
+  it('resets the chosen service when the doctor changes (avoids booking a mismatched one)', () => {
     const set = vi.fn()
     render(
       <AppointmentFields
@@ -83,8 +83,8 @@ describe('AppointmentFields — filtro de servicios por especialidad', () => {
   })
 })
 
-describe('AppointmentFields — accesibilidad', () => {
-  it('asocia cada etiqueta con su campo (label ↔ input)', () => {
+describe('AppointmentFields — accessibility', () => {
+  it('links every label with its field (label ↔ input)', () => {
     render(
       <AppointmentFields
         form={baseForm({ medico_id: 'm1' })}
