@@ -35,7 +35,7 @@ Lo derivado del backend (`A5`, `B1`, `C1`–`C4`) espera a que su mejora esté p
 
 | Orden | ID | Tarea | Rama | Coste | Espera al backend | Estado |
 |:-----:|:--:|-------|------|:-----:|:-----------------:|:------:|
-| 1 | **F1** | Terminar la migración a inglés | `refactor/english-identifiers` | bajo | no | ⬜ |
+| 1 | **F1** | Terminar la migración a inglés | `refactor/english-identifiers` | bajo | no | ✅ |
 | 2 | **F2** | Pantalla de disponibilidad del médico | `feat/availability-ui` | medio | no | ⬜ |
 | 3 | **F3** | Integración continua | `chore/ci-github-actions` | bajo | no | ⬜ |
 | 4 | **F4** | Cobertura de tests de páginas | `test/pages-coverage` | medio | no | ⬜ |
@@ -54,21 +54,30 @@ nace mezclada y habría que volver a tocar esas mismas líneas en el rename.
 
 ## 4. Bloque F — Trabajo propio del frontend
 
-### F1 · Terminar la migración a inglés · coste bajo
+### F1 · Terminar la migración a inglés · coste bajo · **hecha**
 
-- **Hoy:** los componentes, los archivos y las utilidades ya están en inglés (`indexBy`,
-  `formatTime`, `APPOINTMENT_STATES`, `AppointmentDetail`), pero **las variables locales no**. En
-  `AgendaPage.jsx` conviven `HORAS`, `horaDisponible`, `nombreCorto`, `filtroMedico`,
-  `dispPorMedico`, `citaSel` con `loading`, `error` y `canManage`.
-- **Consecuencia:** el proyecto se lee mezclado, igual que le pasaba al backend antes de `A8`.
-- **Qué haríamos:** renombrar variables, funciones y estados locales de páginas y organismos, sin
-  cambio de comportamiento — los tests existentes deben seguir pasando **sin tocarlos**. Después,
-  los nombres de archivo que quedan en español (`utils/citas.js` → `utils/appointments.js`,
-  `molecules/ErrorCita.jsx` → `molecules/AppointmentError.jsx`) y sus importaciones. Por último,
-  las descripciones de `describe`/`it`, hoy en español (p. ej. `AppointmentFields.test.jsx:26`).
-- **Aviso:** el contrato sigue en español, así que los campos que vienen de la API
-  (`nombre_completo`, `medico_id`, `fecha_nacimiento`…) **no se tocan**. La frontera está en el
-  `api.get`: fuera inglés, dentro del JSON español.
+- **Antes:** los componentes, los archivos y las utilidades ya estaban en inglés, pero **las
+  variables locales no**. En `AgendaPage.jsx` convivían `HORAS`, `horaDisponible`, `nombreCorto`,
+  `filtroMedico`, `dispPorMedico` y `citaSel` con `loading`, `error` y `canManage`.
+- **Qué se hizo**, en cuatro commits que se pueden revisar por separado:
+  1. **Identificadores internos** (18 archivos): variables, estados, funciones auxiliares y
+     parámetros de evento. Los 25 tests pasaron **sin tocarlos**, que era la prueba de que no
+     había cambio de comportamiento.
+  2. **Props de componentes** (13 archivos): `cita`→`appointment`, `nombrePaciente`→`patientName`,
+     `medicos`→`doctors`, `servicios`→`services`, `paciente`→`patient`, `usuario`→`user`,
+     `especialidades`→`specialties`, `estado`→`status`, `nota`→`note`, y el objeto de error
+     `{mensaje, candidatos}`→`{message, candidates}`. Aquí sí hubo que actualizar los tests.
+  3. **Nombres de archivo**: `utils/citas.js`→`utils/appointments.js`,
+     `ErrorCita.jsx`→`AppointmentError.jsx`, `CitaPage.jsx`→`NewAppointmentPage.jsx`, con sus
+     importaciones y las referencias en `docs/`.
+  4. **Tests**: descripciones de `describe`/`it` y variables auxiliares.
+- **La regla, ahora en [`CLAUDE.md`](../CLAUDE.md):** la frontera está en la llamada a la API. Un
+  campo que viaja en el JSON conserva su nombre del contrato (`form.duracion_min`, `medico_id`,
+  `fecha_nacimiento`); uno puramente local se traduce (`form.date` y `form.time`, que se combinan
+  en `starts_at` antes de enviarse). Renombrar lo primero rompería la petición.
+- **Lo único que sigue en español dentro del código** son tres lecturas de campos que **envía el
+  backend**: `detail?.mensaje` en `config/configClient.js:60` y `err.detail?.candidatos` en dos
+  bloques `catch`. Es correcto que sea así.
 
 ### F2 · Pantalla de disponibilidad del médico · coste medio
 
