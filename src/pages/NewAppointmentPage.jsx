@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useForm } from '../hooks/useForm'
-import ErrorCita from '../components/molecules/ErrorCita'
+import AppointmentError from '../components/molecules/AppointmentError'
 import { useNavigate } from 'react-router-dom'
 import { api, ApiError } from '../config/api'
 import { todayISO } from '../utils/date'
@@ -10,18 +10,18 @@ import Button from '../components/atoms/Button'
 import Card from '../components/atoms/Card'
 import AppointmentFields from '../components/molecules/AppointmentFields'
 
-export default function CitaPage() {
+export default function NewAppointmentPage() {
   const navigate = useNavigate()
-  const [medicos, setMedicos] = useState([])
-  const [servicios, setServicios] = useState([])
+  const [doctors, setDoctors] = useState([])
+  const [services, setServices] = useState([])
 
   const [form, set] = useForm({
     nombre_completo: '',
     edad: '',
     medico_id: '',
     servicio_id: '',
-    fecha: todayISO(),
-    hora: '09:00',
+    date: todayISO(),
+    time: '09:00',
     duracion_min: 30,
     motivo: '',
     permitir_sobrecupo: false,
@@ -32,23 +32,26 @@ export default function CitaPage() {
   useEffect(() => {
     async function load() {
       try {
-        const [ms, ss] = await Promise.all([api.get('/medicos'), api.get('/servicios')])
-        setMedicos(ms)
-        setServicios(ss)
+        const [doctorList, serviceList] = await Promise.all([
+          api.get('/medicos'),
+          api.get('/servicios'),
+        ])
+        setDoctors(doctorList)
+        setServices(serviceList)
       } catch {
-        setError({ mensaje: 'No se pudieron cargar los médicos y servicios.' })
+        setError({ message: 'No se pudieron cargar los médicos y servicios.' })
       }
     }
     load()
   }, [])
 
-  async function onSubmit(e) {
-    e.preventDefault()
+  async function onSubmit(event) {
+    event.preventDefault()
     setError(null)
 
-    const minutos = Number(form.hora.slice(3, 5))
-    if (minutos % 15 !== 0) {
-      setError({ mensaje: 'La hora debe empezar en :00, :15, :30 o :45.' })
+    const minutes = Number(form.time.slice(3, 5))
+    if (minutes % 15 !== 0) {
+      setError({ message: 'La hora debe empezar en :00, :15, :30 o :45.' })
       return
     }
 
@@ -58,7 +61,7 @@ export default function CitaPage() {
       edad: Number(form.edad),
       medico_id: form.medico_id,
       servicio_id: form.servicio_id,
-      starts_at: `${form.fecha}T${form.hora}:00`,
+      starts_at: `${form.date}T${form.time}:00`,
       duracion_min: Number(form.duracion_min),
       motivo: form.motivo.trim() || null,
       permitir_sobrecupo: form.permitir_sobrecupo,
@@ -69,10 +72,9 @@ export default function CitaPage() {
       navigate('/agenda')
     } catch (err) {
       if (err instanceof ApiError) {
-        const candidatos = err.detail?.candidatos
-        setError({ mensaje: err.message, candidatos })
+        setError({ message: err.message, candidates: err.detail?.candidatos })
       } else {
-        setError({ mensaje: 'No se pudo agendar la cita.' })
+        setError({ message: 'No se pudo agendar la cita.' })
       }
       setSaving(false)
     }
@@ -89,14 +91,14 @@ export default function CitaPage() {
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4 p-6">
-          <ErrorCita error={error} />
+          <AppointmentError error={error} />
 
           <div className="grid grid-cols-3 gap-3">
             <div className="col-span-2">
               <Field label="Paciente (nombre completo)">
                 <Input
                   value={form.nombre_completo}
-                  onChange={(e) => set('nombre_completo', e.target.value)}
+                  onChange={(event) => set('nombre_completo', event.target.value)}
                   required
                   autoFocus
                 />
@@ -108,13 +110,13 @@ export default function CitaPage() {
                 min="0"
                 max="120"
                 value={form.edad}
-                onChange={(e) => set('edad', e.target.value)}
+                onChange={(event) => set('edad', event.target.value)}
                 required
               />
             </Field>
           </div>
 
-          <AppointmentFields form={form} set={set} medicos={medicos} servicios={servicios} />
+          <AppointmentFields form={form} set={set} doctors={doctors} services={services} />
 
           <div className="flex justify-end gap-3 border-t border-line pt-4">
             <Button variant="secondary" type="button" onClick={() => navigate(-1)}>

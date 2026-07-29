@@ -1,7 +1,7 @@
 import Badge from '../atoms/Badge'
-import { APPOINTMENT_STATES } from '../../utils/citas'
+import { APPOINTMENT_STATES } from '../../utils/appointments'
 
-export default function StatusBadge({ estado }) {
-  const { text, color } = APPOINTMENT_STATES[estado] ?? { text: estado, color: 'neutral' }
+export default function StatusBadge({ status }) {
+  const { text, color } = APPOINTMENT_STATES[status] ?? { text: status, color: 'neutral' }
   return <Badge color={color}>{text}</Badge>
 }

@@ -55,7 +55,7 @@ src/
 | `AppointmentFields` | `Field` + `Input` + `Select` | campos compartidos de **nueva/editar cita** |
 | `Table` | `Card` + `thead`/`tbody` + estados | tabla reutilizable (config de columnas): Pacientes · Usuarios · Médicos |
 | `DataRow` | `dt` + `dd` | fila "etiqueta: valor" (ficha de paciente, detalle de cita) |
-| `ErrorCita` | caja crit + lista | error de agenda: mensaje + candidatos de solapamiento (nueva/editar cita) |
+| `AppointmentError` | caja crit + lista | error de agenda: mensaje + candidatos de solapamiento (nueva/editar cita) |
 
 > `EnlaceNav`, `SelectorVista` (Día/Semana), `FranjaHoraria`, `ItemNota` (del plan) → no se hicieron: la nav va inline en `Sidebar`; solo hay vista Día; la disponibilidad se pinta directa; las notas clínicas son **fase 2**.
 
@@ -69,7 +69,7 @@ src/
 | `UserForm` | alta/edición de personal: nombre + email + rol (+ matrícula/especialidades si médico) |
 | `AppointmentDetail` | detalle de una cita + **acciones** (cancelar · asistencia · editar/mover) |
 
-> `TablaPacientes` / `TablaUsuarios` / cuadro médico usan la molécula reutilizable **`Table`** (config de columnas). Otras secciones de una sola vista se dejaron **inline**: `Calendario` (la rejilla vive en `AgendaPage`), `PanelResumen` (en `PanelPage`), `FichaCabecera`/`FichaTabs` (en `PatientFilePage`). `FormularioCita` = `CitaPage` + `AppointmentFields`. `ListaNotasClinicas` → **fase 2**.
+> `TablaPacientes` / `TablaUsuarios` / cuadro médico usan la molécula reutilizable **`Table`** (config de columnas). Otras secciones de una sola vista se dejaron **inline**: `Calendario` (la rejilla vive en `AgendaPage`), `PanelResumen` (en `PanelPage`), `FichaCabecera`/`FichaTabs` (en `PatientFilePage`). `FormularioCita` = `NewAppointmentPage` + `AppointmentFields`. `ListaNotasClinicas` → **fase 2**.
 
 ## 🖼️ Plantillas (layouts)
 
@@ -88,7 +88,7 @@ src/
 | `PatientsPage` | `/pacientes` | ADMIN · RECEPCION | `Table` + `SearchBar` + `PatientForm` |
 | `PatientFilePage` | `/pacientes/:id` | ADMIN · RECEPCION | cabecera + pestañas (Datos · Historial) |
 | `DoctorsPage` | `/medicos` | ADMIN · RECEPCION | `Table` (lista: médico · especialidades · disponibilidad) |
-| `CitaPage` | `/citas/nueva` | ADMIN · RECEPCION | Paciente + `AppointmentFields` |
+| `NewAppointmentPage` | `/citas/nueva` | ADMIN · RECEPCION | Paciente + `AppointmentFields` |
 | `UsersPage` | `/usuarios` | **solo ADMIN** | `Table` + `UserForm` |
 | `ConfigPage` | `/config` | **solo ADMIN** | especialidades + servicios |
 
@@ -101,12 +101,12 @@ src/
 | `date.js` | `todayISO`, `formatTime`, `formatShortDate`/`LongDate`, `addDays`, `weekday`… |
 | `text.js` | `initials` (para `Avatar`) |
 | `data.js` | `indexBy` (lista → mapa por id) |
-| `citas.js` | `APPOINTMENT_STATES` (estado → text · color · bar · chip) |
+| `appointments.js` | `APPOINTMENT_STATES` (estado → text · color · bar · chip) |
 | `roles.js` | `ROLES` (rol → label · color) |
 
 ## 🔑 Comportamientos clave (dónde vive la lógica)
 
-- **Nueva cita** (`CitaPage` + `AppointmentFields`) → `POST /citas`: **upsert de paciente** por nombre + edad; el backend valida **disponibilidad** (con **sobrecupo**) y **cero solapamientos por médico**.
+- **Nueva cita** (`NewAppointmentPage` + `AppointmentFields`) → `POST /citas`: **upsert de paciente** por nombre + edad; el backend valida **disponibilidad** (con **sobrecupo**) y **cero solapamientos por médico**.
 - **`AgendaPage`** → pide la disponibilidad de cada médico y **grisa** las horas fuera de ella; recepción puede **forzar sobrecupo**.
 - **Acciones sobre la cita** (`AppointmentDetail`) → cancelar (libera cupo), marcar asistencia (atendida/no-show), editar/mover (revalida reglas).
 - **`StatusBadge` + `APPOINTMENT_STATES`** → mapea `EstadoCita` (SCHEDULED · CONFIRMED · CANCELLED · COMPLETED · NO_SHOW) a color y etiqueta.

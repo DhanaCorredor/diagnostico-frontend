@@ -15,10 +15,10 @@ import DataRow from '../components/molecules/DataRow'
 
 export default function PatientFilePage() {
   const { id } = useParams()
-  const [paciente, setPaciente] = useState(null)
-  const [citas, setCitas] = useState([])
-  const [medicos, setMedicos] = useState({})
-  const [servicios, setServicios] = useState({})
+  const [patient, setPatient] = useState(null)
+  const [appointments, setAppointments] = useState([])
+  const [doctorNames, setDoctorNames] = useState({})
+  const [serviceNames, setServiceNames] = useState({})
   const [tab, setTab] = useState('datos')
   const [editing, setEditing] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -28,16 +28,16 @@ export default function PatientFilePage() {
     setLoading(true)
     setError('')
     try {
-      const [pac, hist, listaMedicos, listaServicios] = await Promise.all([
+      const [patientData, history, doctorList, serviceList] = await Promise.all([
         api.get(`/pacientes/${id}`),
         api.get(`/pacientes/${id}/citas`),
         api.get('/medicos'),
         api.get('/servicios'),
       ])
-      setPaciente(pac)
-      setCitas(hist)
-      setMedicos(indexBy(listaMedicos, 'nombre_completo'))
-      setServicios(indexBy(listaServicios, 'nombre'))
+      setPatient(patientData)
+      setAppointments(history)
+      setDoctorNames(indexBy(doctorList, 'nombre_completo'))
+      setServiceNames(indexBy(serviceList, 'nombre'))
     } catch {
       setError('No se pudo cargar la ficha del paciente.')
     } finally {
@@ -51,11 +51,14 @@ export default function PatientFilePage() {
 
   if (loading) return <Spinner />
   if (error) return <Alert>{error}</Alert>
-  if (!paciente) return null
+  if (!patient) return null
 
   return (
     <div>
-      <Link to="/pacientes" className="mb-4 flex items-center gap-1.5 text-sm text-ink-2 hover:text-brand">
+      <Link
+        to="/pacientes"
+        className="mb-4 flex items-center gap-1.5 text-sm text-ink-2 hover:text-brand"
+      >
         <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path d="M15 19l-7-7 7-7" />
         </svg>
@@ -64,12 +67,12 @@ export default function PatientFilePage() {
 
       <Card className="mb-6 p-5">
         <div className="flex flex-wrap items-center gap-4">
-          <Avatar name={paciente.nombre_completo} size="lg" />
+          <Avatar name={patient.nombre_completo} size="lg" />
           <div className="flex-1">
-            <h2 className="text-xl font-semibold">{paciente.nombre_completo}</h2>
+            <h2 className="text-xl font-semibold">{patient.nombre_completo}</h2>
             <p className="text-sm text-ink-2">
-              {paciente.cedula ?? 'Sin cédula'}
-              {paciente.edad != null && ` · ${paciente.edad} años`}
+              {patient.cedula ?? 'Sin cédula'}
+              {patient.edad != null && ` · ${patient.edad} años`}
             </p>
           </div>
           <Button variant="secondary" onClick={() => setEditing(true)}>
@@ -108,12 +111,12 @@ export default function PatientFilePage() {
               Identificación
             </h3>
             <dl className="space-y-2 text-sm">
-              <DataRow label="Cédula" value={paciente.cedula} />
+              <DataRow label="Cédula" value={patient.cedula} />
               <DataRow
                 label="Fecha de nacimiento"
-                value={paciente.fecha_nacimiento && formatShortDate(paciente.fecha_nacimiento)}
+                value={patient.fecha_nacimiento && formatShortDate(patient.fecha_nacimiento)}
               />
-              <DataRow label="Edad" value={paciente.edad != null ? `${paciente.edad} años` : null} />
+              <DataRow label="Edad" value={patient.edad != null ? `${patient.edad} años` : null} />
             </dl>
           </Card>
           <Card className="p-5">
@@ -121,7 +124,7 @@ export default function PatientFilePage() {
               Contacto
             </h3>
             <dl className="space-y-2 text-sm">
-              <DataRow label="Teléfono" value={paciente.telefono} />
+              <DataRow label="Teléfono" value={patient.telefono} />
             </dl>
           </Card>
         </div>
@@ -129,7 +132,7 @@ export default function PatientFilePage() {
 
       {tab === 'citas' && (
         <Card>
-          {citas.length === 0 ? (
+          {appointments.length === 0 ? (
             <ListMessage>Este paciente no tiene citas registradas.</ListMessage>
           ) : (
             <table className="w-full text-sm">
@@ -142,15 +145,17 @@ export default function PatientFilePage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
-                {citas.map((c) => (
-                  <tr key={c.id} className="hover:bg-surface-plane">
+                {appointments.map((appointment) => (
+                  <tr key={appointment.id} className="hover:bg-surface-plane">
                     <td className="tnum px-5 py-3">
-                      {formatShortDate(c.starts_at)} · {formatTime(c.starts_at)}
+                      {formatShortDate(appointment.starts_at)} · {formatTime(appointment.starts_at)}
                     </td>
-                    <td className="px-5 py-3">{medicos[c.medico_id] ?? 'Médico'}</td>
-                    <td className="px-5 py-3 text-ink-2">{servicios[c.servicio_id] ?? 'Servicio'}</td>
+                    <td className="px-5 py-3">{doctorNames[appointment.medico_id] ?? 'Médico'}</td>
+                    <td className="px-5 py-3 text-ink-2">
+                      {serviceNames[appointment.servicio_id] ?? 'Servicio'}
+                    </td>
                     <td className="px-5 py-3">
-                      <StatusBadge estado={c.estado} />
+                      <StatusBadge status={appointment.estado} />
                     </td>
                   </tr>
                 ))}
@@ -162,7 +167,7 @@ export default function PatientFilePage() {
 
       {editing && (
         <PatientForm
-          paciente={paciente}
+          patient={patient}
           onClose={() => setEditing(false)}
           onSaved={() => {
             setEditing(false)

@@ -7,37 +7,37 @@ import AppointmentDetail from '../components/organisms/AppointmentDetail'
 import Spinner from '../components/atoms/Spinner'
 import Card from '../components/atoms/Card'
 import ListMessage from '../components/atoms/ListMessage'
-import { APPOINTMENT_STATES } from '../utils/citas'
+import { APPOINTMENT_STATES } from '../utils/appointments'
 
-const HORAS = Array.from({ length: 11 }, (_, i) => 7 + i)
+const HOURS = Array.from({ length: 11 }, (_, i) => 7 + i)
 
-function horaDisponible(franjas, dia, h) {
-  return franjas.some((f) => {
-    if (f.dia_semana !== dia) return false
-    const ini = Number(f.hora_inicio.slice(0, 2)) * 60 + Number(f.hora_inicio.slice(3, 5))
-    const fin = Number(f.hora_fin.slice(0, 2)) * 60 + Number(f.hora_fin.slice(3, 5))
-    return (h + 1) * 60 > ini && h * 60 < fin
+function isHourAvailable(slots, weekdayIndex, hour) {
+  return slots.some((slot) => {
+    if (slot.dia_semana !== weekdayIndex) return false
+    const start = Number(slot.hora_inicio.slice(0, 2)) * 60 + Number(slot.hora_inicio.slice(3, 5))
+    const end = Number(slot.hora_fin.slice(0, 2)) * 60 + Number(slot.hora_fin.slice(3, 5))
+    return (hour + 1) * 60 > start && hour * 60 < end
   })
 }
 
-function nombreCorto(nombre = '') {
-  const partes = nombre.split(' ').filter(Boolean)
-  if (partes.length < 2) return nombre
-  return `${partes[0][0]}. ${partes[partes.length - 1]}`
+function shortName(name = '') {
+  const parts = name.split(' ').filter(Boolean)
+  if (parts.length < 2) return name
+  return `${parts[0][0]}. ${parts[parts.length - 1]}`
 }
 
 export default function AgendaPage() {
   const { user } = useAuth()
-  const [fecha, setFecha] = useState(todayISO())
-  const [filtroMedico, setFiltroMedico] = useState('todos')
-  const [citas, setCitas] = useState([])
-  const [medicos, setMedicos] = useState([])
-  const [servicios, setServicios] = useState([])
-  const [pacientes, setPacientes] = useState({})
-  const [dispPorMedico, setDispPorMedico] = useState({})
+  const [date, setDate] = useState(todayISO())
+  const [doctorFilter, setDoctorFilter] = useState('todos')
+  const [appointments, setAppointments] = useState([])
+  const [doctors, setDoctors] = useState([])
+  const [services, setServices] = useState([])
+  const [patientNames, setPatientNames] = useState({})
+  const [availabilityByDoctor, setAvailabilityByDoctor] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [citaSel, setCitaSel] = useState(null)
+  const [selectedAppointment, setSelectedAppointment] = useState(null)
 
   const canManage = user.rol === 'ADMIN' || user.rol === 'RECEPCION'
 
@@ -45,85 +45,85 @@ export default function AgendaPage() {
     setLoading(true)
     setError('')
     try {
-      const [citasDia, listaMedicos, listaServicios, listaPacientes] = await Promise.all([
-        api.get(`/citas?fecha=${fecha}`),
+      const [dayAppointments, doctorList, serviceList, patientList] = await Promise.all([
+        api.get(`/citas?fecha=${date}`),
         api.get('/medicos'),
         api.get('/servicios'),
         canManage ? api.get('/pacientes') : Promise.resolve([]),
       ])
-      const franjas = await Promise.all(
-        listaMedicos.map((m) => api.get(`/disponibilidad?medico_id=${m.id}`)),
+      const slots = await Promise.all(
+        doctorList.map((doctor) => api.get(`/disponibilidad?medico_id=${doctor.id}`)),
       )
-      const dispMapa = {}
-      listaMedicos.forEach((m, i) => {
-        dispMapa[m.id] = franjas[i]
+      const availabilityMap = {}
+      doctorList.forEach((doctor, i) => {
+        availabilityMap[doctor.id] = slots[i]
       })
 
-      setCitas(citasDia)
-      setMedicos(listaMedicos)
-      setServicios(listaServicios)
-      setPacientes(indexBy(listaPacientes, 'nombre_completo'))
-      setDispPorMedico(dispMapa)
+      setAppointments(dayAppointments)
+      setDoctors(doctorList)
+      setServices(serviceList)
+      setPatientNames(indexBy(patientList, 'nombre_completo'))
+      setAvailabilityByDoctor(availabilityMap)
     } catch {
       setError('No se pudo cargar la agenda.')
     } finally {
       setLoading(false)
     }
-  }, [fecha, canManage])
+  }, [date, canManage])
 
   useEffect(() => {
     load()
   }, [load])
 
-  const dia = weekday(fecha)
-  const serviciosMap = indexBy(servicios, 'nombre')
-  const medicosVisibles =
+  const weekdayIndex = weekday(date)
+  const serviceNames = indexBy(services, 'nombre')
+  const visibleDoctors =
     user.rol === 'MEDICO'
-      ? medicos.filter((m) => m.id === user.id)
-      : filtroMedico === 'todos'
-        ? medicos
-        : medicos.filter((m) => m.id === filtroMedico)
+      ? doctors.filter((doctor) => doctor.id === user.id)
+      : doctorFilter === 'todos'
+        ? doctors
+        : doctors.filter((doctor) => doctor.id === doctorFilter)
 
-  function citasDe(medicoId, h) {
-    return citas.filter(
-      (c) => c.medico_id === medicoId && new Date(c.starts_at).getHours() === h,
+  function appointmentsAt(doctorId, hour) {
+    return appointments.filter(
+      (a) => a.medico_id === doctorId && new Date(a.starts_at).getHours() === hour,
     )
   }
 
   return (
     <Card className="p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-semibold capitalize">{longDateFromISO(fecha)}</h2>
+        <h2 className="font-semibold capitalize">{longDateFromISO(date)}</h2>
         <div className="flex items-center gap-2 text-sm">
           {user.rol !== 'MEDICO' && (
             <select
-              value={filtroMedico}
-              onChange={(e) => setFiltroMedico(e.target.value)}
+              value={doctorFilter}
+              onChange={(e) => setDoctorFilter(e.target.value)}
               className="rounded-lg border border-line px-3 py-1.5 outline-none focus:border-brand"
             >
               <option value="todos">Todos los médicos</option>
-              {medicos.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.nombre_completo}
+              {doctors.map((doctor) => (
+                <option key={doctor.id} value={doctor.id}>
+                  {doctor.nombre_completo}
                 </option>
               ))}
             </select>
           )}
           <div className="flex gap-1">
             <button
-              onClick={() => setFecha(addDays(fecha, -1))}
+              onClick={() => setDate(addDays(date, -1))}
               className="rounded-lg border border-line px-3 py-1.5 hover:bg-surface-plane"
             >
               ‹
             </button>
             <button
-              onClick={() => setFecha(todayISO())}
+              onClick={() => setDate(todayISO())}
               className="rounded-lg border border-line px-3 py-1.5 hover:bg-surface-plane"
             >
               Hoy
             </button>
             <button
-              onClick={() => setFecha(addDays(fecha, 1))}
+              onClick={() => setDate(addDays(date, 1))}
               className="rounded-lg border border-line px-3 py-1.5 hover:bg-surface-plane"
             >
               ›
@@ -136,33 +136,36 @@ export default function AgendaPage() {
         <Spinner className="py-10 text-center" />
       ) : error ? (
         <ListMessage type="error">{error}</ListMessage>
-      ) : medicosVisibles.length === 0 ? (
+      ) : visibleDoctors.length === 0 ? (
         <ListMessage>No hay médicos que mostrar.</ListMessage>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-line">
           <div
             className="grid gap-px bg-line text-sm"
-            style={{ gridTemplateColumns: `160px repeat(${HORAS.length}, minmax(96px, 1fr))` }}
+            style={{ gridTemplateColumns: `160px repeat(${HOURS.length}, minmax(96px, 1fr))` }}
           >
             <div className="sticky left-0 z-10 bg-surface-plane px-3 py-2 text-left text-[11px] font-semibold">
               Médico
             </div>
-            {HORAS.map((h) => (
-              <div key={h} className="bg-surface-plane py-2 text-center text-[11px] font-semibold">
-                {String(h).padStart(2, '0')}:00
+            {HOURS.map((hour) => (
+              <div
+                key={hour}
+                className="bg-surface-plane py-2 text-center text-[11px] font-semibold"
+              >
+                {String(hour).padStart(2, '0')}:00
               </div>
             ))}
 
-            {medicosVisibles.map((m) => (
+            {visibleDoctors.map((doctor) => (
               <DoctorRow
-                key={m.id}
-                medico={m}
-                dia={dia}
-                franjas={dispPorMedico[m.id] ?? []}
-                citasDe={citasDe}
-                serviciosMap={serviciosMap}
-                pacientes={pacientes}
-                onSelect={setCitaSel}
+                key={doctor.id}
+                doctor={doctor}
+                weekdayIndex={weekdayIndex}
+                slots={availabilityByDoctor[doctor.id] ?? []}
+                appointmentsAt={appointmentsAt}
+                serviceNames={serviceNames}
+                patientNames={patientNames}
+                onSelect={setSelectedAppointment}
               />
             ))}
           </div>
@@ -173,16 +176,16 @@ export default function AgendaPage() {
         Pulsa una cita para ver el detalle. Las celdas grises quedan fuera del horario del médico.
       </p>
 
-      {citaSel && (
+      {selectedAppointment && (
         <AppointmentDetail
-          cita={citaSel}
-          nombrePaciente={pacientes[citaSel.paciente_id]}
-          medicos={medicos}
-          servicios={servicios}
+          appointment={selectedAppointment}
+          patientName={patientNames[selectedAppointment.paciente_id]}
+          doctors={doctors}
+          services={services}
           canManage={canManage}
-          onClose={() => setCitaSel(null)}
+          onClose={() => setSelectedAppointment(null)}
           onUpdated={() => {
-            setCitaSel(null)
+            setSelectedAppointment(null)
             load()
           }}
         />
@@ -191,36 +194,44 @@ export default function AgendaPage() {
   )
 }
 
-function DoctorRow({ medico, dia, franjas, citasDe, serviciosMap, pacientes, onSelect }) {
+function DoctorRow({
+  doctor,
+  weekdayIndex,
+  slots,
+  appointmentsAt,
+  serviceNames,
+  patientNames,
+  onSelect,
+}) {
   return (
     <>
       <div className="sticky left-0 z-10 bg-white px-3 py-2 shadow-[1px_0_0_var(--color-line)]">
-        <p className="text-xs font-medium">{medico.nombre_completo}</p>
-        <p className="text-[10px] text-ink-muted">
-          {medico.especialidades[0]?.nombre ?? 'General'}
-        </p>
+        <p className="text-xs font-medium">{doctor.nombre_completo}</p>
+        <p className="text-[10px] text-ink-muted">{doctor.especialidades[0]?.nombre ?? 'General'}</p>
       </div>
-      {HORAS.map((h) => {
-        const disponible = horaDisponible(franjas, dia, h)
-        const enHora = citasDe(medico.id, h)
+      {HOURS.map((hour) => {
+        const available = isHourAvailable(slots, weekdayIndex, hour)
+        const hourAppointments = appointmentsAt(doctor.id, hour)
         return (
           <div
-            key={h}
-            className={`min-h-[46px] space-y-1 p-1 ${disponible ? 'bg-white' : 'bg-surface-plane'}`}
+            key={hour}
+            className={`min-h-[46px] space-y-1 p-1 ${available ? 'bg-white' : 'bg-surface-plane'}`}
           >
-            {enHora.map((c) => (
+            {hourAppointments.map((appointment) => (
               <button
-                key={c.id}
-                onClick={() => onSelect(c)}
-                title={`${formatTime(c.starts_at)} · ${serviciosMap[c.servicio_id] ?? ''}`}
+                key={appointment.id}
+                onClick={() => onSelect(appointment)}
+                title={`${formatTime(appointment.starts_at)} · ${serviceNames[appointment.servicio_id] ?? ''}`}
                 className={`block w-full rounded px-1.5 py-1 text-left text-[11px] leading-tight hover:brightness-95 ${
-                  APPOINTMENT_STATES[c.estado]?.chip ?? 'bg-brand-light text-brand-dark'
+                  APPOINTMENT_STATES[appointment.estado]?.chip ?? 'bg-brand-light text-brand-dark'
                 }`}
               >
-                <span className="tnum font-medium">{formatTime(c.starts_at)}</span>{' '}
-                {pacientes[c.paciente_id] ? nombreCorto(pacientes[c.paciente_id]) : ''}
+                <span className="tnum font-medium">{formatTime(appointment.starts_at)}</span>{' '}
+                {patientNames[appointment.paciente_id]
+                  ? shortName(patientNames[appointment.paciente_id])
+                  : ''}
                 <span className="block text-[10px] opacity-80">
-                  {serviciosMap[c.servicio_id] ?? ''}
+                  {serviceNames[appointment.servicio_id] ?? ''}
                 </span>
               </button>
             ))}
