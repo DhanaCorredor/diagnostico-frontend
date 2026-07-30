@@ -24,7 +24,7 @@ export default function AppointmentFields({ form, set, doctors, services }) {
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Field label="Médico">
           <Select
             value={form.medico_id}
@@ -56,7 +56,7 @@ export default function AppointmentFields({ form, set, doctors, services }) {
         </Field>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Field label="Fecha">
           <Input
             type="date"

@@ -183,7 +183,8 @@ export default function PatientFilePage() {
           ) : visibleAppointments.length === 0 ? (
             <ListMessage>No hay citas en ese rango de fechas.</ListMessage>
           ) : (
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[560px] text-sm">
               <thead className="text-left text-xs uppercase tracking-wide text-ink-muted">
                 <tr className="border-b border-line">
                   <th className="px-5 py-3 font-medium">Fecha</th>
@@ -206,9 +207,10 @@ export default function PatientFilePage() {
                       <StatusBadge status={appointment.estado} />
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </Card>
       )}
