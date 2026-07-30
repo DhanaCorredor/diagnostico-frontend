@@ -7,6 +7,7 @@ import { APPOINTMENT_STATES } from '../utils/appointments'
 import DateRangePicker from '../components/molecules/DateRangePicker'
 import KpiCard from '../components/molecules/KpiCard'
 import Card from '../components/atoms/Card'
+import Button from '../components/atoms/Button'
 import Alert from '../components/atoms/Alert'
 import Spinner from '../components/atoms/Spinner'
 import ListMessage from '../components/atoms/ListMessage'
@@ -112,12 +113,23 @@ export default function ReportsPage() {
     <div className="space-y-6">
       <Card className="p-5">
         <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="font-semibold">
-            Del {formatShortDate(from)} al {formatShortDate(to)}
-          </h2>
+          <div>
+            <p className="hidden text-sm font-semibold text-brand print:block">
+              Diagnóstico · Centro de Salud
+            </p>
+            <h2 className="font-semibold">
+              Informe de citas · del {formatShortDate(from)} al {formatShortDate(to)}
+            </h2>
+          </div>
           <span className="text-xs text-ink-muted">Incluye las citas canceladas</span>
         </div>
-        <DateRangePicker from={from} to={to} onChange={changeRange} />
+
+        <div className="no-print flex flex-wrap items-center justify-between gap-3">
+          <DateRangePicker from={from} to={to} onChange={changeRange} />
+          <Button variant="secondary" size="sm" onClick={() => window.print()}>
+            Imprimir o guardar en PDF
+          </Button>
+        </div>
       </Card>
 
       {error && <Alert>{error}</Alert>}
