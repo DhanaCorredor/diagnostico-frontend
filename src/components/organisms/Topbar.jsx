@@ -7,6 +7,7 @@ const TITLES = {
   agenda: 'Agenda',
   pacientes: 'Pacientes',
   medicos: 'Médicos',
+  reportes: 'Informes',
   usuarios: 'Usuarios',
   config: 'Configuración',
   citas: 'Nueva cita',

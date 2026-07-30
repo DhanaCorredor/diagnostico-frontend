@@ -9,6 +9,7 @@ import PatientFilePage from './pages/PatientFilePage'
 import DoctorsPage from './pages/DoctorsPage'
 import NewAppointmentPage from './pages/NewAppointmentPage'
 import UsersPage from './pages/UsersPage'
+import ReportsPage from './pages/ReportsPage'
 import ConfigPage from './pages/ConfigPage'
 
 const RECEP = ['ADMIN', 'RECEPCION']
@@ -57,6 +58,14 @@ export default function AppRouter() {
           element={
             <ProtectedRoute roles={RECEP}>
               <NewAppointmentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reportes"
+          element={
+            <ProtectedRoute roles={['ADMIN']}>
+              <ReportsPage />
             </ProtectedRoute>
           }
         />
