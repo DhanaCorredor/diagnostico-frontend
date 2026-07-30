@@ -8,14 +8,11 @@ import {
   formatShortDate,
   todayISO,
   addDays,
-  startOfWeek,
-  endOfWeek,
-  startOfMonth,
-  endOfMonth,
   daysBetween,
 } from '../utils/date'
 import { indexBy } from '../utils/data'
 import AppointmentDetail from '../components/organisms/AppointmentDetail'
+import DateRangePicker from '../components/molecules/DateRangePicker'
 import StatusBadge from '../components/molecules/StatusBadge'
 import Spinner from '../components/atoms/Spinner'
 import Card from '../components/atoms/Card'
@@ -117,21 +114,9 @@ export default function AgendaPage() {
     load()
   }, [load])
 
-  function selectDay(day) {
-    setFrom(day)
-    setTo(day)
-  }
-
-  function selectWeek() {
-    const today = todayISO()
-    setFrom(startOfWeek(today))
-    setTo(endOfWeek(today))
-  }
-
-  function selectMonth() {
-    const today = todayISO()
-    setFrom(startOfMonth(today))
-    setTo(endOfMonth(today))
+  function changeRange(nextFrom, nextTo) {
+    setFrom(nextFrom)
+    setTo(nextTo)
   }
 
   function shift(direction) {
@@ -181,47 +166,7 @@ export default function AgendaPage() {
           )}
         </div>
 
-        <div className="flex flex-wrap items-end gap-3 text-sm">
-          <div className="flex gap-1">
-            <button
-              onClick={() => selectDay(todayISO())}
-              className="rounded-lg border border-line px-3 py-1.5 hover:bg-surface-plane"
-            >
-              Hoy
-            </button>
-            <button
-              onClick={selectWeek}
-              className="rounded-lg border border-line px-3 py-1.5 hover:bg-surface-plane"
-            >
-              Esta semana
-            </button>
-            <button
-              onClick={selectMonth}
-              className="rounded-lg border border-line px-3 py-1.5 hover:bg-surface-plane"
-            >
-              Este mes
-            </button>
-          </div>
-
-          <label className="flex items-center gap-2">
-            <span className="text-ink-2">Desde</span>
-            <input
-              type="date"
-              value={from}
-              onChange={(event) => setFrom(event.target.value)}
-              className="rounded-lg border border-line px-2 py-1.5 outline-none focus:border-brand"
-            />
-          </label>
-          <label className="flex items-center gap-2">
-            <span className="text-ink-2">Hasta</span>
-            <input
-              type="date"
-              value={to}
-              onChange={(event) => setTo(event.target.value)}
-              className="rounded-lg border border-line px-2 py-1.5 outline-none focus:border-brand"
-            />
-          </label>
-
+        <DateRangePicker from={from} to={to} onChange={changeRange}>
           <div className="flex gap-1">
             <button
               onClick={() => shift(-1)}
@@ -238,7 +183,7 @@ export default function AgendaPage() {
               ›
             </button>
           </div>
-        </div>
+        </DateRangePicker>
       </div>
 
       {loading ? (
