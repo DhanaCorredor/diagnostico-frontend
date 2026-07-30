@@ -1,4 +1,4 @@
-# ERP Diagnóstico — Mejoras del backend y trabajo del frontend
+# ERP Diagnóstico — Catálogo de trabajo
 
 > **Catálogo único de trabajo pendiente.** Reúne en un solo sitio el estado de las mejoras del
 > **backend** y, a partir de ellas, **qué hay que hacer en el frontend**.
@@ -55,7 +55,9 @@ backend.
 
 ## 3. Capacidades de la API que el frontend no usa
 
-Encontradas al revisar el backend. **No requieren que el backend haga nada**: ya están publicadas.
+### 3.1 Publicadas y disponibles hoy
+
+Encontradas al revisar el backend. **No requieren que el backend haga nada**: ya están en `v0.8.0`.
 
 | Capacidad | Dónde está | Qué permite |
 |-----------|-----------|-------------|
@@ -65,6 +67,33 @@ Encontradas al revisar el backend. **No requieren que el backend haga nada**: ya
 | `GET /servicios?medico_id=` | `catalog.py:27-32` | `F25` — la lógica está duplicada en el frontend |
 | `GET /usuarios/{id}` | `users.py:27` | `F13` ficha del médico |
 | `GET /health` con comprobación de base | `A13` | `F8` aviso de "conectando…" |
+
+### 3.2 En camino — rama `feat/complete-crud` del backend
+
+Nueve endpoints nuevos en una rama **todavía sin mergear ni publicar**. Se anotan aquí para tener
+la UI pensada cuando salgan, pero **no se empieza hasta que estén en producción**.
+
+| Endpoint nuevo | Qué permite en la UI |
+|----------------|----------------------|
+| `PUT /disponibilidad/{id}` · `DELETE /disponibilidad/{id}` | Completa `F2`: editar y borrar franjas, no solo crearlas |
+| `PUT /especialidades/{id}` | `F30` — renombrar una especialidad |
+| `DELETE /especialidades/{id}` | `F30` — eliminarla, con el aviso de que está en uso |
+| `PUT /servicios/{id}` con especialidades | `F31` — **decidir qué especialidades ofrecen cada servicio** |
+| `DELETE /servicios/{id}` | `F32` — baja lógica de verdad, en vez del apaño actual |
+| `GET /citas/{id}` | `F33` — que una cita tenga URL propia |
+
+**Tres reglas de negocio nuevas que la interfaz tendrá que explicar**, todas con `409` y datos
+útiles en el `detail`:
+
+- **R7** · dos franjas del mismo médico y día no pueden cruzarse (`OverlappingSlot`).
+- **R8** · no se puede editar ni borrar una franja que **sostiene citas futuras activas**
+  (`StrandedAppointments`, que **incluye cuántas**). Es el caso más delicado: el usuario cree que
+  está cambiando un horario y en realidad dejaría citas huérfanas.
+- **R9** · no se puede eliminar una especialidad **en uso** (`SpecialtyInUse`, que dice **cuántos
+  médicos y servicios** la usan).
+
+Las tres refuerzan `F5`: si la UI sigue tragándose el `detail`, el usuario verá "no se pudo" en vez
+de "esta franja sostiene 3 citas futuras".
 
 ## 4. Plan priorizado del frontend
 
@@ -96,6 +125,10 @@ Encontradas al revisar el backend. **No requieren que el backend haga nada**: ya
 | 23 | **F15** | Panel con datos de la semana | `feat/weekly-kpis` | bajo | no | ⬜ |
 | 24 | **F25** | Filtrar servicios en el servidor | `refactor/services-by-doctor` | bajo | no | ⬜ |
 | 25 | **F23** | Atajos de teclado | `feat/keyboard-shortcuts` | bajo | no | ⬜ |
+| — | **F30** | Gestión completa de especialidades | `feat/specialty-management` | bajo | **sí** | ⬜ |
+| — | **F31** | Qué especialidades ofrecen cada servicio | `feat/service-specialties` | medio | **sí** | ⬜ |
+| — | **F32** | Baja de servicios con su propio endpoint | `refactor/service-delete` | bajo | **sí** | ⬜ |
+| — | **F33** | URL propia para el detalle de cita | `feat/appointment-route` | medio | **sí** | ⬜ |
 | — | **F7** | Disponibilidad en una sola petición | `perf/availability-batch` | bajo | **sí** | ⬜ |
 | — | **F24** | Tabla de pacientes virtualizada | `perf/virtual-table` | medio | **sí** | ⬜ |
 | — | **F29** | Dónde vive el token *(decisión abierta)* | — | alto | **sí** | ⬜ |
@@ -227,6 +260,10 @@ haga la UI). Lo que sigue son los huecos del **lado del navegador**, que es dond
   más visible que queda, y así lo recoge también el backend en su §4.1.
 - **Qué haríamos:** alta y listado de franjas por día en la ficha del médico, distinguiendo el
   `400` ("inicio posterior al fin") del `409` de `A1` (franja cruzada).
+- **Se puede empezar ya** con lo publicado (`GET` y `POST`). Cuando salga `feat/complete-crud`
+  (§3.2) se amplía con **editar y borrar**, y con el `409` de **R8**: una franja que sostiene
+  citas futuras no se puede tocar, y el error dice cuántas son. Merece la pena dejar la pantalla
+  preparada para esos dos botones desde el principio, en vez de rehacerla después.
 
 #### F11 · Ver las citas canceladas · bajo
 
@@ -320,6 +357,46 @@ regla cambia, hay que acordarse de ambos.
 Recepción trabaja rápido y todo se hace a ratón. Al menos: nueva cita, buscar y cerrar modal.
 
 ### 5.6 Esperan al backend
+
+Los cuatro primeros dependen de la rama `feat/complete-crud` (§3.2), aún sin publicar.
+
+#### F30 · Gestión completa de especialidades · bajo
+
+- **Hoy:** `ConfigPage.jsx` solo permite **crear**. Una especialidad mal escrita se queda para
+  siempre en el catálogo.
+- **Qué haríamos:** renombrar (`PUT`) y eliminar (`DELETE`). Al eliminar hay que contar bien el
+  `409` de **R9**: no basta con "no se pudo", el backend dice **cuántos médicos y servicios** la
+  usan, y eso es justo lo que el administrador necesita saber para decidir.
+
+#### F31 · Qué especialidades ofrecen cada servicio · medio
+
+- **Hoy:** la relación N:M entre servicios y especialidades **existe y se usa** —es la que filtra
+  los servicios al elegir médico (`AppointmentFields.jsx:7-14`)— pero **no se puede editar desde
+  la aplicación**. Se configuró por el *seed*.
+- **Consecuencia:** la regla que decide qué puede agendarse con cada médico está fuera del alcance
+  del administrador. Si entra un servicio nuevo, no hay forma de decir qué especialidad lo ofrece
+  sin tocar la base de datos.
+- **Qué haríamos:** en el formulario de servicio, un selector múltiple de especialidades, igual
+  que el que ya existe para los médicos en `UserForm.jsx:145-166`.
+- **Por qué importa más de lo que parece:** es la pieza que cierra el círculo del filtro por
+  especialidad, hoy medio configurable.
+
+#### F32 · Baja de servicios con su propio endpoint · bajo
+
+- **Hoy:** `ConfigPage.jsx:75` da de baja un servicio con `PUT /servicios/{id}` y
+  `{ activo: false }`, porque no había un `DELETE`. Es un apaño que funciona pero que confunde:
+  parece una edición cuando es una baja.
+- **Qué haríamos:** cambiarlo por `api.del('/servicios/{id}')` cuando exista, igual que ya se hace
+  con pacientes y usuarios.
+
+#### F33 · URL propia para el detalle de cita · medio
+
+- **Hoy:** `AppointmentDetail` solo se abre como modal desde una lista. No hay forma de enlazar a
+  una cita: si recargas la página, se pierde.
+- **Consecuencia:** no se puede pasar un enlace a un compañero ni volver a una cita concreta desde
+  el historial del navegador.
+- **Qué haríamos:** una ruta `/citas/:id` que cargue la cita con `GET /citas/{id}`. Encaja con
+  `F22`, que también busca que el estado de la vista viva en la URL.
 
 #### F7 · Disponibilidad en una sola petición · bajo
 
