@@ -47,6 +47,7 @@ backend.
 | **A17** | Copias de seguridad | ⬜ | Nada |
 | **B1** | Paginación de listados | ⬜ | Bloquea `F24` y el paginador real |
 | **B2** | Contrato de la API en inglés | ✖️ | **Decidido que no**: el contrato se queda en español |
+| **B3** | Eliminar un usuario del sistema | 📝 | **Propuesta nuestra** (§5.6). Bloquea `F35` |
 | **C1** | Historia clínica | ⬜ | Bloquea la sección de notas del paciente |
 | **C2** | Reportes y estadísticas | ⬜ | Bloquea la sección de reportes |
 | **C3** | Auditoría de cambios | ⬜ | Bloquea el historial en el detalle de cita |
@@ -173,6 +174,7 @@ El orden es una **propuesta**; lo que se hace de verdad es lo aprobado. Estados:
 | 23 | **F15** | Panel con datos de la semana | `feat/weekly-kpis` | bajo | no | ⬜ |
 | 24 | **F25** | Filtrar servicios en el servidor | `refactor/services-by-doctor` | bajo | no | ⬜ |
 | 25 | **F23** | Atajos de teclado | `feat/keyboard-shortcuts` | bajo | no | ⬜ |
+| — | **F35** | Botón de eliminar usuario | `feat/user-delete` | bajo | **sí (B3)** | ⬜ |
 | — | **F30** | Gestión completa de especialidades | `feat/specialty-management` | bajo | **sí** | ⬜ |
 | — | **F31** | Qué especialidades ofrecen cada servicio | `feat/service-specialties` | medio | **sí** | ⬜ |
 | — | **F32** | Baja de servicios con su propio endpoint | `refactor/service-delete` | bajo | **sí** | ⬜ |
@@ -433,6 +435,66 @@ Recepción trabaja rápido y todo se hace a ratón. Al menos: nueva cita, buscar
 ### 5.6 Esperan al backend
 
 Los cuatro primeros dependen de la rama `feat/complete-crud` (§3.2), aún sin publicar.
+
+#### B3 · Eliminar un usuario del sistema · *propuesta para el backend*
+
+> **Esta ficha no es trabajo del frontend: es la propuesta que hay que llevar al otro repo.**
+> Aquí solo queda `F35`, el botón, que no se puede hacer hasta que exista.
+
+**Por qué.** Hoy no se puede borrar un acceso: `DELETE /usuarios/{id}` hace baja lógica
+(`activo = False`). Para un centro que da de alta y de baja personal, «este acceso ya no existe»
+es una necesidad real, y hoy la lista sigue mostrando a quien se fue.
+
+**El obstáculo.** `citas` tiene **tres** claves foráneas obligatorias a `usuarios`:
+
+```
+paciente_id     → usuarios.id   NOT NULL
+medico_id       → usuarios.id   NOT NULL
+creado_por_id   → usuarios.id   NOT NULL
+```
+
+Ese `creado_por_id` es quien creó la cita, así que **cualquier acceso que haya agendado alguna vez
+está referenciado**, no solo los médicos. Borrar la fila sin más hace que PostgreSQL rechace la
+operación.
+
+**Regla propuesta (R11).** Misma forma que `R10` en pacientes, con el eje activo/pasado de `R8`:
+
+| Situación del usuario | Resultado |
+|-----------------------|-----------|
+| Tiene **citas futuras activas** (como médico o como creador) | **No se borra.** `409`, diciendo cuántas |
+| Solo tiene **citas pasadas o cerradas** | **Anonimizado**: se borran nombre, email, contraseña, matrícula y especialidades; el historial conserva la referencia |
+| **No tiene ninguna cita** | **Eliminado**: se borra la fila |
+
+En los tres casos que proceden, **el acceso desaparece**: sin correo y sin contraseña, esa persona
+no vuelve a entrar ni figura en el listado. Lo único que sobrevive, cuando hay historial, es una
+referencia para que una cita de marzo siga sabiendo quién la atendió.
+
+**Cambio de contrato.** `DELETE /usuarios/{id}` pasa de dar de baja a **borrar**, igual que en
+pacientes. La baja reversible se hace con `PUT /usuarios/{id}` y `{"activo": false}`, que ya
+funciona.
+
+| | Respuesta |
+|---|---|
+| `200` | `{ "resultado": "eliminado" \| "anonimizado", "citas_conservadas": int }` |
+| `404` | El usuario no existe |
+| `409` | Tiene citas futuras activas; el `detail` lleva cuántas |
+| `409` | Es el **último administrador activo** |
+| `422` | Es **el propio usuario autenticado** |
+
+Las dos últimas son salvaguardas: borrar al único administrador deja el sistema sin quien
+gestione, y borrarse a uno mismo a media sesión es un accidente esperando a pasar.
+
+**Aviso:** al cambiar el significado de `DELETE`, el botón «Desactivar» de `UsersPage.jsx:82`
+—que hoy llama a `api.del`— tiene que pasar a `PUT {"activo": false}` **antes o a la vez** que se
+publique. Si no, dar de baja pasaría a borrar sin que nadie lo haya pedido. Es el mismo tropiezo
+que `F34`.
+
+#### F35 · Botón de eliminar usuario · bajo · **espera a `B3`**
+
+En `UsersPage`, junto a la baja: confirmación que explique lo que va a pasar según el caso, el
+mensaje del `409` cuando tenga citas futuras —diciendo cuántas—, y el resultado al terminar
+(«eliminado» o «se conservan N citas»). Mismo patrón que `F34`, incluido escribir el nombre para
+confirmar. Y separar los dos verbos en la interfaz: **Dar de baja** frente a **Eliminar**.
 
 #### F30 · Gestión completa de especialidades · bajo
 
