@@ -5,7 +5,7 @@ import ListMessage from '../atoms/ListMessage'
 export default function Table({ title, count, action, columns, rows, loading, error, empty }) {
   return (
     <Card>
-      <div className="flex items-center justify-between border-b border-line px-5 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-4 sm:px-5">
         <h2 className="font-semibold">
           {title}
           {count != null && (
@@ -22,26 +22,30 @@ export default function Table({ title, count, action, columns, rows, loading, er
       ) : rows.length === 0 ? (
         <ListMessage>{empty}</ListMessage>
       ) : (
-        <table className="w-full text-sm">
-          <thead className="text-left text-xs uppercase tracking-wide text-ink-muted">
-            <tr className="border-b border-line">
-              {columns.map((c, i) => (
-                <th key={i} className={`px-5 py-3 font-medium ${c.thClassName ?? ''}`}>
-                  {c.header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-line">
-            {rows.map((fila) => (
-              <tr key={fila.id} className="hover:bg-surface-plane">
-                {columns.map((c, i) => (
-                  <td key={i} className={`px-5 py-3 ${c.className ?? ''}`}>{c.render(fila)}</td>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] text-sm">
+            <thead className="text-left text-xs uppercase tracking-wide text-ink-muted">
+              <tr className="border-b border-line">
+                {columns.map((column, i) => (
+                  <th key={i} className={`px-4 py-3 font-medium sm:px-5 ${column.thClassName ?? ''}`}>
+                    {column.header}
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-line">
+              {rows.map((row) => (
+                <tr key={row.id} className="hover:bg-surface-plane">
+                  {columns.map((column, i) => (
+                    <td key={i} className={`px-4 py-3 sm:px-5 ${column.className ?? ''}`}>
+                      {column.render(row)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </Card>
   )

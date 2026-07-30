@@ -93,8 +93,8 @@ export default function NewAppointmentPage() {
         <form onSubmit={onSubmit} className="space-y-4 p-6">
           <AppointmentError error={error} />
 
-          <div className="grid grid-cols-3 gap-3">
-            <div className="col-span-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="sm:col-span-2">
               <Field label="Paciente (nombre completo)">
                 <Input
                   value={form.nombre_completo}

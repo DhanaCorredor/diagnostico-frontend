@@ -43,7 +43,7 @@ function linkClass({ isActive }) {
     : `${base} text-ink-2 hover:bg-surface-plane`
 }
 
-export default function Sidebar() {
+export default function Sidebar({ open = false, onClose }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
@@ -53,7 +53,11 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="fixed inset-y-0 left-0 flex w-60 flex-col border-r border-line bg-white">
+    <aside
+      className={`fixed inset-y-0 left-0 z-50 flex w-60 flex-col border-r border-line bg-white transition-transform duration-200 lg:translate-x-0 ${
+        open ? 'translate-x-0' : '-translate-x-full'
+      }`}
+    >
       <div className="flex items-center gap-3 px-5 py-5">
         <img src="/isotipo.png" alt="Diagnóstico" className="h-9 w-9 object-contain" />
         <div>
@@ -67,7 +71,13 @@ export default function Sidebar() {
           item.divider ? (
             <div key={`divider-${i}`} className="my-2 border-t border-line" />
           ) : (
-            <NavLink key={item.to} to={item.to} end={item.end} className={linkClass}>
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              onClick={onClose}
+              className={linkClass}
+            >
               <svg
                 className="h-5 w-5"
                 fill="none"

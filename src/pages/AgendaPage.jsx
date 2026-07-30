@@ -246,10 +246,12 @@ export default function AgendaPage() {
       ) : error ? (
         <ListMessage type="error">{error}</ListMessage>
       ) : singleDay ? (
-        visibleDoctors.length === 0 ? (
-          <ListMessage>No hay médicos que mostrar.</ListMessage>
-        ) : (
-          <div className="overflow-x-auto rounded-lg border border-line">
+        <>
+          <div className="hidden lg:block">
+            {visibleDoctors.length === 0 ? (
+              <ListMessage>No hay médicos que mostrar.</ListMessage>
+            ) : (
+              <div className="overflow-x-auto rounded-lg border border-line">
             <div
               className="grid gap-px bg-line text-sm"
               style={{ gridTemplateColumns: `160px repeat(${HOURS.length}, minmax(96px, 1fr))` }}
@@ -277,51 +279,42 @@ export default function AgendaPage() {
                   patientNames={patientNames}
                   onSelect={setSelectedAppointment}
                 />
-              ))}
-            </div>
-          </div>
-        )
-      ) : appointments.length === 0 ? (
-        <ListMessage>No hay citas en este periodo.</ListMessage>
-      ) : (
-        <div className="space-y-5">
-          {groupByDay(appointments).map(([day, dayAppointments]) => (
-            <div key={day}>
-              <h3 className="mb-2 text-sm font-semibold capitalize text-ink-2">
-                {longDateFromISO(day)}
-              </h3>
-              <div className="divide-y divide-line rounded-lg border border-line">
-                {dayAppointments.map((appointment) => (
-                  <button
-                    key={appointment.id}
-                    onClick={() => setSelectedAppointment(appointment)}
-                    className="flex w-full items-center gap-4 px-4 py-2.5 text-left hover:bg-surface-plane"
-                  >
-                    <span className="tnum w-14 text-sm font-medium text-ink-2">
-                      {formatTime(appointment.starts_at)}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">
-                        {patientNames[appointment.paciente_id] ?? 'Paciente'}
-                      </p>
-                      <p className="truncate text-xs text-ink-muted">
-                        {doctorNames[appointment.medico_id] ?? 'Médico'} ·{' '}
-                        {serviceNames[appointment.servicio_id] ?? 'Servicio'}
-                      </p>
-                    </div>
-                    <StatusBadge status={appointment.estado} />
-                  </button>
                 ))}
               </div>
             </div>
-          ))}
-        </div>
-      )}
+            )}
+            <p className="mt-2 text-[11px] text-ink-muted">
+              Pulsa una cita para ver el detalle. Las celdas grises quedan fuera del horario del
+              médico.
+            </p>
+          </div>
 
-      {singleDay && !loading && !error && (
-        <p className="mt-2 text-[11px] text-ink-muted">
-          Pulsa una cita para ver el detalle. Las celdas grises quedan fuera del horario del médico.
-        </p>
+          <div className="lg:hidden">
+            {appointments.length === 0 ? (
+              <ListMessage>No hay citas este día.</ListMessage>
+            ) : (
+              <DayList
+                appointments={appointments}
+                patientNames={patientNames}
+                doctorNames={doctorNames}
+                serviceNames={serviceNames}
+                onSelect={setSelectedAppointment}
+                showDayHeadings={false}
+              />
+            )}
+          </div>
+        </>
+      ) : appointments.length === 0 ? (
+        <ListMessage>No hay citas en este periodo.</ListMessage>
+      ) : (
+        <DayList
+          appointments={appointments}
+          patientNames={patientNames}
+          doctorNames={doctorNames}
+          serviceNames={serviceNames}
+          onSelect={setSelectedAppointment}
+          showDayHeadings
+        />
       )}
 
       {selectedAppointment && (
@@ -339,6 +332,81 @@ export default function AgendaPage() {
         />
       )}
     </Card>
+  )
+}
+
+function AppointmentRow({ appointment, patientNames, doctorNames, serviceNames, onSelect }) {
+  return (
+    <button
+      onClick={() => onSelect(appointment)}
+      className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-surface-plane"
+    >
+      <span className="tnum w-12 shrink-0 text-sm font-medium text-ink-2">
+        {formatTime(appointment.starts_at)}
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium">
+          {patientNames[appointment.paciente_id] ?? 'Paciente'}
+        </p>
+        <p className="truncate text-xs text-ink-muted">
+          {doctorNames[appointment.medico_id] ?? 'Médico'} ·{' '}
+          {serviceNames[appointment.servicio_id] ?? 'Servicio'}
+        </p>
+      </div>
+      <StatusBadge status={appointment.estado} />
+    </button>
+  )
+}
+
+function DayList({
+  appointments,
+  patientNames,
+  doctorNames,
+  serviceNames,
+  onSelect,
+  showDayHeadings,
+}) {
+  const days = groupByDay(appointments)
+
+  if (!showDayHeadings) {
+    return (
+      <div className="divide-y divide-line rounded-lg border border-line">
+        {days.flatMap(([, dayAppointments]) => dayAppointments).map((appointment) => (
+          <AppointmentRow
+            key={appointment.id}
+            appointment={appointment}
+            patientNames={patientNames}
+            doctorNames={doctorNames}
+            serviceNames={serviceNames}
+            onSelect={onSelect}
+          />
+        ))}
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-5">
+      {days.map(([day, dayAppointments]) => (
+        <div key={day}>
+          <h3 className="mb-2 text-sm font-semibold capitalize text-ink-2">
+            {longDateFromISO(day)}
+          </h3>
+          <div className="divide-y divide-line rounded-lg border border-line">
+            {dayAppointments.map((appointment) => (
+              <AppointmentRow
+                key={appointment.id}
+                appointment={appointment}
+                patientNames={patientNames}
+                doctorNames={doctorNames}
+                serviceNames={serviceNames}
+                onSelect={onSelect}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
   )
 }
 
