@@ -147,7 +147,7 @@ El orden es una **propuesta**; lo que se hace de verdad es lo aprobado. Estados:
 | Orden | ID | Tarea | Rama | Coste | Espera al backend | Estado |
 |:-----:|:--:|-------|------|:-----:|:-----------------:|:------:|
 | — | **F1** | Migración a inglés | `refactor/english-identifiers` | bajo | no | ✅ |
-| **0** | **F34** | **Corregir el aviso al borrar un paciente** | `fix/patient-erase-warning` | bajo | **coordinada** | ✔️ |
+| **0** | **F34** | **Corregir el aviso al borrar un paciente** | `fix/patient-erase-warning` | bajo | **coordinada** | ✅ |
 | 1 | **F5** | Mensajes de error reales | `fix/api-error-messages` | bajo | no | ✔️ |
 | 2 | **F27** | Avisar cuando la sesión caduca | `fix/session-expired-notice` | bajo | no | ⬜ |
 | 3 | **F17** | Reintentar tras un error | `fix/error-retry` | bajo | no | ⬜ |
@@ -189,7 +189,7 @@ hace usable de verdad, después funcionalidad nueva.
 
 ### 5.0 Urgente
 
-#### F34 · Corregir el aviso al borrar un paciente · bajo · **antes de la release**
+#### F34 · Corregir el aviso al borrar un paciente · bajo · **hecha**
 
 - **Hoy:** el modal de `PatientsPage.jsx:125-145` dice literalmente *"El paciente se dará de baja
   (baja lógica, recuperable)"*, y el botón se llama "Eliminar".
