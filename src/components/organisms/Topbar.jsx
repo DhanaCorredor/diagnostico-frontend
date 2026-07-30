@@ -23,7 +23,7 @@ export default function Topbar({ onOpenMenu }) {
   const canSchedule = user.rol === 'ADMIN' || user.rol === 'RECEPCION'
 
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-line bg-white/90 px-4 py-4 backdrop-blur sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-line bg-surface/90 px-4 py-4 backdrop-blur sm:px-6 lg:px-8">
       <div className="flex min-w-0 items-center gap-3">
         <button
           type="button"

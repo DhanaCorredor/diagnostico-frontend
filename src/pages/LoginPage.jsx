@@ -42,7 +42,7 @@ export default function LoginPage() {
     <AuthLayout>
       <form
         onSubmit={onSubmit}
-        className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-xl ring-1 ring-line"
+        className="w-full max-w-sm rounded-2xl bg-surface p-8 shadow-xl ring-1 ring-line"
       >
         <img src="/logo.png" alt="Diagnóstico · Centro de Salud" className="mx-auto mb-6 h-14 w-auto" />
 

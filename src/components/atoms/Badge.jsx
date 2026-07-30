@@ -1,10 +1,10 @@
 const COLORS = {
   brand: 'bg-brand-light text-brand-dark',
   good: 'bg-good/10 text-good',
-  warn: 'bg-warn/10 text-[#8a6100]',
+  warn: 'bg-warn/10 text-warn-ink',
   crit: 'bg-crit/10 text-crit',
   muted: 'bg-ink-muted/10 text-ink-2',
-  aqua: 'bg-[#eef4e3] text-aqua',
+  aqua: 'bg-aqua-light text-aqua',
   neutral: 'bg-surface-plane text-ink-2',
 }
 
