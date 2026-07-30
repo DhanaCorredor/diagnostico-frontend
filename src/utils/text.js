@@ -1,3 +1,11 @@
+export function normalize(value = '') {
+  return value
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+    .trim()
+}
+
 export function initials(name = '') {
   return name
     .split(' ')
