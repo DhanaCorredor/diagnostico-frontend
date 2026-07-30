@@ -72,33 +72,37 @@ Encontradas al revisar el backend. **No requieren que el backend haga nada**: ya
 |:-----:|:--:|-------|------|:-----:|:-----------------:|:------:|
 | — | **F1** | Migración a inglés | `refactor/english-identifiers` | bajo | no | ✅ |
 | 1 | **F5** | Mensajes de error reales | `fix/api-error-messages` | bajo | no | ⬜ |
-| 2 | **F17** | Reintentar tras un error | `fix/error-retry` | bajo | no | ⬜ |
-| 3 | **F18** | Modales con teclado y foco | `fix/modal-keyboard` | bajo | no | ⬜ |
-| 4 | **F19** | Aviso de cambios sin guardar | `feat/unsaved-changes-guard` | bajo | no | ⬜ |
-| 5 | **F20** | Confirmación tras guardar | `feat/toasts` | bajo | no | ⬜ |
-| 6 | **F16** | Uso en móvil y tablet | `feat/responsive-layout` | medio | no | ⬜ |
-| 7 | **F2** | Pantalla de disponibilidad | `feat/availability-ui` | medio | no | ⬜ |
-| 8 | **F11** | Ver las citas canceladas | `feat/cancelled-appointments` | bajo | no | ⬜ |
-| 9 | **F12** | Comprobante de cita imprimible | `feat/appointment-receipt` | bajo | no | ⬜ |
-| 10 | **F8** | Aviso de conexión con el servidor | `feat/connection-status` | bajo | no | ⬜ |
-| 11 | **F9** | Vista semanal de la agenda | `feat/week-view` | medio | no | ⬜ |
-| 12 | **F3** | Integración continua | `chore/ci-github-actions` | bajo | no | ⬜ |
-| 13 | **F4** | Cobertura de tests de páginas | `test/pages-coverage` | medio | no | ⬜ |
-| 14 | **F6** | Accesibilidad de pestañas | `fix/a11y-tabs` | bajo | no | ⬜ |
-| 15 | **F10** | Buscador de hueco libre | `feat/next-free-slot` | medio | no | ⬜ |
-| 16 | **F13** | Ficha del médico | `feat/doctor-file` | medio | no | ⬜ |
-| 17 | **F21** | Esqueletos de carga | `feat/loading-skeletons` | bajo | no | ⬜ |
-| 18 | **F22** | Recordar los filtros de la agenda | `feat/persist-filters` | bajo | no | ⬜ |
-| 19 | **F14** | Exportar la agenda del día | `feat/export-agenda` | bajo | no | ⬜ |
-| 20 | **F15** | Panel con datos de la semana | `feat/weekly-kpis` | bajo | no | ⬜ |
-| 21 | **F25** | Filtrar servicios en el servidor | `refactor/services-by-doctor` | bajo | no | ⬜ |
-| 22 | **F23** | Atajos de teclado | `feat/keyboard-shortcuts` | bajo | no | ⬜ |
+| 2 | **F27** | Avisar cuando la sesión caduca | `fix/session-expired-notice` | bajo | no | ⬜ |
+| 3 | **F17** | Reintentar tras un error | `fix/error-retry` | bajo | no | ⬜ |
+| 4 | **F18** | Modales con teclado y foco | `fix/modal-keyboard` | bajo | no | ⬜ |
+| 5 | **F19** | Aviso de cambios sin guardar | `feat/unsaved-changes-guard` | bajo | no | ⬜ |
+| 6 | **F20** | Confirmación tras guardar | `feat/toasts` | bajo | no | ⬜ |
+| 7 | **F28** | Cabeceras de seguridad en Vercel | `chore/security-headers` | bajo | no | ⬜ |
+| 8 | **F26** | Cierre de sesión por inactividad | `feat/idle-logout` | bajo | no | ⬜ |
+| 9 | **F16** | Uso en móvil y tablet | `feat/responsive-layout` | medio | no | ⬜ |
+| 10 | **F2** | Pantalla de disponibilidad | `feat/availability-ui` | medio | no | ⬜ |
+| 11 | **F11** | Ver las citas canceladas | `feat/cancelled-appointments` | bajo | no | ⬜ |
+| 12 | **F12** | Comprobante de cita imprimible | `feat/appointment-receipt` | bajo | no | ⬜ |
+| 13 | **F8** | Aviso de conexión con el servidor | `feat/connection-status` | bajo | no | ⬜ |
+| 14 | **F9** | Vista semanal de la agenda | `feat/week-view` | medio | no | ⬜ |
+| 15 | **F3** | Integración continua | `chore/ci-github-actions` | bajo | no | ⬜ |
+| 16 | **F4** | Cobertura de tests de páginas | `test/pages-coverage` | medio | no | ⬜ |
+| 17 | **F6** | Accesibilidad de pestañas | `fix/a11y-tabs` | bajo | no | ⬜ |
+| 18 | **F10** | Buscador de hueco libre | `feat/next-free-slot` | medio | no | ⬜ |
+| 19 | **F13** | Ficha del médico | `feat/doctor-file` | medio | no | ⬜ |
+| 20 | **F21** | Esqueletos de carga | `feat/loading-skeletons` | bajo | no | ⬜ |
+| 21 | **F22** | Recordar los filtros de la agenda | `feat/persist-filters` | bajo | no | ⬜ |
+| 22 | **F14** | Exportar la agenda del día | `feat/export-agenda` | bajo | no | ⬜ |
+| 23 | **F15** | Panel con datos de la semana | `feat/weekly-kpis` | bajo | no | ⬜ |
+| 24 | **F25** | Filtrar servicios en el servidor | `refactor/services-by-doctor` | bajo | no | ⬜ |
+| 25 | **F23** | Atajos de teclado | `feat/keyboard-shortcuts` | bajo | no | ⬜ |
 | — | **F7** | Disponibilidad en una sola petición | `perf/availability-batch` | bajo | **sí** | ⬜ |
 | — | **F24** | Tabla de pacientes virtualizada | `perf/virtual-table` | medio | **sí** | ⬜ |
+| — | **F29** | Dónde vive el token *(decisión abierta)* | — | alto | **sí** | ⬜ |
 
-El orden no va por valor sino por **coste creciente dentro de cada grupo**: primero los cinco
-arreglos baratos que cambian cómo se siente la aplicación, luego lo que la hace usable de verdad,
-después funcionalidad nueva.
+El orden no va por valor sino por **coste creciente dentro de cada grupo**: primero los arreglos
+baratos que cambian cómo se siente la aplicación y cierran los huecos de sesión, luego lo que la
+hace usable de verdad, después funcionalidad nueva.
 
 ## 5. Bloque F — Fichas
 
@@ -150,7 +154,60 @@ de uso más que cualquier funcionalidad nueva.
 - **Consecuencia:** en acciones rápidas el usuario no sabe si se guardó y repite la operación.
 - **Qué haríamos:** un aviso breve y no bloqueante ("Paciente guardado", "Cita cancelada").
 
-### 5.2 Que se pueda usar de verdad
+### 5.2 Seguridad de la sesión
+
+El `CLAUDE.md` pone la **seguridad de datos (HIPAA/GDPR)** como prioridad número uno del proyecto.
+El backend cumple su parte: contraseñas con bcrypt, JWT, y los roles se comprueban **en el
+servidor** (`require_role`, y en `appointments.py:125-126` un médico solo ve su agenda haga lo que
+haga la UI). Lo que sigue son los huecos del **lado del navegador**, que es donde hoy no hay nada.
+
+> Conviene tenerlo claro para la defensa: `ProtectedRoute` **no es una medida de seguridad**, es
+> comodidad de navegación. Quien manda es el backend. Ocultar un botón no protege un endpoint.
+
+#### F27 · Avisar cuando la sesión caduca · bajo
+
+- **Hoy:** ante un `401`, `AuthProvider.jsx:13-18` borra el token, borra el usuario y navega a
+  `/login`. **Sin decir nada.**
+- **Consecuencia:** el usuario estaba rellenando una cita y de pronto aparece en la pantalla de
+  entrada, sin saber si ha hecho algo mal, si se ha roto la aplicación o si su sesión expiró. Y lo
+  que estaba escribiendo se pierde.
+- **Qué haríamos:** pasar un motivo al redirigir y que `LoginPage` muestre "Tu sesión ha caducado,
+  vuelve a entrar". Va con `F5`: las dos son lo mismo — contar lo que pasa en vez de tragárselo.
+
+#### F26 · Cierre de sesión por inactividad · bajo
+
+- **Hoy:** no existe. La sesión solo termina si el usuario pulsa salir o si una petición devuelve
+  `401` porque el token ya expiró en el servidor.
+- **Consecuencia:** el ordenador de recepción es **compartido y está en una zona de paso**. Una
+  sesión abierta y desatendida deja a la vista el censo de pacientes y su historial de citas. Para
+  datos de salud, esto es lo primero que se mira en una auditoría.
+- **Qué haríamos:** temporizador de inactividad (unos 15 minutos), con aviso antes de cerrar para
+  no interrumpir a media tarea. Se apoya en `F27` para explicar por qué se cerró.
+
+#### F28 · Cabeceras de seguridad en Vercel · bajo
+
+- **Hoy:** `vercel.json` solo tiene la reescritura de rutas de la SPA. No se envía ninguna cabecera
+  de seguridad.
+- **Consecuencia:** la aplicación se puede embeber en un `iframe` ajeno (*clickjacking*), no hay
+  política de contenidos que limite de dónde se cargan scripts, y la URL completa viaja como
+  *referrer* a terceros.
+- **Qué haríamos:** un bloque `headers` en `vercel.json` con `X-Frame-Options`,
+  `X-Content-Type-Options`, `Referrer-Policy` y una `Content-Security-Policy` que permita solo el
+  propio origen y la API. Es configuración, no código: media hora.
+
+#### F29 · Dónde vive el token · alto · *decisión abierta, con el backend*
+
+- **Hoy:** el JWT se guarda en `localStorage` (`config/configClient.js:3,13-20`).
+- **El problema:** `localStorage` es accesible desde JavaScript, así que **cualquier XSS se lleva
+  el token** y con él la sesión. Además sobrevive a cerrar el navegador.
+- **La alternativa:** que el backend lo emita como *cookie* `httpOnly` + `Secure` + `SameSite`,
+  inaccesible desde JavaScript. Obliga a **tocar los dos repos** y a resolver CSRF, y el frontend
+  y la API están en dominios distintos (Vercel y Render), lo que complica las cookies.
+- **Recomendación:** para el alcance actual **se documenta y se deja como está**, apoyándose en que
+  React escapa el contenido por defecto (el riesgo de XSS es bajo) y en que el token caduca. Si el
+  sistema pasa a manejar historias clínicas reales (`C1`), se reabre.
+
+### 5.3 Que se pueda usar de verdad
 
 #### F16 · Uso en móvil y tablet · medio
 
@@ -199,7 +256,7 @@ de uso más que cualquier funcionalidad nueva.
 - **Consecuencia:** recepción no puede planificar. Para colocar una cita hay que ir día a día.
 - **Qué haríamos:** conmutador día/semana en la agenda, con una sola petición `?desde=&hasta=`.
 
-### 5.3 Funcionalidad nueva
+### 5.4 Funcionalidad nueva
 
 #### F10 · Buscador de hueco libre · medio
 
@@ -222,7 +279,7 @@ está cargado; **no necesita API**.
 Los KPI actuales solo miran hoy. Con `?desde=&hasta=` salen ocupación y ausencias de la semana sin
 esperar a `C2`.
 
-### 5.4 Calidad e infraestructura
+### 5.5 Calidad e infraestructura
 
 #### F3 · Integración continua · bajo
 
@@ -262,7 +319,7 @@ regla cambia, hay que acordarse de ambos.
 
 Recepción trabaja rápido y todo se hace a ratón. Al menos: nueva cita, buscar y cerrar modal.
 
-### 5.5 Esperan al backend
+### 5.6 Esperan al backend
 
 #### F7 · Disponibilidad en una sola petición · bajo
 
@@ -275,7 +332,7 @@ acepte varios `medico_id`. **No tiene ficha en el catálogo del backend: hay que
 La tabla pinta el censo entero. Va después de `B1` (paginación), que es quien define cómo se pide
 por páginas.
 
-### 5.6 Derivado de las mejoras pendientes
+### 5.7 Derivado de las mejoras pendientes
 
 Cada uno espera a que su mejora esté **publicada**.
 
@@ -303,7 +360,57 @@ Cosas que el frontend debe respetar y que no se deducen leyendo solo este repo:
 - **El médico solo ve su agenda**, y eso lo impone el servidor (`appointments.py:125-126`). La UI
   no debe depender de filtrar en el cliente para eso.
 
-## 7. Convenciones
+## 7. Riesgos del despliegue
+
+Todo el sistema corre en planes gratuitos. Esto es lo que puede fallar, por qué, y qué se puede
+hacer desde el frontend.
+
+### 7.1 El backend se duerme
+
+El servicio web de Render **se suspende a los 15 minutos sin tráfico** y despierta con la siguiente
+petición, que tarda bastante. El servicio **no caduca**: solo duerme.
+
+- **Se nota en:** el primer acceso del día y cualquiera tras un rato de pausa. El *login* parece
+  colgado.
+- **Mitigación desde aquí:** `F8` (avisar de que se está conectando) y `F21` (esqueletos en vez de
+  pantalla vacía). No lo arregla, pero deja de parecer roto.
+- **Lo que ya está resuelto en el backend:** `A9` añadió `pool_pre_ping`, así que la base
+  suspendida no provoca `SSL SYSCALL error` al despertar.
+
+### 7.2 La URL de la API se fija al construir
+
+Vite sustituye `import.meta.env.VITE_API_URL` **en tiempo de compilación**, no de ejecución.
+
+- **Consecuencia:** si la URL del backend cambia, **no basta con editar la variable en Vercel**;
+  hay que volver a desplegar el frontend. Es el tipo de detalle que cuesta una tarde el día que
+  pasa.
+
+### 7.3 CORS y los despliegues de vista previa
+
+El backend admite varios orígenes (`A2`), pero es una **lista explícita**: `FRONTEND_ORIGINS`.
+
+- **Consecuencia:** cada *preview deploy* de Vercel recibe una URL única que **no está en esa
+  lista**, así que no puede hablar con la API y la vista previa aparece rota aunque el código esté
+  bien. Solo funcionan `localhost:5173` y la URL de producción.
+- **Qué hacer:** saberlo antes de asustarse, y probar las ramas en local.
+
+### 7.4 No hay copias de seguridad
+
+`A17` sigue pendiente en el backend y el plan gratuito de Neon **no trae copias automáticas**.
+
+- **Hoy no es grave:** en producción solo hay datos del *seed* y pruebas; la base se puede recrear.
+- **Pasa a ser lo más importante del proyecto** en cuanto el centro registre pacientes y citas
+  reales. Son datos de salud, y una copia que nunca se ha restaurado no se sabe si sirve.
+- **No es trabajo del frontend**, pero conviene que esté escrito aquí: es el riesgo que de verdad
+  puede hacer daño.
+
+### 7.5 Límites del plan gratuito de Neon
+
+Según el runbook del backend: **0,5 GB de almacenamiento y 100 horas de cómputo por proyecto y
+mes**, con suspensión automática cuando nadie la usa. De sobra para este ERP, pero conviene saber
+que existe un techo y que la suspensión es justo la que provoca 7.1.
+
+## 8. Convenciones
 
 - **Código 100 % en inglés**: identificadores, funciones, componentes, nombres de archivo,
   descripciones de tests y mensajes de commit. **El contrato de la API se queda en español**
@@ -313,7 +420,7 @@ Cosas que el frontend debe respetar y que no se deducen leyendo solo este repo:
 - Commits *Conventional Commits* en inglés y atómicos. Una rama por unidad, `develop → main` con
   merge `--no-ff` y tag en los hitos. Las casillas de este documento se marcan **al mergear**.
 
-## 8. Ya hecho — no rehacer
+## 9. Ya hecho — no rehacer
 
 - **F1 · Código en inglés** (5 commits): identificadores, props, nombres de archivo y tests.
 - **Baja de pacientes y usuarios:** `PatientsPage.jsx:125-145` con modal de confirmación y aviso de
@@ -323,7 +430,7 @@ Cosas que el frontend debe respetar y que no se deducen leyendo solo este repo:
 - **Acciones sobre la cita:** cancelar, marcar asistencia y editar, en `AppointmentDetail.jsx`.
 - **Refactor a atomic design**, con lint en 0 avisos.
 
-## 9. Fuera del sistema
+## 10. Fuera del sistema
 
 **Facturación y cobros:** fuera del ERP (SENIAT, pago directo). Decisión de alcance, no pendiente.
 
