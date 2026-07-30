@@ -247,7 +247,7 @@ export default function AgendaPage() {
         <ListMessage type="error">{error}</ListMessage>
       ) : singleDay ? (
         <>
-          <div className="hidden lg:block">
+          <div className="hidden md:block">
             {visibleDoctors.length === 0 ? (
               <ListMessage>No hay médicos que mostrar.</ListMessage>
             ) : (
@@ -289,7 +289,7 @@ export default function AgendaPage() {
             </p>
           </div>
 
-          <div className="lg:hidden">
+          <div className="md:hidden">
             {appointments.length === 0 ? (
               <ListMessage>No hay citas este día.</ListMessage>
             ) : (
