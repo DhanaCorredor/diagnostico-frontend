@@ -1,188 +1,277 @@
 import { useCallback, useEffect, useState } from 'react'
-import { api } from '../config/api'
+import { api, errorMessage } from '../config/api'
 import { useAuth } from '../auth/useAuth'
-import { weekday, longDateFromISO, formatTime, todayISO, addDays } from '../utils/date'
+import {
+  weekday,
+  longDateFromISO,
+  formatTime,
+  formatShortDate,
+  todayISO,
+  addDays,
+  daysBetween,
+} from '../utils/date'
 import { indexBy } from '../utils/data'
 import AppointmentDetail from '../components/organisms/AppointmentDetail'
+import DateRangePicker from '../components/molecules/DateRangePicker'
+import StatusBadge from '../components/molecules/StatusBadge'
 import Spinner from '../components/atoms/Spinner'
 import Card from '../components/atoms/Card'
 import ListMessage from '../components/atoms/ListMessage'
-import { APPOINTMENT_STATES } from '../utils/citas'
+import { APPOINTMENT_STATES } from '../utils/appointments'
 
-const HORAS = Array.from({ length: 11 }, (_, i) => 7 + i)
+const HOURS = Array.from({ length: 11 }, (_, i) => 7 + i)
 
-function horaDisponible(franjas, dia, h) {
-  return franjas.some((f) => {
-    if (f.dia_semana !== dia) return false
-    const ini = Number(f.hora_inicio.slice(0, 2)) * 60 + Number(f.hora_inicio.slice(3, 5))
-    const fin = Number(f.hora_fin.slice(0, 2)) * 60 + Number(f.hora_fin.slice(3, 5))
-    return (h + 1) * 60 > ini && h * 60 < fin
+const MAX_RANGE_DAYS = 60
+
+function isHourAvailable(slots, weekdayIndex, hour) {
+  return slots.some((slot) => {
+    if (slot.dia_semana !== weekdayIndex) return false
+    const start = Number(slot.hora_inicio.slice(0, 2)) * 60 + Number(slot.hora_inicio.slice(3, 5))
+    const end = Number(slot.hora_fin.slice(0, 2)) * 60 + Number(slot.hora_fin.slice(3, 5))
+    return (hour + 1) * 60 > start && hour * 60 < end
   })
 }
 
-function nombreCorto(nombre = '') {
-  const partes = nombre.split(' ').filter(Boolean)
-  if (partes.length < 2) return nombre
-  return `${partes[0][0]}. ${partes[partes.length - 1]}`
+function shortName(name = '') {
+  const parts = name.split(' ').filter(Boolean)
+  if (parts.length < 2) return name
+  return `${parts[0][0]}. ${parts[parts.length - 1]}`
+}
+
+function groupByDay(appointments) {
+  const days = {}
+  for (const appointment of appointments) {
+    const day = appointment.starts_at.slice(0, 10)
+    ;(days[day] ??= []).push(appointment)
+  }
+  return Object.entries(days)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([day, list]) => [day, list.sort((a, b) => a.starts_at.localeCompare(b.starts_at))])
 }
 
 export default function AgendaPage() {
   const { user } = useAuth()
-  const [fecha, setFecha] = useState(todayISO())
-  const [filtroMedico, setFiltroMedico] = useState('todos')
-  const [citas, setCitas] = useState([])
-  const [medicos, setMedicos] = useState([])
-  const [servicios, setServicios] = useState([])
-  const [pacientes, setPacientes] = useState({})
-  const [dispPorMedico, setDispPorMedico] = useState({})
+  const [from, setFrom] = useState(todayISO())
+  const [to, setTo] = useState(todayISO())
+  const [doctorFilter, setDoctorFilter] = useState('todos')
+  const [appointments, setAppointments] = useState([])
+  const [doctors, setDoctors] = useState([])
+  const [services, setServices] = useState([])
+  const [patientNames, setPatientNames] = useState({})
+  const [availabilityByDoctor, setAvailabilityByDoctor] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [citaSel, setCitaSel] = useState(null)
+  const [selectedAppointment, setSelectedAppointment] = useState(null)
 
   const canManage = user.rol === 'ADMIN' || user.rol === 'RECEPCION'
+  const span = daysBetween(from, to)
+  const singleDay = span === 0
 
   const load = useCallback(async () => {
+    const length = daysBetween(from, to)
+    if (length < 0) {
+      setError('La fecha final no puede ser anterior a la inicial.')
+      setLoading(false)
+      return
+    }
+    if (length >= MAX_RANGE_DAYS) {
+      setError(`El rango no puede superar los ${MAX_RANGE_DAYS} días.`)
+      setLoading(false)
+      return
+    }
+
     setLoading(true)
     setError('')
     try {
-      const [citasDia, listaMedicos, listaServicios, listaPacientes] = await Promise.all([
-        api.get(`/citas?fecha=${fecha}`),
+      const doctorParam = doctorFilter === 'todos' ? '' : `&medico_id=${doctorFilter}`
+      const [rangeAppointments, doctorList, serviceList, patientList] = await Promise.all([
+        api.get(`/citas?desde=${from}&hasta=${to}${doctorParam}`),
         api.get('/medicos'),
         api.get('/servicios'),
         canManage ? api.get('/pacientes') : Promise.resolve([]),
       ])
-      const franjas = await Promise.all(
-        listaMedicos.map((m) => api.get(`/disponibilidad?medico_id=${m.id}`)),
+      const slots = await Promise.all(
+        doctorList.map((doctor) => api.get(`/disponibilidad?medico_id=${doctor.id}`)),
       )
-      const dispMapa = {}
-      listaMedicos.forEach((m, i) => {
-        dispMapa[m.id] = franjas[i]
+      const availabilityMap = {}
+      doctorList.forEach((doctor, i) => {
+        availabilityMap[doctor.id] = slots[i]
       })
 
-      setCitas(citasDia)
-      setMedicos(listaMedicos)
-      setServicios(listaServicios)
-      setPacientes(indexBy(listaPacientes, 'nombre_completo'))
-      setDispPorMedico(dispMapa)
-    } catch {
-      setError('No se pudo cargar la agenda.')
+      setAppointments(rangeAppointments)
+      setDoctors(doctorList)
+      setServices(serviceList)
+      setPatientNames(indexBy(patientList, 'nombre_completo'))
+      setAvailabilityByDoctor(availabilityMap)
+    } catch (err) {
+      setError(errorMessage(err, 'No se pudo cargar la agenda.'))
     } finally {
       setLoading(false)
     }
-  }, [fecha, canManage])
+  }, [from, to, doctorFilter, canManage])
 
   useEffect(() => {
     load()
   }, [load])
 
-  const dia = weekday(fecha)
-  const serviciosMap = indexBy(servicios, 'nombre')
-  const medicosVisibles =
-    user.rol === 'MEDICO'
-      ? medicos.filter((m) => m.id === user.id)
-      : filtroMedico === 'todos'
-        ? medicos
-        : medicos.filter((m) => m.id === filtroMedico)
+  function changeRange(nextFrom, nextTo) {
+    setFrom(nextFrom)
+    setTo(nextTo)
+  }
 
-  function citasDe(medicoId, h) {
-    return citas.filter(
-      (c) => c.medico_id === medicoId && new Date(c.starts_at).getHours() === h,
+  function shift(direction) {
+    const step = (span + 1) * direction
+    setFrom(addDays(from, step))
+    setTo(addDays(to, step))
+  }
+
+  const weekdayIndex = weekday(from)
+  const doctorNames = indexBy(doctors, 'nombre_completo')
+  const serviceNames = indexBy(services, 'nombre')
+  const visibleDoctors =
+    user.rol === 'MEDICO'
+      ? doctors.filter((doctor) => doctor.id === user.id)
+      : doctorFilter === 'todos'
+        ? doctors
+        : doctors.filter((doctor) => doctor.id === doctorFilter)
+
+  function appointmentsAt(doctorId, hour) {
+    return appointments.filter(
+      (a) => a.medico_id === doctorId && new Date(a.starts_at).getHours() === hour,
     )
   }
 
+  const title = singleDay
+    ? longDateFromISO(from)
+    : `${formatShortDate(from)} – ${formatShortDate(to)}`
+
   return (
     <Card className="p-5">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-semibold capitalize">{longDateFromISO(fecha)}</h2>
-        <div className="flex items-center gap-2 text-sm">
+      <div className="mb-4 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-semibold capitalize">{title}</h2>
           {user.rol !== 'MEDICO' && (
             <select
-              value={filtroMedico}
-              onChange={(e) => setFiltroMedico(e.target.value)}
-              className="rounded-lg border border-line px-3 py-1.5 outline-none focus:border-brand"
+              value={doctorFilter}
+              onChange={(event) => setDoctorFilter(event.target.value)}
+              className="rounded-lg border border-line px-3 py-1.5 text-sm outline-none focus:border-brand"
             >
               <option value="todos">Todos los médicos</option>
-              {medicos.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.nombre_completo}
+              {doctors.map((doctor) => (
+                <option key={doctor.id} value={doctor.id}>
+                  {doctor.nombre_completo}
                 </option>
               ))}
             </select>
           )}
+        </div>
+
+        <DateRangePicker from={from} to={to} onChange={changeRange}>
           <div className="flex gap-1">
             <button
-              onClick={() => setFecha(addDays(fecha, -1))}
+              onClick={() => shift(-1)}
+              aria-label="Periodo anterior"
               className="rounded-lg border border-line px-3 py-1.5 hover:bg-surface-plane"
             >
               ‹
             </button>
             <button
-              onClick={() => setFecha(todayISO())}
-              className="rounded-lg border border-line px-3 py-1.5 hover:bg-surface-plane"
-            >
-              Hoy
-            </button>
-            <button
-              onClick={() => setFecha(addDays(fecha, 1))}
+              onClick={() => shift(1)}
+              aria-label="Periodo siguiente"
               className="rounded-lg border border-line px-3 py-1.5 hover:bg-surface-plane"
             >
               ›
             </button>
           </div>
-        </div>
+        </DateRangePicker>
       </div>
 
       {loading ? (
         <Spinner className="py-10 text-center" />
       ) : error ? (
         <ListMessage type="error">{error}</ListMessage>
-      ) : medicosVisibles.length === 0 ? (
-        <ListMessage>No hay médicos que mostrar.</ListMessage>
-      ) : (
-        <div className="overflow-x-auto rounded-lg border border-line">
-          <div
-            className="grid gap-px bg-line text-sm"
-            style={{ gridTemplateColumns: `160px repeat(${HORAS.length}, minmax(96px, 1fr))` }}
-          >
-            <div className="sticky left-0 z-10 bg-surface-plane px-3 py-2 text-left text-[11px] font-semibold">
-              Médico
-            </div>
-            {HORAS.map((h) => (
-              <div key={h} className="bg-surface-plane py-2 text-center text-[11px] font-semibold">
-                {String(h).padStart(2, '0')}:00
+      ) : singleDay ? (
+        <>
+          <div className="hidden md:block">
+            {visibleDoctors.length === 0 ? (
+              <ListMessage>No hay médicos que mostrar.</ListMessage>
+            ) : (
+              <div className="overflow-x-auto rounded-lg border border-line">
+            <div
+              className="grid gap-px bg-line text-sm"
+              style={{ gridTemplateColumns: `160px repeat(${HOURS.length}, minmax(96px, 1fr))` }}
+            >
+              <div className="sticky left-0 z-10 bg-surface-plane px-3 py-2 text-left text-[11px] font-semibold">
+                Médico
               </div>
-            ))}
+              {HOURS.map((hour) => (
+                <div
+                  key={hour}
+                  className="bg-surface-plane py-2 text-center text-[11px] font-semibold"
+                >
+                  {String(hour).padStart(2, '0')}:00
+                </div>
+              ))}
 
-            {medicosVisibles.map((m) => (
-              <DoctorRow
-                key={m.id}
-                medico={m}
-                dia={dia}
-                franjas={dispPorMedico[m.id] ?? []}
-                citasDe={citasDe}
-                serviciosMap={serviciosMap}
-                pacientes={pacientes}
-                onSelect={setCitaSel}
-              />
-            ))}
+              {visibleDoctors.map((doctor) => (
+                <DoctorRow
+                  key={doctor.id}
+                  doctor={doctor}
+                  weekdayIndex={weekdayIndex}
+                  slots={availabilityByDoctor[doctor.id] ?? []}
+                  appointmentsAt={appointmentsAt}
+                  serviceNames={serviceNames}
+                  patientNames={patientNames}
+                  onSelect={setSelectedAppointment}
+                />
+                ))}
+              </div>
+            </div>
+            )}
+            <p className="mt-2 text-[11px] text-ink-muted">
+              Pulsa una cita para ver el detalle. Las celdas grises quedan fuera del horario del
+              médico.
+            </p>
           </div>
-        </div>
+
+          <div className="md:hidden">
+            {appointments.length === 0 ? (
+              <ListMessage>No hay citas este día.</ListMessage>
+            ) : (
+              <DayList
+                appointments={appointments}
+                patientNames={patientNames}
+                doctorNames={doctorNames}
+                serviceNames={serviceNames}
+                onSelect={setSelectedAppointment}
+                showDayHeadings={false}
+              />
+            )}
+          </div>
+        </>
+      ) : appointments.length === 0 ? (
+        <ListMessage>No hay citas en este periodo.</ListMessage>
+      ) : (
+        <DayList
+          appointments={appointments}
+          patientNames={patientNames}
+          doctorNames={doctorNames}
+          serviceNames={serviceNames}
+          onSelect={setSelectedAppointment}
+          showDayHeadings
+        />
       )}
 
-      <p className="mt-2 text-[11px] text-ink-muted">
-        Pulsa una cita para ver el detalle. Las celdas grises quedan fuera del horario del médico.
-      </p>
-
-      {citaSel && (
+      {selectedAppointment && (
         <AppointmentDetail
-          cita={citaSel}
-          nombrePaciente={pacientes[citaSel.paciente_id]}
-          medicos={medicos}
-          servicios={servicios}
+          appointment={selectedAppointment}
+          patientName={patientNames[selectedAppointment.paciente_id]}
+          doctors={doctors}
+          services={services}
           canManage={canManage}
-          onClose={() => setCitaSel(null)}
+          onClose={() => setSelectedAppointment(null)}
           onUpdated={() => {
-            setCitaSel(null)
+            setSelectedAppointment(null)
             load()
           }}
         />
@@ -191,36 +280,119 @@ export default function AgendaPage() {
   )
 }
 
-function DoctorRow({ medico, dia, franjas, citasDe, serviciosMap, pacientes, onSelect }) {
+function AppointmentRow({ appointment, patientNames, doctorNames, serviceNames, onSelect }) {
   return (
-    <>
-      <div className="sticky left-0 z-10 bg-white px-3 py-2 shadow-[1px_0_0_var(--color-line)]">
-        <p className="text-xs font-medium">{medico.nombre_completo}</p>
-        <p className="text-[10px] text-ink-muted">
-          {medico.especialidades[0]?.nombre ?? 'General'}
+    <button
+      onClick={() => onSelect(appointment)}
+      className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-surface-plane"
+    >
+      <span className="tnum w-12 shrink-0 text-sm font-medium text-ink-2">
+        {formatTime(appointment.starts_at)}
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium">
+          {patientNames[appointment.paciente_id] ?? 'Paciente'}
+        </p>
+        <p className="truncate text-xs text-ink-muted">
+          {doctorNames[appointment.medico_id] ?? 'Médico'} ·{' '}
+          {serviceNames[appointment.servicio_id] ?? 'Servicio'}
         </p>
       </div>
-      {HORAS.map((h) => {
-        const disponible = horaDisponible(franjas, dia, h)
-        const enHora = citasDe(medico.id, h)
+      <StatusBadge status={appointment.estado} />
+    </button>
+  )
+}
+
+function DayList({
+  appointments,
+  patientNames,
+  doctorNames,
+  serviceNames,
+  onSelect,
+  showDayHeadings,
+}) {
+  const days = groupByDay(appointments)
+
+  if (!showDayHeadings) {
+    return (
+      <div className="divide-y divide-line rounded-lg border border-line">
+        {days.flatMap(([, dayAppointments]) => dayAppointments).map((appointment) => (
+          <AppointmentRow
+            key={appointment.id}
+            appointment={appointment}
+            patientNames={patientNames}
+            doctorNames={doctorNames}
+            serviceNames={serviceNames}
+            onSelect={onSelect}
+          />
+        ))}
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-5">
+      {days.map(([day, dayAppointments]) => (
+        <div key={day}>
+          <h3 className="mb-2 text-sm font-semibold capitalize text-ink-2">
+            {longDateFromISO(day)}
+          </h3>
+          <div className="divide-y divide-line rounded-lg border border-line">
+            {dayAppointments.map((appointment) => (
+              <AppointmentRow
+                key={appointment.id}
+                appointment={appointment}
+                patientNames={patientNames}
+                doctorNames={doctorNames}
+                serviceNames={serviceNames}
+                onSelect={onSelect}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function DoctorRow({
+  doctor,
+  weekdayIndex,
+  slots,
+  appointmentsAt,
+  serviceNames,
+  patientNames,
+  onSelect,
+}) {
+  return (
+    <>
+      <div className="sticky left-0 z-10 bg-surface px-3 py-2 shadow-[1px_0_0_var(--color-line)]">
+        <p className="text-xs font-medium">{doctor.nombre_completo}</p>
+        <p className="text-[10px] text-ink-muted">{doctor.especialidades[0]?.nombre ?? 'General'}</p>
+      </div>
+      {HOURS.map((hour) => {
+        const available = isHourAvailable(slots, weekdayIndex, hour)
+        const hourAppointments = appointmentsAt(doctor.id, hour)
         return (
           <div
-            key={h}
-            className={`min-h-[46px] space-y-1 p-1 ${disponible ? 'bg-white' : 'bg-surface-plane'}`}
+            key={hour}
+            className={`min-h-[46px] space-y-1 p-1 ${available ? 'bg-surface' : 'bg-surface-plane'}`}
           >
-            {enHora.map((c) => (
+            {hourAppointments.map((appointment) => (
               <button
-                key={c.id}
-                onClick={() => onSelect(c)}
-                title={`${formatTime(c.starts_at)} · ${serviciosMap[c.servicio_id] ?? ''}`}
+                key={appointment.id}
+                onClick={() => onSelect(appointment)}
+                title={`${formatTime(appointment.starts_at)} · ${serviceNames[appointment.servicio_id] ?? ''}`}
                 className={`block w-full rounded px-1.5 py-1 text-left text-[11px] leading-tight hover:brightness-95 ${
-                  APPOINTMENT_STATES[c.estado]?.chip ?? 'bg-brand-light text-brand-dark'
+                  APPOINTMENT_STATES[appointment.estado]?.chip ?? 'bg-brand-light text-brand-dark'
                 }`}
               >
-                <span className="tnum font-medium">{formatTime(c.starts_at)}</span>{' '}
-                {pacientes[c.paciente_id] ? nombreCorto(pacientes[c.paciente_id]) : ''}
+                <span className="tnum font-medium">{formatTime(appointment.starts_at)}</span>{' '}
+                {patientNames[appointment.paciente_id]
+                  ? shortName(patientNames[appointment.paciente_id])
+                  : ''}
                 <span className="block text-[10px] opacity-80">
-                  {serviciosMap[c.servicio_id] ?? ''}
+                  {serviceNames[appointment.servicio_id] ?? ''}
                 </span>
               </button>
             ))}

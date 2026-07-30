@@ -2,35 +2,39 @@ import Field from './Field'
 import Input from '../atoms/Input'
 import Select from '../atoms/Select'
 
-const DURACIONES = [15, 30, 45, 60, 90]
+const DURATIONS = [15, 30, 45, 60, 90]
 
-function serviciosDelMedico(servicios, medico) {
-  const especialidadesMedico = medico?.especialidades?.map((e) => e.id) ?? []
-  const hayDatosEspecialidad = servicios.some((s) => s.especialidades?.length)
-  if (!hayDatosEspecialidad || especialidadesMedico.length === 0) return servicios
-  return servicios.filter((s) =>
-    (s.especialidades ?? []).some((e) => especialidadesMedico.includes(e.id)),
+function servicesForDoctor(services, doctor) {
+  const doctorSpecialtyIds = doctor?.especialidades?.map((specialty) => specialty.id) ?? []
+  const hasSpecialtyData = services.some((service) => service.especialidades?.length)
+  if (!hasSpecialtyData || doctorSpecialtyIds.length === 0) return services
+  return services.filter((service) =>
+    (service.especialidades ?? []).some((specialty) => doctorSpecialtyIds.includes(specialty.id)),
   )
 }
 
-export default function AppointmentFields({ form, set, medicos, servicios }) {
-  const medico = medicos.find((m) => m.id === form.medico_id)
-  const serviciosFiltrados = serviciosDelMedico(servicios, medico)
+export default function AppointmentFields({ form, set, doctors, services }) {
+  const doctor = doctors.find((candidate) => candidate.id === form.medico_id)
+  const availableServices = servicesForDoctor(services, doctor)
 
-  function elegirMedico(medicoId) {
-    set('medico_id', medicoId)
+  function selectDoctor(doctorId) {
+    set('medico_id', doctorId)
     set('servicio_id', '')
   }
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Field label="Médico">
-          <Select value={form.medico_id} onChange={(e) => elegirMedico(e.target.value)} required>
+          <Select
+            value={form.medico_id}
+            onChange={(event) => selectDoctor(event.target.value)}
+            required
+          >
             <option value="">Selecciona…</option>
-            {medicos.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.nombre_completo}
+            {doctors.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.nombre_completo}
               </option>
             ))}
           </Select>
@@ -38,34 +42,46 @@ export default function AppointmentFields({ form, set, medicos, servicios }) {
         <Field label="Servicio">
           <Select
             value={form.servicio_id}
-            onChange={(e) => set('servicio_id', e.target.value)}
+            onChange={(event) => set('servicio_id', event.target.value)}
             required
             disabled={!form.medico_id}
           >
-            <option value="">
-              {form.medico_id ? 'Selecciona…' : 'Elige un médico primero'}
-            </option>
-            {serviciosFiltrados.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.nombre}
+            <option value="">{form.medico_id ? 'Selecciona…' : 'Elige un médico primero'}</option>
+            {availableServices.map((service) => (
+              <option key={service.id} value={service.id}>
+                {service.nombre}
               </option>
             ))}
           </Select>
         </Field>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Field label="Fecha">
-          <Input type="date" value={form.fecha} onChange={(e) => set('fecha', e.target.value)} required />
+          <Input
+            type="date"
+            value={form.date}
+            onChange={(event) => set('date', event.target.value)}
+            required
+          />
         </Field>
         <Field label="Hora" hint=":00 · :15 · :30 · :45">
-          <Input type="time" step="900" value={form.hora} onChange={(e) => set('hora', e.target.value)} required />
+          <Input
+            type="time"
+            step="900"
+            value={form.time}
+            onChange={(event) => set('time', event.target.value)}
+            required
+          />
         </Field>
         <Field label="Duración">
-          <Select value={form.duracion_min} onChange={(e) => set('duracion_min', e.target.value)}>
-            {DURACIONES.map((d) => (
-              <option key={d} value={d}>
-                {d} min
+          <Select
+            value={form.duracion_min}
+            onChange={(event) => set('duracion_min', event.target.value)}
+          >
+            {DURATIONS.map((minutes) => (
+              <option key={minutes} value={minutes}>
+                {minutes} min
               </option>
             ))}
           </Select>
@@ -73,14 +89,14 @@ export default function AppointmentFields({ form, set, medicos, servicios }) {
       </div>
 
       <Field label="Motivo (opcional)">
-        <Input value={form.motivo} onChange={(e) => set('motivo', e.target.value)} />
+        <Input value={form.motivo} onChange={(event) => set('motivo', event.target.value)} />
       </Field>
 
       <label className="flex items-center gap-2 text-sm text-ink-2">
         <input
           type="checkbox"
           checked={form.permitir_sobrecupo}
-          onChange={(e) => set('permitir_sobrecupo', e.target.checked)}
+          onChange={(event) => set('permitir_sobrecupo', event.target.checked)}
           className="h-4 w-4 rounded border-line text-brand focus:ring-brand"
         />
         Forzar cupo extra (sobrecupo)

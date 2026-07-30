@@ -7,21 +7,21 @@ import Input from '../atoms/Input'
 import Button from '../atoms/Button'
 import Alert from '../atoms/Alert'
 
-export default function PatientForm({ paciente, onClose, onSaved }) {
-  const editing = Boolean(paciente)
+export default function PatientForm({ patient, onClose, onSaved }) {
+  const editing = Boolean(patient)
 
   const [form, set] = useForm({
-    nombre_completo: paciente?.nombre_completo ?? '',
-    edad: paciente?.edad ?? '',
-    cedula: paciente?.cedula ?? '',
-    telefono: paciente?.telefono ?? '',
-    fecha_nacimiento: paciente?.fecha_nacimiento ?? '',
+    nombre_completo: patient?.nombre_completo ?? '',
+    edad: patient?.edad ?? '',
+    cedula: patient?.cedula ?? '',
+    telefono: patient?.telefono ?? '',
+    fecha_nacimiento: patient?.fecha_nacimiento ?? '',
   })
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
 
-  async function onSubmit(e) {
-    e.preventDefault()
+  async function onSubmit(event) {
+    event.preventDefault()
     setError('')
     setSaving(true)
 
@@ -34,10 +34,10 @@ export default function PatientForm({ paciente, onClose, onSaved }) {
     }
 
     try {
-      const guardado = editing
-        ? await api.put(`/pacientes/${paciente.id}`, body)
+      const saved = editing
+        ? await api.put(`/pacientes/${patient.id}`, body)
         : await api.post('/pacientes', body)
-      onSaved(guardado)
+      onSaved(saved)
     } catch (err) {
       if (err instanceof ApiError) setError(err.message)
       else setError('No se pudo guardar el paciente.')
@@ -50,7 +50,7 @@ export default function PatientForm({ paciente, onClose, onSaved }) {
       <Button variant="secondary" type="button" onClick={onClose}>
         Cancelar
       </Button>
-      <Button type="submit" form="form-paciente" disabled={saving}>
+      <Button type="submit" form="patient-form" disabled={saving}>
         {saving ? 'Guardando…' : 'Guardar'}
       </Button>
     </>
@@ -63,43 +63,43 @@ export default function PatientForm({ paciente, onClose, onSaved }) {
       onClose={onClose}
       footer={footer}
     >
-      <form id="form-paciente" onSubmit={onSubmit} className="space-y-4">
+      <form id="patient-form" onSubmit={onSubmit} className="space-y-4">
         {error && <Alert>{error}</Alert>}
 
         <Field label="Nombre completo">
           <Input
             value={form.nombre_completo}
-            onChange={(e) => set('nombre_completo', e.target.value)}
+            onChange={(event) => set('nombre_completo', event.target.value)}
             required
             autoFocus
           />
         </Field>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Field label="Edad">
             <Input
               type="number"
               min="0"
               max="120"
               value={form.edad}
-              onChange={(e) => set('edad', e.target.value)}
+              onChange={(event) => set('edad', event.target.value)}
               required
             />
           </Field>
           <Field label="Cédula (opcional)">
             <Input
               value={form.cedula}
-              onChange={(e) => set('cedula', e.target.value)}
+              onChange={(event) => set('cedula', event.target.value)}
               placeholder="V-12.345.678"
             />
           </Field>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Field label="Teléfono (opcional)">
             <Input
               value={form.telefono}
-              onChange={(e) => set('telefono', e.target.value)}
+              onChange={(event) => set('telefono', event.target.value)}
               placeholder="0414-555-1122"
             />
           </Field>
@@ -107,7 +107,7 @@ export default function PatientForm({ paciente, onClose, onSaved }) {
             <Input
               type="date"
               value={form.fecha_nacimiento}
-              onChange={(e) => set('fecha_nacimiento', e.target.value)}
+              onChange={(event) => set('fecha_nacimiento', event.target.value)}
             />
           </Field>
         </div>

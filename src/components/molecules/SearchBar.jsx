@@ -15,7 +15,7 @@ export default function SearchBar({ value, onChange, placeholder = 'Buscar…', 
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-line bg-white py-2 pl-9 pr-3 text-sm outline-none focus:border-brand"
+        className="w-full rounded-lg border border-line bg-surface py-2 pl-9 pr-3 text-sm outline-none focus:border-brand"
       />
     </div>
   )

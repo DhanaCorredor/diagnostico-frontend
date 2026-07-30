@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api, ApiError } from '../config/api'
+import { api, errorMessage } from '../config/api'
 import Input from '../components/atoms/Input'
 import Button from '../components/atoms/Button'
 import Badge from '../components/atoms/Badge'
@@ -7,7 +7,7 @@ import Alert from '../components/atoms/Alert'
 import Card from '../components/atoms/Card'
 import Modal from '../components/molecules/Modal'
 
-const CATEGORIAS = [
+const CATEGORIES = [
   { value: 'CONSULTA', label: 'Consulta' },
   { value: 'ECOGRAFIA', label: 'Ecografía' },
   { value: 'DOPPLER', label: 'Doppler' },
@@ -15,26 +15,29 @@ const CATEGORIAS = [
   { value: 'PROMOCION', label: 'Promoción' },
   { value: 'OTRO', label: 'Otro' },
 ]
-const CAT_LABEL = Object.fromEntries(CATEGORIAS.map((c) => [c.value, c.label]))
+const CATEGORY_LABEL = Object.fromEntries(CATEGORIES.map((c) => [c.value, c.label]))
 
 export default function ConfigPage() {
-  const [especialidades, setEspecialidades] = useState([])
-  const [servicios, setServicios] = useState([])
+  const [specialties, setSpecialties] = useState([])
+  const [services, setServices] = useState([])
   const [error, setError] = useState('')
 
-  const [nuevaEsp, setNuevaEsp] = useState('')
-  const [nuevoServ, setNuevoServ] = useState({ nombre: '', categoria: 'CONSULTA' })
-  const [eliminando, setEliminando] = useState(null)
+  const [newSpecialty, setNewSpecialty] = useState('')
+  const [newService, setNewService] = useState({ nombre: '', categoria: 'CONSULTA' })
+  const [deleting, setDeleting] = useState(null)
   const [busy, setBusy] = useState(false)
 
   async function load() {
     setError('')
     try {
-      const [es, ss] = await Promise.all([api.get('/especialidades'), api.get('/servicios')])
-      setEspecialidades(es)
-      setServicios(ss)
-    } catch {
-      setError('No se pudieron cargar los catálogos.')
+      const [specialtyList, serviceList] = await Promise.all([
+        api.get('/especialidades'),
+        api.get('/servicios'),
+      ])
+      setSpecialties(specialtyList)
+      setServices(serviceList)
+    } catch (err) {
+      setError(errorMessage(err, 'No se pudieron cargar los catálogos.'))
     }
   }
 
@@ -42,42 +45,42 @@ export default function ConfigPage() {
     load()
   }, [])
 
-  async function crearEspecialidad(e) {
-    e.preventDefault()
-    if (!nuevaEsp.trim()) return
+  async function createSpecialty(event) {
+    event.preventDefault()
+    if (!newSpecialty.trim()) return
     try {
-      await api.post('/especialidades', { nombre: nuevaEsp.trim() })
-      setNuevaEsp('')
+      await api.post('/especialidades', { nombre: newSpecialty.trim() })
+      setNewSpecialty('')
       load()
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'No se pudo crear la especialidad.')
+      setError(errorMessage(err, 'No se pudo crear la especialidad.'))
     }
   }
 
-  async function crearServicio(e) {
-    e.preventDefault()
-    if (!nuevoServ.nombre.trim()) return
+  async function createService(event) {
+    event.preventDefault()
+    if (!newService.nombre.trim()) return
     try {
       await api.post('/servicios', {
-        nombre: nuevoServ.nombre.trim(),
-        categoria: nuevoServ.categoria,
+        nombre: newService.nombre.trim(),
+        categoria: newService.categoria,
       })
-      setNuevoServ({ nombre: '', categoria: 'CONSULTA' })
+      setNewService({ nombre: '', categoria: 'CONSULTA' })
       load()
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'No se pudo crear el servicio.')
+      setError(errorMessage(err, 'No se pudo crear el servicio.'))
     }
   }
 
-  async function eliminarServicio() {
+  async function deleteService() {
     setBusy(true)
     try {
-      await api.put(`/servicios/${eliminando.id}`, { activo: false })
-      setEliminando(null)
+      await api.put(`/servicios/${deleting.id}`, { activo: false })
+      setDeleting(null)
       load()
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'No se pudo eliminar el servicio.')
-      setEliminando(null)
+      setError(errorMessage(err, 'No se pudo eliminar el servicio.'))
+      setDeleting(null)
     } finally {
       setBusy(false)
     }
@@ -93,20 +96,20 @@ export default function ConfigPage() {
           <p className="mb-3 text-xs text-ink-muted">Áreas médicas del centro.</p>
 
           <div className="mb-4 flex flex-wrap gap-1.5">
-            {especialidades.map((e) => (
-              <Badge key={e.id} color="brand" size="sm">
-                {e.nombre}
+            {specialties.map((specialty) => (
+              <Badge key={specialty.id} color="brand" size="sm">
+                {specialty.nombre}
               </Badge>
             ))}
-            {especialidades.length === 0 && (
+            {specialties.length === 0 && (
               <span className="text-sm text-ink-muted">Aún no hay especialidades.</span>
             )}
           </div>
 
-          <form onSubmit={crearEspecialidad} className="flex gap-2">
+          <form onSubmit={createSpecialty} className="flex gap-2">
             <Input
-              value={nuevaEsp}
-              onChange={(e) => setNuevaEsp(e.target.value)}
+              value={newSpecialty}
+              onChange={(event) => setNewSpecialty(event.target.value)}
               placeholder="Nueva especialidad…"
             />
             <Button className="shrink-0">Añadir</Button>
@@ -120,44 +123,48 @@ export default function ConfigPage() {
           </p>
 
           <div className="mb-4 max-h-56 space-y-2 overflow-y-auto text-sm">
-            {servicios.map((s) => (
+            {services.map((service) => (
               <div
-                key={s.id}
+                key={service.id}
                 className="flex items-center justify-between gap-2 rounded-lg bg-surface-plane px-3 py-2"
               >
-                <span className="min-w-0 flex-1 truncate">{s.nombre}</span>
+                <span className="min-w-0 flex-1 truncate">{service.nombre}</span>
                 <span className="shrink-0 text-xs text-ink-muted">
-                  {CAT_LABEL[s.categoria] ?? s.categoria}
+                  {CATEGORY_LABEL[service.categoria] ?? service.categoria}
                 </span>
                 <button
-                  onClick={() => setEliminando(s)}
+                  onClick={() => setDeleting(service)}
                   className="shrink-0 text-ink-muted hover:text-crit"
                   title="Eliminar servicio"
-                  aria-label={`Eliminar ${s.nombre}`}
+                  aria-label={`Eliminar ${service.nombre}`}
                 >
                   ✕
                 </button>
               </div>
             ))}
-            {servicios.length === 0 && (
+            {services.length === 0 && (
               <span className="text-ink-muted">Aún no hay servicios activos.</span>
             )}
           </div>
 
-          <form onSubmit={crearServicio} className="flex gap-2">
+          <form onSubmit={createService} className="flex gap-2">
             <Input
-              value={nuevoServ.nombre}
-              onChange={(e) => setNuevoServ((s) => ({ ...s, nombre: e.target.value }))}
+              value={newService.nombre}
+              onChange={(event) =>
+                setNewService((current) => ({ ...current, nombre: event.target.value }))
+              }
               placeholder="Nuevo servicio…"
             />
             <select
-              value={nuevoServ.categoria}
-              onChange={(e) => setNuevoServ((s) => ({ ...s, categoria: e.target.value }))}
+              value={newService.categoria}
+              onChange={(event) =>
+                setNewService((current) => ({ ...current, categoria: event.target.value }))
+              }
               className="shrink-0 rounded-lg border border-line px-2 py-2 text-sm outline-none focus:border-brand"
             >
-              {CATEGORIAS.map((c) => (
-                <option key={c.value} value={c.value}>
-                  {c.label}
+              {CATEGORIES.map((category) => (
+                <option key={category.value} value={category.value}>
+                  {category.label}
                 </option>
               ))}
             </select>
@@ -173,9 +180,9 @@ export default function ConfigPage() {
             'Contraseñas cifradas (bcrypt)',
             'Acceso por rol (JWT)',
             'Bajas lógicas (sin borrado físico)',
-          ].map((t) => (
-            <div key={t} className="flex items-center justify-between">
-              <span className="text-ink-2">{t}</span>
+          ].map((item) => (
+            <div key={item} className="flex items-center justify-between">
+              <span className="text-ink-2">{item}</span>
               <Badge color="good" size="sm">
                 Activo
               </Badge>
@@ -184,17 +191,17 @@ export default function ConfigPage() {
         </div>
       </Card>
 
-      {eliminando && (
+      {deleting && (
         <Modal
           title="Eliminar servicio"
           subtitle="Se dará de baja (dejará de aparecer al agendar)."
-          onClose={() => setEliminando(null)}
+          onClose={() => setDeleting(null)}
           footer={
             <>
-              <Button variant="secondary" onClick={() => setEliminando(null)} disabled={busy}>
+              <Button variant="secondary" onClick={() => setDeleting(null)} disabled={busy}>
                 Cancelar
               </Button>
-              <Button variant="danger" onClick={eliminarServicio} disabled={busy}>
+              <Button variant="danger" onClick={deleteService} disabled={busy}>
                 {busy ? 'Eliminando…' : 'Eliminar'}
               </Button>
             </>
@@ -202,7 +209,7 @@ export default function ConfigPage() {
         >
           <p className="text-sm text-ink-2">
             ¿Seguro que quieres eliminar{' '}
-            <span className="font-medium text-ink">{eliminando.nombre}</span>?
+            <span className="font-medium text-ink">{deleting.nombre}</span>?
           </p>
         </Modal>
       )}

@@ -2,23 +2,23 @@ import { describe, it, expect } from 'vitest'
 import { initials } from './text'
 
 describe('initials', () => {
-  it('toma la inicial de las dos primeras palabras', () => {
+  it('takes the initial of the first two words', () => {
     expect(initials('Ana García')).toBe('AG')
   })
 
-  it('ignora palabras a partir de la tercera', () => {
+  it('ignores words from the third one on', () => {
     expect(initials('María Fernanda López')).toBe('MF')
   })
 
-  it('funciona con un solo nombre', () => {
+  it('works with a single name', () => {
     expect(initials('Juan')).toBe('J')
   })
 
-  it('descarta los espacios de más', () => {
+  it('discards extra whitespace', () => {
     expect(initials('  Ana   García ')).toBe('AG')
   })
 
-  it('con cadena vacía devuelve cadena vacía', () => {
+  it('returns an empty string for an empty string', () => {
     expect(initials('')).toBe('')
   })
 })

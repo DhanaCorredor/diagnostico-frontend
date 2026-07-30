@@ -2,20 +2,32 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import AppointmentFields from './AppointmentFields'
 
-const medicos = [
-  { id: 'm1', nombre_completo: 'Dra. Gine', especialidades: [{ id: 'gine', nombre: 'Ginecología' }] },
+const doctors = [
+  {
+    id: 'm1',
+    nombre_completo: 'Dra. Gine',
+    especialidades: [{ id: 'gine', nombre: 'Ginecología' }],
+  },
 ]
-const serviciosConEsp = [
-  { id: 's1', nombre: 'Ecografía ginecológica', especialidades: [{ id: 'gine', nombre: 'Ginecología' }] },
-  { id: 's2', nombre: 'Ecocardiograma', especialidades: [{ id: 'cardio', nombre: 'Cardiología' }] },
+const servicesWithSpecialty = [
+  {
+    id: 's1',
+    nombre: 'Ecografía ginecológica',
+    especialidades: [{ id: 'gine', nombre: 'Ginecología' }],
+  },
+  {
+    id: 's2',
+    nombre: 'Ecocardiograma',
+    especialidades: [{ id: 'cardio', nombre: 'Cardiología' }],
+  },
 ]
 
 function baseForm(overrides = {}) {
   return {
     medico_id: '',
     servicio_id: '',
-    fecha: '2026-07-26',
-    hora: '09:00',
+    date: '2026-07-26',
+    time: '09:00',
     duracion_min: 30,
     motivo: '',
     permitir_sobrecupo: false,
@@ -23,22 +35,22 @@ function baseForm(overrides = {}) {
   }
 }
 
-describe('AppointmentFields — filtro de servicios por especialidad', () => {
-  it('solo ofrece los servicios de la especialidad del médico elegido', () => {
+describe('AppointmentFields — service filtering by specialty', () => {
+  it('offers only the services matching the selected doctor specialty', () => {
     render(
       <AppointmentFields
         form={baseForm({ medico_id: 'm1' })}
         set={vi.fn()}
-        medicos={medicos}
-        servicios={serviciosConEsp}
+        doctors={doctors}
+        services={servicesWithSpecialty}
       />,
     )
     expect(screen.getByRole('option', { name: 'Ecografía ginecológica' })).toBeInTheDocument()
     expect(screen.queryByRole('option', { name: 'Ecocardiograma' })).not.toBeInTheDocument()
   })
 
-  it('si los servicios no traen especialidades (backend antiguo), muestra todos', () => {
-    const serviciosSinEsp = [
+  it('shows every service when they carry no specialty (older backend)', () => {
+    const servicesWithoutSpecialty = [
       { id: 's1', nombre: 'Ecografía ginecológica' },
       { id: 's2', nombre: 'Ecocardiograma' },
     ]
@@ -46,34 +58,39 @@ describe('AppointmentFields — filtro de servicios por especialidad', () => {
       <AppointmentFields
         form={baseForm({ medico_id: 'm1' })}
         set={vi.fn()}
-        medicos={medicos}
-        servicios={serviciosSinEsp}
+        doctors={doctors}
+        services={servicesWithoutSpecialty}
       />,
     )
     expect(screen.getByRole('option', { name: 'Ecografía ginecológica' })).toBeInTheDocument()
     expect(screen.getByRole('option', { name: 'Ecocardiograma' })).toBeInTheDocument()
   })
 
-  it('al cambiar de médico resetea el servicio elegido (evita agendar uno que no corresponde)', () => {
+  it('resets the chosen service when the doctor changes (avoids booking a mismatched one)', () => {
     const set = vi.fn()
     render(
-      <AppointmentFields form={baseForm()} set={set} medicos={medicos} servicios={serviciosConEsp} />,
+      <AppointmentFields
+        form={baseForm()}
+        set={set}
+        doctors={doctors}
+        services={servicesWithSpecialty}
+      />,
     )
-    const selectMedico = screen.getAllByRole('combobox')[0]
-    fireEvent.change(selectMedico, { target: { value: 'm1' } })
+    const doctorSelect = screen.getAllByRole('combobox')[0]
+    fireEvent.change(doctorSelect, { target: { value: 'm1' } })
     expect(set).toHaveBeenCalledWith('medico_id', 'm1')
     expect(set).toHaveBeenCalledWith('servicio_id', '')
   })
 })
 
-describe('AppointmentFields — accesibilidad', () => {
-  it('asocia cada etiqueta con su campo (label ↔ input)', () => {
+describe('AppointmentFields — accessibility', () => {
+  it('links every label with its field (label ↔ input)', () => {
     render(
       <AppointmentFields
         form={baseForm({ medico_id: 'm1' })}
         set={vi.fn()}
-        medicos={medicos}
-        servicios={serviciosConEsp}
+        doctors={doctors}
+        services={servicesWithSpecialty}
       />,
     )
     expect(screen.getByLabelText('Médico')).toBeInTheDocument()

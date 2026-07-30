@@ -7,8 +7,9 @@ import AgendaPage from './pages/AgendaPage'
 import PatientsPage from './pages/PatientsPage'
 import PatientFilePage from './pages/PatientFilePage'
 import DoctorsPage from './pages/DoctorsPage'
-import CitaPage from './pages/CitaPage'
+import NewAppointmentPage from './pages/NewAppointmentPage'
 import UsersPage from './pages/UsersPage'
+import ReportsPage from './pages/ReportsPage'
 import ConfigPage from './pages/ConfigPage'
 
 const RECEP = ['ADMIN', 'RECEPCION']
@@ -56,7 +57,15 @@ export default function AppRouter() {
           path="/citas/nueva"
           element={
             <ProtectedRoute roles={RECEP}>
-              <CitaPage />
+              <NewAppointmentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reportes"
+          element={
+            <ProtectedRoute roles={['ADMIN']}>
+              <ReportsPage />
             </ProtectedRoute>
           }
         />

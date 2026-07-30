@@ -2,15 +2,15 @@ import { describe, it, expect } from 'vitest'
 import { indexBy } from './data'
 
 describe('indexBy', () => {
-  it('convierte una lista en un mapa id → campo', () => {
-    const lista = [
+  it('turns a list into an id → field map', () => {
+    const list = [
       { id: 'a', nombre: 'Cardiología' },
       { id: 'b', nombre: 'Ginecología' },
     ]
-    expect(indexBy(lista, 'nombre')).toEqual({ a: 'Cardiología', b: 'Ginecología' })
+    expect(indexBy(list, 'nombre')).toEqual({ a: 'Cardiología', b: 'Ginecología' })
   })
 
-  it('con lista vacía devuelve un objeto vacío', () => {
+  it('returns an empty object for an empty list', () => {
     expect(indexBy([], 'nombre')).toEqual({})
   })
 })

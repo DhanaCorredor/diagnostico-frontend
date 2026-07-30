@@ -4,10 +4,19 @@ const TOKEN_KEY = 'diagnostico_token'
 
 const DEFAULT_HEADERS = { 'Content-Type': 'application/json' }
 
+const SLOW_REQUEST_MS = 2500
+
 let unauthorizedHandler = null
+
+let slowRequestHandler = null
+let pendingRequests = 0
 
 export function setUnauthorizedHandler(fn) {
   unauthorizedHandler = fn
+}
+
+export function setSlowRequestHandler(fn) {
+  slowRequestHandler = fn
 }
 
 export function getToken() {
@@ -35,31 +44,42 @@ export async function request(path, { method, body, auth = true }) {
     if (token) headers.Authorization = `Bearer ${token}`
   }
 
-  const res = await fetch(`${BASE_URL}${path}`, {
-    method,
-    headers,
-    body: body != null ? JSON.stringify(body) : undefined,
-  })
+  pendingRequests += 1
+  const slowTimer = setTimeout(() => slowRequestHandler?.(true), SLOW_REQUEST_MS)
 
-  if (res.status === 204) return null
+  try {
+    const res = await fetch(`${BASE_URL}${path}`, {
+      method,
+      headers,
+      body: body != null ? JSON.stringify(body) : undefined,
+    })
 
-  const text = await res.text()
-  let data = null
-  if (text) {
-    try {
-      data = JSON.parse(text)
-    } catch {
-      data = text
+    if (res.status === 204) return null
+
+    const text = await res.text()
+    let data = null
+    if (text) {
+      try {
+        data = JSON.parse(text)
+      } catch {
+        data = text
+      }
     }
-  }
 
-  if (!res.ok) {
-    if (res.status === 401 && auth) unauthorizedHandler?.()
-    const detail = data?.detail ?? data
-    const message =
-      typeof detail === 'string' ? detail : detail?.mensaje ?? 'Ha ocurrido un error en la petición'
-    throw new ApiError(res.status, message, detail)
-  }
+    if (!res.ok) {
+      if (res.status === 401 && auth) unauthorizedHandler?.()
+      const detail = data?.detail ?? data
+      const message =
+        typeof detail === 'string'
+          ? detail
+          : detail?.mensaje ?? 'Ha ocurrido un error en la petición'
+      throw new ApiError(res.status, message, detail)
+    }
 
-  return data
+    return data
+  } finally {
+    clearTimeout(slowTimer)
+    pendingRequests -= 1
+    if (pendingRequests === 0) slowRequestHandler?.(false)
+  }
 }

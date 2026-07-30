@@ -8,3 +8,7 @@ export const api = {
   put: (path, body) => request(path, { method: 'PUT', body }),
   del: (path) => request(path, { method: 'DELETE' }),
 }
+
+export function errorMessage(err, fallback) {
+  return err instanceof ApiError ? err.message : fallback
+}
