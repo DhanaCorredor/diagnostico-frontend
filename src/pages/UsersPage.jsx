@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api, errorMessage } from '../config/api'
+import { useAuth } from '../auth/useAuth'
 import UserForm from '../components/organisms/UserForm'
 import EraseDialog from '../components/organisms/EraseDialog'
 import Badge from '../components/atoms/Badge'
@@ -22,6 +23,7 @@ function describeErasure(name, result) {
 }
 
 export default function UsersPage() {
+  const { user: currentUser } = useAuth()
   const [users, setUsers] = useState([])
   const [specialties, setSpecialties] = useState([])
   const [loading, setLoading] = useState(true)
@@ -124,15 +126,19 @@ export default function UsersPage() {
           <button onClick={() => setEditing(user)} className="text-brand hover:underline">
             Editar
           </button>
-          <button
-            onClick={() => toggleActive(user)}
-            className={user.activo ? 'text-ink-2 hover:underline' : 'text-good hover:underline'}
-          >
-            {user.activo ? 'Dar de baja' : 'Reactivar'}
-          </button>
-          <button onClick={() => openDeleteDialog(user)} className="text-crit hover:underline">
-            Eliminar
-          </button>
+          {user.id !== currentUser.id && (
+            <>
+              <button
+                onClick={() => toggleActive(user)}
+                className={user.activo ? 'text-ink-2 hover:underline' : 'text-good hover:underline'}
+              >
+                {user.activo ? 'Dar de baja' : 'Reactivar'}
+              </button>
+              <button onClick={() => openDeleteDialog(user)} className="text-crit hover:underline">
+                Eliminar
+              </button>
+            </>
+          )}
         </div>
       ),
     },
