@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { api, errorMessage } from '../config/api'
 import Avatar from '../components/atoms/Avatar'
 import Badge from '../components/atoms/Badge'
 import Table from '../components/molecules/Table'
-
-const WEEKDAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
+import AvailabilityModal from '../components/organisms/AvailabilityModal'
+import { WEEKDAYS_SHORT as WEEKDAYS } from '../utils/weekdays'
 
 function summarizeSlots(slots) {
   const groups = {}
@@ -28,30 +28,32 @@ export default function DoctorsPage() {
   const [availabilityByDoctor, setAvailabilityByDoctor] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [editingSchedule, setEditingSchedule] = useState(null)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const doctorList = await api.get('/medicos')
+      const slots = await Promise.all(
+        doctorList.map((doctor) => api.get(`/disponibilidad?medico_id=${doctor.id}`)),
+      )
+      const availabilityMap = {}
+      doctorList.forEach((doctor, i) => {
+        availabilityMap[doctor.id] = slots[i]
+      })
+      setDoctors(doctorList)
+      setAvailabilityByDoctor(availabilityMap)
+    } catch (err) {
+      setError(errorMessage(err, 'No se pudieron cargar los médicos.'))
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
-    async function load() {
-      setLoading(true)
-      setError('')
-      try {
-        const doctorList = await api.get('/medicos')
-        const slots = await Promise.all(
-          doctorList.map((doctor) => api.get(`/disponibilidad?medico_id=${doctor.id}`)),
-        )
-        const availabilityMap = {}
-        doctorList.forEach((doctor, i) => {
-          availabilityMap[doctor.id] = slots[i]
-        })
-        setDoctors(doctorList)
-        setAvailabilityByDoctor(availabilityMap)
-      } catch (err) {
-        setError(errorMessage(err, 'No se pudieron cargar los médicos.'))
-      } finally {
-        setLoading(false)
-      }
-    }
     load()
-  }, [])
+  }, [load])
 
   const columns = [
     {
@@ -94,17 +96,39 @@ export default function DoctorsPage() {
         )
       },
     },
+    {
+      header: '',
+      className: 'text-right',
+      render: (doctor) => (
+        <button
+          onClick={() => setEditingSchedule(doctor)}
+          className="text-brand hover:underline"
+        >
+          Horario
+        </button>
+      ),
+    },
   ]
 
   return (
-    <Table
-      title="Médicos"
-      count={doctors.length}
-      columns={columns}
-      rows={doctors}
-      loading={loading}
-      error={error}
-      empty="No hay médicos registrados."
-    />
+    <>
+      <Table
+        title="Médicos"
+        count={doctors.length}
+        columns={columns}
+        rows={doctors}
+        loading={loading}
+        error={error}
+        empty="No hay médicos registrados."
+      />
+
+      {editingSchedule && (
+        <AvailabilityModal
+          doctor={editingSchedule}
+          onClose={() => setEditingSchedule(null)}
+          onSaved={load}
+        />
+      )}
+    </>
   )
 }
