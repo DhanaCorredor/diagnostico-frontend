@@ -15,11 +15,11 @@ export default function AppLayout() {
           type="button"
           aria-label="Cerrar menú"
           onClick={() => setMenuOpen(false)}
-          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/40 md:hidden"
         />
       )}
 
-      <main className="lg:ml-60">
+      <main className="md:ml-60">
         <Topbar onOpenMenu={() => setMenuOpen(true)} />
         <div className="p-4 sm:p-6 lg:p-8">
           <Outlet />

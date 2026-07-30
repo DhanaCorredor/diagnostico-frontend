@@ -54,7 +54,7 @@ export default function Sidebar({ open = false, onClose }) {
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-50 flex w-60 flex-col border-r border-line bg-white transition-transform duration-200 lg:translate-x-0 ${
+      className={`fixed inset-y-0 left-0 z-50 flex w-60 flex-col border-r border-line bg-white transition-transform duration-200 md:translate-x-0 ${
         open ? 'translate-x-0' : '-translate-x-full'
       }`}
     >

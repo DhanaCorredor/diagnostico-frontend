@@ -28,7 +28,7 @@ export default function Topbar({ onOpenMenu }) {
           type="button"
           onClick={onOpenMenu}
           aria-label="Abrir menú"
-          className="-ml-1 shrink-0 rounded-lg p-1.5 text-ink-2 hover:bg-surface-plane lg:hidden"
+          className="-ml-1 shrink-0 rounded-lg p-1.5 text-ink-2 hover:bg-surface-plane md:hidden"
         >
           <svg
             className="h-6 w-6"
