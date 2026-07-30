@@ -43,7 +43,7 @@ describe('PatientsPage — erasing a patient', () => {
     await openDeleteDialog()
     expect(confirmButton()).toBeDisabled()
 
-    const input = screen.getByLabelText('Escribe el nombre del paciente para confirmar')
+    const input = screen.getByLabelText('Escribe el nombre completo para confirmar')
     fireEvent.change(input, { target: { value: 'Ana' } })
     expect(confirmButton()).toBeDisabled()
 
@@ -53,7 +53,7 @@ describe('PatientsPage — erasing a patient', () => {
 
   it('accepts the typed name ignoring case and extra spaces', async () => {
     await openDeleteDialog()
-    fireEvent.change(screen.getByLabelText('Escribe el nombre del paciente para confirmar'), {
+    fireEvent.change(screen.getByLabelText('Escribe el nombre completo para confirmar'), {
       target: { value: '  ana   garcía ' },
     })
     expect(confirmButton()).toBeEnabled()
@@ -68,7 +68,7 @@ describe('PatientsPage — erasing a patient', () => {
   it('reports how many appointments were kept when the patient is anonymised', async () => {
     api.del.mockResolvedValue({ resultado: 'anonimizado', citas_conservadas: 4 })
     await openDeleteDialog()
-    fireEvent.change(screen.getByLabelText('Escribe el nombre del paciente para confirmar'), {
+    fireEvent.change(screen.getByLabelText('Escribe el nombre completo para confirmar'), {
       target: { value: 'Ana García' },
     })
     fireEvent.click(confirmButton())
@@ -84,7 +84,7 @@ describe('PatientsPage — erasing a patient', () => {
   it('reports a full deletion when the patient had no appointments', async () => {
     api.del.mockResolvedValue({ resultado: 'eliminado', citas_conservadas: 0 })
     await openDeleteDialog()
-    fireEvent.change(screen.getByLabelText('Escribe el nombre del paciente para confirmar'), {
+    fireEvent.change(screen.getByLabelText('Escribe el nombre completo para confirmar'), {
       target: { value: 'Ana García' },
     })
     fireEvent.click(confirmButton())
