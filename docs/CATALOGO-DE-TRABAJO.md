@@ -53,10 +53,11 @@ backend.
 | **C4** | Recursos y salas | ⬜ | Bloquea el selector de recurso |
 | **C5** | WhatsApp · visitas · Holter · portal · Calendar · PWA | ⬜ | Coste alto, sin fecha |
 
-**En vuelo, sin mergear:** la rama `feat/complete-crud` completa el CRUD de disponibilidad,
-especialidades y servicios, y añade `GET /citas/{id}`. Detalle en §3.2. De paso reorganiza la
-documentación del backend (retira `ROADMAP.md` y funde `FLUJO-USUARIO.md` en el manual);
-`MEJORAS-Y-PROXIMOS-PASOS.md` se mantiene, así que los enlaces de este catálogo siguen valiendo.
+**En `develop`, pendiente de publicar:** `feat/complete-crud` ya está mergeada (17 commits por
+delante de `main`, todavía sin tag). Completa el CRUD de disponibilidad, especialidades y
+servicios, añade `GET /citas/{id}` y **cambia el borrado de pacientes** (R10, ver §3.3). De paso
+reorganiza la documentación del backend (retira `ROADMAP.md` y funde `FLUJO-USUARIO.md` en el
+manual); `MEJORAS-Y-PROXIMOS-PASOS.md` se mantiene, así que los enlaces de aquí siguen valiendo.
 
 ## 3. Capacidades de la API que el frontend no usa
 
@@ -73,10 +74,10 @@ Encontradas al revisar el backend. **No requieren que el backend haga nada**: ya
 | `GET /usuarios/{id}` | `users.py:27` | `F13` ficha del médico |
 | `GET /health` con comprobación de base | `A13` | `F8` aviso de "conectando…" |
 
-### 3.2 En camino — rama `feat/complete-crud` del backend
+### 3.2 En `develop`, pendientes de publicar
 
-Nueve endpoints nuevos en una rama **todavía sin mergear ni publicar**. Se anotan aquí para tener
-la UI pensada cuando salgan, pero **no se empieza hasta que estén en producción**.
+Nueve endpoints nuevos, ya mergeados en el backend pero **aún no publicados en producción**. Se
+anotan aquí para tener la UI pensada; no se empieza hasta que salga la release.
 
 | Endpoint nuevo | Qué permite en la UI |
 |----------------|----------------------|
@@ -100,9 +101,35 @@ la UI pensada cuando salgan, pero **no se empieza hasta que estén en producció
 Las tres refuerzan `F5`: si la UI sigue tragándose el `detail`, el usuario verá "no se pudo" en vez
 de "esta franja sostiene 3 citas futuras".
 
+### 3.3 Cambio de contrato: borrar un paciente ya no es reversible
+
+> **Esto no es una capacidad nueva: es un cambio de significado de algo que la UI ya usa.**
+> Es lo más urgente del catálogo y hay que resolverlo **antes o a la vez** que la release.
+
+`DELETE /pacientes/{id}` **ha cambiado de comportamiento** (regla R10):
+
+| | Antes (`v0.8.0`, lo que hay en producción) | Ahora (en `develop`) |
+|---|---|---|
+| Qué hace | Baja lógica: `activo = False` | **Borra los datos personales para siempre** |
+| ¿Se recupera? | Sí | **No. Es irreversible** |
+| Respuesta | `PatientOut` | `PatientErased`: `{ resultado, citas_conservadas }` |
+
+Con dos desenlaces, según el paciente tenga citas o no:
+
+- **Sin citas** → se elimina la fila entera. `resultado: "eliminado"`.
+- **Con citas** → se borran nombre, cédula, teléfono, fecha de nacimiento, edad, alergias y
+  antecedentes; el registro sale del listado y **las citas se conservan como visita sin
+  identificar**. `resultado: "anonimizado"`, con `citas_conservadas` diciendo cuántas.
+
+**`DELETE /usuarios/{id}` no cambia**: el personal sigue con baja lógica reversible
+(`PUT {"activo": true}`). Los dos botones se parecen y ahora hacen cosas radicalmente distintas.
+
+El problema para el frontend está en `F34`.
+
 ## 4. Plan priorizado del frontend
 
-**33 tareas**: 1 hecha, **25 que se pueden hacer hoy** y 7 que esperan al backend.
+**34 tareas**: 1 hecha, **1 urgente** (`F34`), 25 que se pueden hacer hoy y 7 que esperan al
+backend.
 
 El orden es una **propuesta**; lo que se hace de verdad es lo aprobado. Estados:
 
@@ -120,6 +147,7 @@ El orden es una **propuesta**; lo que se hace de verdad es lo aprobado. Estados:
 | Orden | ID | Tarea | Rama | Coste | Espera al backend | Estado |
 |:-----:|:--:|-------|------|:-----:|:-----------------:|:------:|
 | — | **F1** | Migración a inglés | `refactor/english-identifiers` | bajo | no | ✅ |
+| **0** | **F34** | **Corregir el aviso al borrar un paciente** | `fix/patient-erase-warning` | bajo | **coordinada** | ✔️ |
 | 1 | **F5** | Mensajes de error reales | `fix/api-error-messages` | bajo | no | ✔️ |
 | 2 | **F27** | Avisar cuando la sesión caduca | `fix/session-expired-notice` | bajo | no | ⬜ |
 | 3 | **F17** | Reintentar tras un error | `fix/error-retry` | bajo | no | ⬜ |
@@ -158,6 +186,32 @@ baratos que cambian cómo se siente la aplicación y cierran los huecos de sesi�
 hace usable de verdad, después funcionalidad nueva.
 
 ## 5. Bloque F — Fichas
+
+### 5.0 Urgente
+
+#### F34 · Corregir el aviso al borrar un paciente · bajo · **antes de la release**
+
+- **Hoy:** el modal de `PatientsPage.jsx:125-145` dice literalmente *"El paciente se dará de baja
+  (baja lógica, recuperable)"*, y el botón se llama "Eliminar".
+- **El problema:** con el cambio `R10` (§3.3) **ese texto es falso**. En cuanto se publique
+  `develop`, recepción borrará pacientes **de forma irreversible** creyendo que se pueden
+  recuperar. Son datos de salud y no hay copias de seguridad todavía (`A17`, §7.4).
+- **Por qué es lo primero:** no es una mejora, es **una advertencia equivocada delante de una
+  acción destructiva**. El resto del catálogo puede esperar; esto no.
+- **Qué haríamos:**
+  1. Reescribir el aviso: que diga que es **irreversible** y qué va a pasar exactamente — se
+     elimina el paciente, o se borran sus datos personales y **se conservan sus citas** como
+     visita sin identificar.
+  2. Endurecer la confirmación. Para algo irreversible no basta con un botón rojo: pedir que se
+     escriba el nombre del paciente, como hacen las herramientas que borran de verdad.
+  3. Usar la respuesta, que hoy se ignora: `PatientErased` trae `resultado` y
+     `citas_conservadas`. Decir "Paciente eliminado" o "Datos borrados; se conservan 4 citas como
+     registro anónimo" es información que el usuario necesita.
+  4. Distinguirlo de **Usuarios**, donde `DELETE` **sí** sigue siendo baja reversible. Dos botones
+     que se parecen y hacen cosas opuestas piden nombres distintos: "Eliminar definitivamente"
+     frente a "Desactivar".
+- **Coordinación:** hay que decidir con el backend si la release espera a este arreglo o si salen
+  juntos. Publicar el backend sin esto deja una trampa en producción.
 
 ### 5.1 La interfaz no dialoga con quien la usa
 
@@ -452,8 +506,10 @@ Cosas que el frontend debe respetar y que no se deducen leyendo solo este repo:
 - **Rango máximo de 60 días** en `GET /citas?desde=&hasta=`; si se supera, `422`.
 - **Los mensajes de error de la API vienen en español** a propósito: los lee el personal del
   centro. Se muestran tal cual, no se traducen.
-- **Baja lógica, no borrado.** `DELETE /pacientes/{id}` y `/usuarios/{id}` desactivan; el registro
-  es recuperable. La interfaz ya lo dice y debe seguir diciéndolo.
+- **Borrar y desactivar no son lo mismo, y cada uno va por su lado.**
+  `DELETE /usuarios/{id}` **desactiva**: es reversible con `PUT {"activo": true}`.
+  `DELETE /pacientes/{id}` **borra para siempre** desde `R10` (§3.3): no hay vuelta atrás. La
+  interfaz debe decir cada cosa por su nombre (`F34`).
 - **El médico solo ve su agenda**, y eso lo impone el servidor (`appointments.py:125-126`). La UI
   no debe depender de filtrar en el cliente para eso.
 
@@ -520,8 +576,9 @@ que existe un techo y que la suspensión es justo la que provoca 7.1.
 ## 9. Ya hecho — no rehacer
 
 - **F1 · Código en inglés** (5 commits): identificadores, props, nombres de archivo y tests.
-- **Baja de pacientes y usuarios:** `PatientsPage.jsx:125-145` con modal de confirmación y aviso de
-  baja lógica, y `UsersPage.jsx:82` para activar/desactivar, sobre `api.del` (`config/api.js:9`).
+- **Baja de pacientes y usuarios:** `PatientsPage.jsx:125-145` con modal de confirmación, y
+  `UsersPage.jsx:82` para activar/desactivar, sobre `api.del` (`config/api.js:9`).
+  ⚠️ El aviso del modal de pacientes **se quedó obsoleto** con `R10`: lo corrige `F34`.
 - **Filtro de servicios por especialidad:** consumido en `AppointmentFields.jsx:7-14`, con
   *fallback* si el backend no envía especialidades. (`F25` lo mueve al servidor.)
 - **Acciones sobre la cita:** cancelar, marcar asistencia y editar, en `AppointmentDetail.jsx`.
