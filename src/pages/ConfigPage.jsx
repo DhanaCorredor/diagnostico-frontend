@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api, ApiError } from '../config/api'
+import { api, errorMessage } from '../config/api'
 import Input from '../components/atoms/Input'
 import Button from '../components/atoms/Button'
 import Badge from '../components/atoms/Badge'
@@ -36,8 +36,8 @@ export default function ConfigPage() {
       ])
       setSpecialties(specialtyList)
       setServices(serviceList)
-    } catch {
-      setError('No se pudieron cargar los catálogos.')
+    } catch (err) {
+      setError(errorMessage(err, 'No se pudieron cargar los catálogos.'))
     }
   }
 
@@ -53,7 +53,7 @@ export default function ConfigPage() {
       setNewSpecialty('')
       load()
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'No se pudo crear la especialidad.')
+      setError(errorMessage(err, 'No se pudo crear la especialidad.'))
     }
   }
 
@@ -68,7 +68,7 @@ export default function ConfigPage() {
       setNewService({ nombre: '', categoria: 'CONSULTA' })
       load()
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'No se pudo crear el servicio.')
+      setError(errorMessage(err, 'No se pudo crear el servicio.'))
     }
   }
 
@@ -79,7 +79,7 @@ export default function ConfigPage() {
       setDeleting(null)
       load()
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'No se pudo eliminar el servicio.')
+      setError(errorMessage(err, 'No se pudo eliminar el servicio.'))
       setDeleting(null)
     } finally {
       setBusy(false)

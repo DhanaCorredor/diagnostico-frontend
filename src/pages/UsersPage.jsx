@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api } from '../config/api'
+import { api, errorMessage } from '../config/api'
 import UserForm from '../components/organisms/UserForm'
 import Badge from '../components/atoms/Badge'
 import Button from '../components/atoms/Button'
@@ -25,8 +25,8 @@ export default function UsersPage() {
       ])
       setUsers(userList)
       setSpecialties(specialtyList)
-    } catch {
-      setError('No se pudieron cargar los usuarios.')
+    } catch (err) {
+      setError(errorMessage(err, 'No se pudieron cargar los usuarios.'))
     } finally {
       setLoading(false)
     }
@@ -42,8 +42,8 @@ export default function UsersPage() {
       if (user.activo) await api.del(`/usuarios/${user.id}`)
       else await api.put(`/usuarios/${user.id}`, { activo: true })
       load()
-    } catch {
-      setActionError('No se pudo cambiar el estado del usuario.')
+    } catch (err) {
+      setActionError(errorMessage(err, 'No se pudo cambiar el estado del usuario.'))
     }
   }
 

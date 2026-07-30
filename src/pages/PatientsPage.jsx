@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { api, ApiError } from '../config/api'
+import { api, errorMessage } from '../config/api'
 import PatientForm from '../components/organisms/PatientForm'
 import Button from '../components/atoms/Button'
 import Alert from '../components/atoms/Alert'
@@ -44,8 +44,8 @@ export default function PatientsPage() {
     setError('')
     try {
       setPatients(await api.get('/pacientes'))
-    } catch {
-      setError('No se pudieron cargar los pacientes.')
+    } catch (err) {
+      setError(errorMessage(err, 'No se pudieron cargar los pacientes.'))
     } finally {
       setLoading(false)
     }
@@ -78,7 +78,7 @@ export default function PatientsPage() {
       setNotice(describeErasure(name, result))
       load()
     } catch (err) {
-      setDeleteError(err instanceof ApiError ? err.message : 'No se pudo eliminar el paciente.')
+      setDeleteError(errorMessage(err, 'No se pudo eliminar el paciente.'))
     } finally {
       setBusy(false)
     }

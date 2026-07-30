@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { api } from '../config/api'
+import { api, errorMessage } from '../config/api'
 import StatusBadge from '../components/molecules/StatusBadge'
 import PatientForm from '../components/organisms/PatientForm'
 import { formatShortDate, formatTime } from '../utils/date'
@@ -38,8 +38,8 @@ export default function PatientFilePage() {
       setAppointments(history)
       setDoctorNames(indexBy(doctorList, 'nombre_completo'))
       setServiceNames(indexBy(serviceList, 'nombre'))
-    } catch {
-      setError('No se pudo cargar la ficha del paciente.')
+    } catch (err) {
+      setError(errorMessage(err, 'No se pudo cargar la ficha del paciente.'))
     } finally {
       setLoading(false)
     }

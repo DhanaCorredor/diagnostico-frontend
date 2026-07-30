@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { api } from '../config/api'
+import { api, errorMessage } from '../config/api'
 import { useAuth } from '../auth/useAuth'
 import StatusBadge from '../components/molecules/StatusBadge'
 import AppointmentDetail from '../components/organisms/AppointmentDetail'
@@ -38,8 +38,8 @@ export default function PanelPage() {
       setDoctors(doctorList)
       setServices(serviceList)
       setPatientNames(indexBy(patientList, 'nombre_completo'))
-    } catch {
-      setError('No se pudieron cargar los datos del panel.')
+    } catch (err) {
+      setError(errorMessage(err, 'No se pudieron cargar los datos del panel.'))
     } finally {
       setLoading(false)
     }
