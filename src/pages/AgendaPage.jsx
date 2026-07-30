@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { api } from '../config/api'
+import { api, errorMessage } from '../config/api'
 import { useAuth } from '../auth/useAuth'
 import { weekday, longDateFromISO, formatTime, todayISO, addDays } from '../utils/date'
 import { indexBy } from '../utils/data'
@@ -64,8 +64,8 @@ export default function AgendaPage() {
       setServices(serviceList)
       setPatientNames(indexBy(patientList, 'nombre_completo'))
       setAvailabilityByDoctor(availabilityMap)
-    } catch {
-      setError('No se pudo cargar la agenda.')
+    } catch (err) {
+      setError(errorMessage(err, 'No se pudo cargar la agenda.'))
     } finally {
       setLoading(false)
     }

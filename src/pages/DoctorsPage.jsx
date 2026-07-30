@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { api } from '../config/api'
+import { api, errorMessage } from '../config/api'
 import Avatar from '../components/atoms/Avatar'
 import Badge from '../components/atoms/Badge'
 import Table from '../components/molecules/Table'
@@ -44,8 +44,8 @@ export default function DoctorsPage() {
         })
         setDoctors(doctorList)
         setAvailabilityByDoctor(availabilityMap)
-      } catch {
-        setError('No se pudieron cargar los médicos.')
+      } catch (err) {
+        setError(errorMessage(err, 'No se pudieron cargar los médicos.'))
       } finally {
         setLoading(false)
       }

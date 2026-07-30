@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from '../hooks/useForm'
 import AppointmentError from '../components/molecules/AppointmentError'
 import { useNavigate } from 'react-router-dom'
-import { api, ApiError } from '../config/api'
+import { api, ApiError, errorMessage } from '../config/api'
 import { todayISO } from '../utils/date'
 import Field from '../components/molecules/Field'
 import Input from '../components/atoms/Input'
@@ -38,8 +38,8 @@ export default function NewAppointmentPage() {
         ])
         setDoctors(doctorList)
         setServices(serviceList)
-      } catch {
-        setError({ message: 'No se pudieron cargar los médicos y servicios.' })
+      } catch (err) {
+        setError({ message: errorMessage(err, 'No se pudieron cargar los médicos y servicios.') })
       }
     }
     load()
