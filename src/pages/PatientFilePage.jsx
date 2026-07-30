@@ -20,6 +20,8 @@ export default function PatientFilePage() {
   const [doctorNames, setDoctorNames] = useState({})
   const [serviceNames, setServiceNames] = useState({})
   const [tab, setTab] = useState('datos')
+  const [historyFrom, setHistoryFrom] = useState('')
+  const [historyTo, setHistoryTo] = useState('')
   const [editing, setEditing] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -52,6 +54,13 @@ export default function PatientFilePage() {
   if (loading) return <Spinner />
   if (error) return <Alert>{error}</Alert>
   if (!patient) return null
+
+  const visibleAppointments = appointments.filter((appointment) => {
+    const day = appointment.starts_at.slice(0, 10)
+    if (historyFrom && day < historyFrom) return false
+    if (historyTo && day > historyTo) return false
+    return true
+  })
 
   return (
     <div>
@@ -132,8 +141,47 @@ export default function PatientFilePage() {
 
       {tab === 'citas' && (
         <Card>
+          {appointments.length > 0 && (
+            <div className="flex flex-wrap items-center gap-3 border-b border-line px-5 py-3 text-sm">
+              <label className="flex items-center gap-2">
+                <span className="text-ink-2">Desde</span>
+                <input
+                  type="date"
+                  value={historyFrom}
+                  onChange={(event) => setHistoryFrom(event.target.value)}
+                  className="rounded-lg border border-line px-2 py-1.5 outline-none focus:border-brand"
+                />
+              </label>
+              <label className="flex items-center gap-2">
+                <span className="text-ink-2">Hasta</span>
+                <input
+                  type="date"
+                  value={historyTo}
+                  onChange={(event) => setHistoryTo(event.target.value)}
+                  className="rounded-lg border border-line px-2 py-1.5 outline-none focus:border-brand"
+                />
+              </label>
+              {(historyFrom || historyTo) && (
+                <button
+                  onClick={() => {
+                    setHistoryFrom('')
+                    setHistoryTo('')
+                  }}
+                  className="text-brand hover:underline"
+                >
+                  Quitar filtro
+                </button>
+              )}
+              <span className="ml-auto text-xs text-ink-muted">
+                {visibleAppointments.length} de {appointments.length}
+              </span>
+            </div>
+          )}
+
           {appointments.length === 0 ? (
             <ListMessage>Este paciente no tiene citas registradas.</ListMessage>
+          ) : visibleAppointments.length === 0 ? (
+            <ListMessage>No hay citas en ese rango de fechas.</ListMessage>
           ) : (
             <table className="w-full text-sm">
               <thead className="text-left text-xs uppercase tracking-wide text-ink-muted">
@@ -145,7 +193,7 @@ export default function PatientFilePage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
-                {appointments.map((appointment) => (
+                {visibleAppointments.map((appointment) => (
                   <tr key={appointment.id} className="hover:bg-surface-plane">
                     <td className="tnum px-5 py-3">
                       {formatShortDate(appointment.starts_at)} · {formatTime(appointment.starts_at)}

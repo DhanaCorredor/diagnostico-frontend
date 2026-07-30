@@ -1,5 +1,17 @@
 import { describe, it, expect } from 'vitest'
-import { todayISO, formatTime, formatShortDate, addDays, weekday, longDateFromISO } from './date'
+import {
+  todayISO,
+  formatTime,
+  formatShortDate,
+  addDays,
+  weekday,
+  longDateFromISO,
+  startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+  daysBetween,
+} from './date'
 
 describe('todayISO', () => {
   it('returns today as YYYY-MM-DD', () => {
@@ -46,6 +58,55 @@ describe('weekday', () => {
     expect(weekday('2000-01-01')).toBe(6)
     expect(weekday('2000-01-02')).toBe(0)
     expect(weekday('2000-01-03')).toBe(1)
+  })
+})
+
+describe('startOfWeek and endOfWeek', () => {
+  it('treats Monday as the first day of the week', () => {
+    expect(startOfWeek('2026-07-29')).toBe('2026-07-27')
+    expect(endOfWeek('2026-07-29')).toBe('2026-08-02')
+  })
+
+  it('keeps Monday itself as the start', () => {
+    expect(startOfWeek('2026-07-27')).toBe('2026-07-27')
+  })
+
+  it('puts Sunday at the end of the week that just finished', () => {
+    expect(startOfWeek('2026-08-02')).toBe('2026-07-27')
+    expect(endOfWeek('2026-08-02')).toBe('2026-08-02')
+  })
+})
+
+describe('startOfMonth and endOfMonth', () => {
+  it('covers a 31-day month', () => {
+    expect(startOfMonth('2026-07-15')).toBe('2026-07-01')
+    expect(endOfMonth('2026-07-15')).toBe('2026-07-31')
+  })
+
+  it('covers a 30-day month', () => {
+    expect(endOfMonth('2026-04-10')).toBe('2026-04-30')
+  })
+
+  it('handles February in a leap year', () => {
+    expect(endOfMonth('2028-02-05')).toBe('2028-02-29')
+  })
+
+  it('handles February in a common year', () => {
+    expect(endOfMonth('2026-02-05')).toBe('2026-02-28')
+  })
+})
+
+describe('daysBetween', () => {
+  it('counts the days from one date to another', () => {
+    expect(daysBetween('2026-07-01', '2026-07-31')).toBe(30)
+  })
+
+  it('is zero for the same day', () => {
+    expect(daysBetween('2026-07-01', '2026-07-01')).toBe(0)
+  })
+
+  it('goes negative when the range is backwards', () => {
+    expect(daysBetween('2026-07-31', '2026-07-01')).toBe(-30)
   })
 })
 
