@@ -41,7 +41,7 @@ const NAV = [
 function linkClass({ isActive }) {
   const base = 'flex items-center gap-3 rounded-lg px-3 py-2 cursor-pointer'
   return isActive
-    ? `${base} bg-[#e8f2f0] font-semibold text-brand-dark`
+    ? `${base} bg-brand-light font-semibold text-brand-dark`
     : `${base} text-ink-2 hover:bg-surface-plane`
 }
 
@@ -56,7 +56,7 @@ export default function Sidebar({ open = false, onClose }) {
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-50 flex w-60 flex-col border-r border-line bg-white transition-transform duration-200 md:translate-x-0 ${
+      className={`fixed inset-y-0 left-0 z-50 flex w-60 flex-col border-r border-line bg-surface transition-transform duration-200 md:translate-x-0 ${
         open ? 'translate-x-0' : '-translate-x-full'
       }`}
     >

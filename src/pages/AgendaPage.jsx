@@ -366,7 +366,7 @@ function DoctorRow({
 }) {
   return (
     <>
-      <div className="sticky left-0 z-10 bg-white px-3 py-2 shadow-[1px_0_0_var(--color-line)]">
+      <div className="sticky left-0 z-10 bg-surface px-3 py-2 shadow-[1px_0_0_var(--color-line)]">
         <p className="text-xs font-medium">{doctor.nombre_completo}</p>
         <p className="text-[10px] text-ink-muted">{doctor.especialidades[0]?.nombre ?? 'General'}</p>
       </div>
@@ -376,7 +376,7 @@ function DoctorRow({
         return (
           <div
             key={hour}
-            className={`min-h-[46px] space-y-1 p-1 ${available ? 'bg-white' : 'bg-surface-plane'}`}
+            className={`min-h-[46px] space-y-1 p-1 ${available ? 'bg-surface' : 'bg-surface-plane'}`}
           >
             {hourAppointments.map((appointment) => (
               <button
