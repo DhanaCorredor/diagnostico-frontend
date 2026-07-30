@@ -53,6 +53,11 @@ backend.
 | **C4** | Recursos y salas | ⬜ | Bloquea el selector de recurso |
 | **C5** | WhatsApp · visitas · Holter · portal · Calendar · PWA | ⬜ | Coste alto, sin fecha |
 
+**En vuelo, sin mergear:** la rama `feat/complete-crud` completa el CRUD de disponibilidad,
+especialidades y servicios, y añade `GET /citas/{id}`. Detalle en §3.2. De paso reorganiza la
+documentación del backend (retira `ROADMAP.md` y funde `FLUJO-USUARIO.md` en el manual);
+`MEJORAS-Y-PROXIMOS-PASOS.md` se mantiene, así que los enlaces de este catálogo siguen valiendo.
+
 ## 3. Capacidades de la API que el frontend no usa
 
 ### 3.1 Publicadas y disponibles hoy
@@ -97,10 +102,25 @@ de "esta franja sostiene 3 citas futuras".
 
 ## 4. Plan priorizado del frontend
 
+**33 tareas**: 1 hecha, **25 que se pueden hacer hoy** y 7 que esperan al backend.
+
+El orden es una **propuesta**; lo que se hace de verdad es lo aprobado. Estados:
+
+| Símbolo | Significado |
+|:-------:|-------------|
+| ⬜ | **Propuesta** — la sugiere el análisis, falta decidir si entra |
+| ✔️ | **Aprobada** — decidida, pendiente de hacer |
+| 🔨 | **En curso** — hay una rama abierta |
+| ✅ | **Hecha** — mergeada en `develop` |
+| ✖️ | **Descartada** — se decidió que no, con su motivo en la ficha |
+
+> Para aprobar: marca ✔️ lo que quieras que se haga y ✖️ lo que no. Lo que quede en ⬜ no se
+> empieza. Así el documento distingue lo que **propone el análisis** de lo que **has decidido tú**.
+
 | Orden | ID | Tarea | Rama | Coste | Espera al backend | Estado |
 |:-----:|:--:|-------|------|:-----:|:-----------------:|:------:|
 | — | **F1** | Migración a inglés | `refactor/english-identifiers` | bajo | no | ✅ |
-| 1 | **F5** | Mensajes de error reales | `fix/api-error-messages` | bajo | no | ⬜ |
+| 1 | **F5** | Mensajes de error reales | `fix/api-error-messages` | bajo | no | ✔️ |
 | 2 | **F27** | Avisar cuando la sesión caduca | `fix/session-expired-notice` | bajo | no | ⬜ |
 | 3 | **F17** | Reintentar tras un error | `fix/error-retry` | bajo | no | ⬜ |
 | 4 | **F18** | Modales con teclado y foco | `fix/modal-keyboard` | bajo | no | ⬜ |
@@ -109,7 +129,7 @@ de "esta franja sostiene 3 citas futuras".
 | 7 | **F28** | Cabeceras de seguridad en Vercel | `chore/security-headers` | bajo | no | ⬜ |
 | 8 | **F26** | Cierre de sesión por inactividad | `feat/idle-logout` | bajo | no | ⬜ |
 | 9 | **F16** | Uso en móvil y tablet | `feat/responsive-layout` | medio | no | ⬜ |
-| 10 | **F2** | Pantalla de disponibilidad | `feat/availability-ui` | medio | no | ⬜ |
+| 10 | **F2** | Pantalla de disponibilidad | `feat/availability-ui` | medio | no | ✔️ |
 | 11 | **F11** | Ver las citas canceladas | `feat/cancelled-appointments` | bajo | no | ⬜ |
 | 12 | **F12** | Comprobante de cita imprimible | `feat/appointment-receipt` | bajo | no | ⬜ |
 | 13 | **F8** | Aviso de conexión con el servidor | `feat/connection-status` | bajo | no | ⬜ |
